@@ -3594,6 +3594,12 @@ requestAnimationFrame(frame);
 .acctpop .msg{color:#d0d0d0;margin:0 0 10px}
 .acctpop button{width:100%;padding:8px 0;margin-top:6px;background:transparent;color:#f5f5f5;border:1px solid #555;font-size:12px;cursor:pointer}
 .acctpop button.pri{background:#f5f5f5;color:#111;border-color:#f5f5f5;font-weight:700}
+.acctpop input{width:100%;box-sizing:border-box;margin-top:6px;padding:8px;background:#111;color:#f5f5f5;border:1px solid #444;font-size:14px;border-radius:0}
+.acctpop .or{color:#777;font-size:11px;text-align:center;margin:10px 0 2px}
+.acctpop .sm{font-size:11px;color:#bbb}
+.acctpop .er{color:#ff9b8a}
+.acctpop .lnk{display:flex;justify-content:space-between;margin-top:8px;font-size:11px}
+.acctpop .lnk a{color:#9ab8ff;cursor:pointer;text-decoration:underline}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -3612,7 +3618,7 @@ const FIREBASE_CONFIG={
   const btn=document.createElement('button');btn.className='acctbtn';btn.type='button';btn.textContent='로그인';
   const pop=document.createElement('div');pop.className='acctpop';pop.hidden=true;
   lobby.appendChild(btn);lobby.appendChild(pop);
-  btn.onclick=e=>{e.stopPropagation();if(!user&&ready&&!inApp){doLogin();return}pop.hidden=!pop.hidden;if(!pop.hidden)renderPop()};
+  btn.onclick=e=>{e.stopPropagation();pop.hidden=!pop.hidden;if(!pop.hidden)renderPop()};
   pop.onclick=e=>e.stopPropagation();
   document.addEventListener('click',()=>{pop.hidden=true});
   const ua=navigator.userAgent||'',isIOS=/iPhone|iPad|iPod/.test(ua),isAnd=/Android/.test(ua);
@@ -3621,32 +3627,59 @@ const FIREBASE_CONFIG={
   const configured=!/YOUR_/.test(FIREBASE_CONFIG.apiKey);
   let user=null,timer=0,status='',err='',ready=false,auth=null,db=null;
   function renderBtn(){
-    if(user){btn.classList.add('on');btn.innerHTML=(user.photoURL?`<img src="${user.photoURL}" referrerpolicy="no-referrer" alt="">`:'')+'<span></span>';btn.querySelector('span').textContent=(user.displayName||user.email||'내 계정').split(' ')[0]}
+    if(user){btn.classList.add('on');btn.innerHTML=(user.photoURL?`<img src="${user.photoURL}" referrerpolicy="no-referrer" alt="">`:'')+'<span></span>';btn.querySelector('span').textContent=(user.displayName?user.displayName.split(' ')[0]:(user.email||'내 계정').split('@')[0])}
     else{btn.classList.remove('on');btn.textContent='로그인'}
   }
+  let mode='in',em='',busy=false;
   function renderPop(){
     let h='';
     if(user){h=`<div class="nm"></div><div class="st"></div><button class="out">로그아웃</button>`}
     else if(!configured||!window.firebase){h=`<div class="msg">로그인 준비가 안 됐어요. (Firebase 설정 필요)</div>`}
-    else if(inApp){h=`<div class="msg">지금 앱 안의 브라우저로 열려 있어서 구글이 로그인을 막아요.<br>${isAnd?'<b>Chrome</b>이나 <b>Safari</b>로':'<b>Safari</b>로'} 열어 주세요.${isIOS?'<br><span style="color:#8c8c8c">오른쪽 아래 ⋯ 또는 공유 버튼 → "Safari로 열기"</span>':''}</div>${isAnd?'<button class="pri chrome">Chrome으로 열기</button>':''}<button class="copy">주소 복사</button>`}
-    else{h=`${err?`<div class="msg">${err}</div>`:''}<button class="pri go">Google로 로그인</button>`}
+    else{
+      h+=err?`<div class="msg er"></div>`:'';
+      if(inApp)h+=`<div class="msg sm">앱 안 브라우저에서는 구글 로그인이 막혀 있어요. 아래 <b>이메일</b>로 로그인하거나 Safari${isAnd?'·Chrome':''}에서 열어 주세요.</div>`;
+      else h+=`<button class="pri go">Google로 로그인</button><div class="or">또는 이메일</div>`;
+      h+=`<input class="em" type="email" placeholder="이메일" autocomplete="email" autocapitalize="off"><input class="pw" type="password" placeholder="비밀번호 (6자 이상)" autocomplete="${mode==='up'?'new-password':'current-password'}"><button class="${inApp?'pri ':''}eml">${busy?'잠시만요…':mode==='up'?'회원가입':'이메일로 로그인'}</button><div class="lnk"><a class="sw">${mode==='up'?'이미 계정이 있어요 · 로그인':'처음이에요 · 회원가입'}</a><a class="fg">비밀번호 찾기</a></div>`;
+      if(inApp)h+=`<button class="copy">주소 복사 (Safari에서 열기)</button>`;
+    }
     pop.innerHTML=h;
-    if(user){pop.querySelector('.nm').textContent=user.displayName||user.email||'Google 계정';pop.querySelector('.st').textContent=status||'진행 상황이 계정에 저장돼요';pop.querySelector('.out').onclick=()=>{auth.signOut();pop.hidden=true}}
-    const go=pop.querySelector('.go');if(go)go.onclick=doLogin;
-    const cp=pop.querySelector('.copy');if(cp)cp.onclick=()=>{const u=location.href;(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>{cp.textContent='복사됐어요! Safari에 붙여 넣으세요'},()=>{prompt('이 주소를 복사하세요',u)})};
-    const ch=pop.querySelector('.chrome');if(ch)ch.onclick=()=>{location.href='intent://'+location.href.replace(/^https?:\/\//,'')+'#Intent;scheme=https;package=com.android.chrome;end'};
+    if(user){pop.querySelector('.nm').textContent=user.displayName||user.email||'내 계정';pop.querySelector('.st').textContent=status||'진행 상황이 계정에 저장돼요';pop.querySelector('.out').onclick=()=>{auth.signOut();pop.hidden=true};return}
+    const q=c=>pop.querySelector(c);
+    if(q('.er'))q('.er').textContent=err;
+    const go=q('.go');if(go)go.onclick=doLogin;
+    const ei=q('.em'),pi=q('.pw');
+    if(ei){ei.value=em;[ei,pi].forEach(i=>{i.addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter')emailGo()});i.addEventListener('keyup',e=>e.stopPropagation());i.addEventListener('input',()=>{em=ei.value})});
+      q('.eml').onclick=emailGo;
+      q('.sw').onclick=()=>{mode=mode==='up'?'in':'up';err='';renderPop()};
+      q('.fg').onclick=()=>{em=ei.value.trim();if(!em){err='비밀번호를 찾을 이메일을 먼저 적어 주세요.';renderPop();return}auth.sendPasswordResetEmail(em).then(()=>{err='비밀번호 재설정 메일을 보냈어요. 메일함(스팸함 포함)을 확인해 주세요.';renderPop()},e=>{err=ERR[e.code]||('실패 ('+e.code+')');renderPop()})}}
+    const cp=q('.copy');if(cp)cp.onclick=()=>{const u=location.href;(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>{cp.textContent='복사됐어요! Safari에 붙여 넣으세요'},()=>{prompt('이 주소를 복사하세요',u)})};
+  }
+  function emailGo(){
+    if(busy)return;const e1=pop.querySelector('.em').value.trim(),p1=pop.querySelector('.pw').value;em=e1;
+    if(!e1||!p1){err='이메일과 비밀번호를 모두 적어 주세요.';renderPop();return}
+    busy=true;err='';renderPop();
+    (mode==='up'?auth.createUserWithEmailAndPassword(e1,p1):auth.signInWithEmailAndPassword(e1,p1))
+      .then(()=>{busy=false;pop.hidden=true},x=>{busy=false;err=ERR[x.code]||('실패 ('+x.code+')');renderPop()});
   }
   function showErr(m){err=m;user=null;renderBtn();pop.hidden=false;renderPop()}
   const ERR={
-    'auth/popup-closed-by-user':'로그인 창이 닫혔어요. 다시 눌러 주세요. 계속 닫히면 팝업 차단을 꺼 주세요.',
+    'auth/popup-closed-by-user':'로그인 창이 닫혔어요. 다시 눌러 주세요. 계속 닫히면 팝업 차단을 끄거나 이메일로 로그인해 주세요.',
     'auth/cancelled-popup-request':'로그인 창이 닫혔어요. 다시 눌러 주세요.',
     'auth/unauthorized-domain':'이 주소가 Firebase에 등록되지 않았어요. 승인된 도메인에 "'+location.hostname+'"을 추가해 주세요.',
-    'auth/operation-not-allowed':'Firebase에서 Google 로그인이 꺼져 있어요. Authentication → 로그인 방법에서 Google을 켜 주세요.',
+    'auth/operation-not-allowed':'Firebase에서 이 로그인 방법이 꺼져 있어요. Authentication → 로그인 방법에서 켜 주세요.',
     'auth/network-request-failed':'인터넷 연결을 확인해 주세요.',
-    'auth/web-storage-unsupported':'브라우저 저장소가 막혀 있어요. 개인정보 보호(비공개) 모드를 끄고 다시 해 주세요.'
+    'auth/web-storage-unsupported':'브라우저 저장소가 막혀 있어요. 개인정보 보호(비공개) 모드를 끄고 다시 해 주세요.',
+    'auth/invalid-email':'이메일 형식이 올바르지 않아요.',
+    'auth/missing-password':'비밀번호를 적어 주세요.',
+    'auth/weak-password':'비밀번호는 6자 이상이어야 해요.',
+    'auth/email-already-in-use':'이미 가입된 이메일이에요. 로그인으로 바꿔서 해 주세요.',
+    'auth/invalid-credential':'이메일 또는 비밀번호가 맞지 않아요. 처음이면 회원가입을 눌러 주세요.',
+    'auth/invalid-login-credentials':'이메일 또는 비밀번호가 맞지 않아요. 처음이면 회원가입을 눌러 주세요.',
+    'auth/wrong-password':'비밀번호가 맞지 않아요.',
+    'auth/user-not-found':'가입되지 않은 이메일이에요. 회원가입을 눌러 주세요.',
+    'auth/too-many-requests':'시도가 너무 많아요. 잠시 뒤에 다시 해 주세요.'
   };
   function doLogin(){
-    if(inApp){pop.hidden=false;renderPop();return}
     err='';const pv=new firebase.auth.GoogleAuthProvider();pv.setCustomParameters({prompt:'select_account'});
     auth.signInWithPopup(pv).catch(e=>{
       if(e.code==='auth/popup-blocked'||e.code==='auth/operation-not-supported-in-this-environment'){auth.signInWithRedirect(pv).catch(x=>showErr(ERR[x.code]||('로그인 실패: '+x.code)));return}
