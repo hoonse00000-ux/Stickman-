@@ -85,6 +85,10 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .act button small{font-size:8.5px;margin-top:3px;color:var(--dim);font-family:var(--f-mono)}
 .act button.down{opacity:.85;box-shadow:0 0 14px var(--glow)}
 .act button{position:relative}
+.act button.soulg{opacity:1;border-color:#dffff5;color:#dffff5;animation:soulg .55s ease-in-out infinite alternate}
+#keys span.soulg{color:#dffff5;animation:soulgt .55s ease-in-out infinite alternate}#keys span.soulg kbd{border-color:#dffff5;color:#dffff5;box-shadow:0 0 10px rgba(80,255,210,.9)}
+@keyframes soulg{from{box-shadow:0 0 8px rgba(80,255,210,.45),inset 0 0 6px rgba(80,255,210,.2)}to{box-shadow:0 0 24px rgba(80,255,210,1),inset 0 0 14px rgba(80,255,210,.45)}}
+@keyframes soulgt{from{text-shadow:0 0 4px rgba(80,255,210,.5)}to{text-shadow:0 0 12px rgba(80,255,210,1)}}
 .act button.hint{opacity:.95;border-color:var(--ink);box-shadow:0 0 18px rgba(255,255,255,.7),inset 0 0 10px rgba(255,255,255,.25)}
 .act button.hint::after{content:attr(data-hint);position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);font-family:var(--f-mono);font-size:9px;letter-spacing:.04em;white-space:nowrap;color:var(--ink);background:rgba(0,0,0,.75);padding:1px 5px;border:1px solid rgba(255,255,255,.45);pointer-events:none}
 .act [data-c="punch"]{grid-area:s1;--s:clamp(62px,18vw,80px);border-width:2px;font-size:21px;opacity:.55}
@@ -1889,7 +1893,7 @@ function collectSouls(){const V=vaultSrc(),got=G.souls.filter(o=>Math.abs(o.x-p.
   G.souls=G.souls.filter(o=>!got.includes(o));saveVault();ringFx(p.x,p.h+.6,.6,3);sfx('dodge');p.soulGlow=.5;
   texts.push({x:p.x,y:p.h+1.5,txt:(boss?'BOSS SOUL':mid?'ELITE SOUL':'SOUL')+' +'+n,big:true,life:1,max:1});if(G.tutorial)tutEv('collect');return true}
 function updSouls(dt){if(!G.souls||!G.souls.length)return;for(const o of G.souls){o.t+=dt;o.life-=dt}G.souls=G.souls.filter(o=>o.life>0)}
-function drawSouls(c,X,Yh){if(G.cls!=='necro'||!G.souls||!G.souls.length)return;const near=soulNear(),T=G.T;
+function drawSouls(c,X,Yh){if(G.cls!=='necro'||!G.souls||!G.souls.length)return;const T=G.T;
   for(const o of G.souls){const blink=o.life<4?(.45+.55*Math.abs(Math.sin(T*8))):1,sp=Math.min(1,o.t*3),r=(o.boss?.17:o.mid?.125:.095)*(o.n>1?1.15:1)*sp,bob=Math.sin(T*2.4+o.ph)*.09,x=X(o.x+Math.sin(T*1.3+o.ph)*.05),y=Yh(o.h+bob),R=r*U;
     c.save();c.globalAlpha=blink;
     const gr=c.createRadialGradient(x,y,0,x,y,R*2.6);gr.addColorStop(0,'rgba(170,255,230,.55)');gr.addColorStop(1,'rgba(80,255,210,0)');c.fillStyle=gr;c.beginPath();c.arc(x,y,R*2.6,0,Math.PI*2);c.fill();
@@ -1897,7 +1901,6 @@ function drawSouls(c,X,Yh){if(G.cls!=='necro'||!G.souls||!G.souls.length)return;
     const sw=Math.sin(T*5+o.ph)*R*.45;c.arc(x,y,R,0,Math.PI);c.quadraticCurveTo(x-R*1.05,y-R*1.1,x+sw,y-R*2.5);c.quadraticCurveTo(x+R*1.05,y-R*1.1,x+R,y);c.closePath();c.fill();
     c.shadowBlur=0;c.fillStyle='rgba(10,40,34,.85)';c.beginPath();c.arc(x-R*.32,y-R*.1,R*.14,0,Math.PI*2);c.arc(x+R*.32,y-R*.1,R*.14,0,Math.PI*2);c.fill();
     if(o.n>1){c.fillStyle='#dffff5';c.font=`700 ${Math.round(U*.1+6)}px ${FONT.mono}`;c.textAlign='center';c.fillText('×2',x+R*1.6,y-R*1.2)}
-    if(o===near){const lb=('ontouchstart' in window)?'소환 버튼':km('2');c.globalAlpha=.75+.25*Math.sin(T*6);c.fillStyle='#dffff5';c.shadowColor='rgba(80,255,210,.9)';c.shadowBlur=8;c.font=`700 ${Math.round(U*.11+6)}px ${FONT.mono}`;c.textAlign='center';c.textBaseline='middle';c.fillText(`[${lb}] 수집`,x,y-R*2.6-U*.42)}
     c.restore()}}
 function raiseSoul(kind,o){o=o||{};if(G.tutorial)tutEv('raise');const t=TY[kind],x=p.x+p.face*(o.dx!=null?o.dx:.7+.25*t.size),d=t.dmg||{},base=d.punch||d.kick||d.spin||d.stomp||d.throw||8,gh=Math.max(0,floorAt(x,.1,p.h+.5));
   allies.push({kind,undead:true,boss:!!t.boss,x,h:gh>-50?gh:p.h,vh:0,vx:0,gnd:true,face:p.face,size:t.size,state:'ultcast',st:0,dur:1,w:.3,phase:0,life:o.life||25,cd:.4,seed:rnd(0,9),hitDone:false,dmg:Math.round(base*(t.boss?.75:.9)),spd:Math.max(1.3,t.spd||1.4),rise:t.boss?1.3:.9,riseMax:t.boss?1.3:.9});crack(x,gh>-50?gh:p.h,.5+.35*t.size);sfx('rumble');
@@ -3293,6 +3296,7 @@ function comboHint(a){
 let hintCache={};
 function updHud(){
   if(!document.body.classList.contains('desk'))for(const a of['punch','kick','jump']){const h=comboHint(a);if(hintCache[a]!==h){hintCache[a]=h;const b=document.querySelector(`.act [data-c="${a}"]`);if(b){b.classList.toggle('hint',!!h);b.dataset.hint=h}}}
+  {const sn=G.cls==='necro'&&kitMode()&&p.state!=='dead'&&!!soulNear();if(hud.soulN!==sn){hud.soulN=sn;const b=document.querySelector('.act [data-c="kick"]');if(b)b.classList.toggle('soulg',sn);const k=document.querySelector('#keys [data-a="kick"]');if(k)k.classList.toggle('soulg',sn)}}
   setTxt('rtag','R'+G.round);setTxt('wv',String(G.wave+1));setTxt('ko','KO '+G.ko);setTxt('expv','EXP '+EXP.toLocaleString());{const ug=(p.ultG||0);$('#ultb').style.width=ug+'%';$('#ultbar').classList.toggle('full',ug>=100);const ub=document.querySelector('.act [data-c="ult"]');if(ub){ub.style.setProperty('--ug',(ug/100).toFixed(3));ub.classList.toggle('ready',ug>=100)}const kl=document.querySelector('#keys [data-a="ult"]');if(kl)kl.classList.toggle('cool',ug<100)}setTxt('dm',Math.floor(G.maxX*2.4)+'m');
   $('#hpb').style.width=(p.hp/p.maxHp*100)+'%';$('#hpbar').classList.toggle('low',p.hp<p.maxHp*.25);$('#stb').style.width=p.sta+'%';
   document.querySelector('.act [data-c="roll"]').style.setProperty('--st',clamp(p.sta/100,0,1));
