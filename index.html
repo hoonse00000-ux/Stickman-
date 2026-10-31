@@ -905,6 +905,19 @@ function nz(dur,o){if(!AC||mute)return;graph();o=o||{};const t=AC.currentTime+(o
 function osc(dur,o){if(!AC||mute)return;graph();o=o||{};const t=AC.currentTime+(o.delay||0),v=AC.createOscillator(),g=AC.createGain();
   v.type=o.type||'sine';v.frequency.setValueAtTime(o.f0||100,t);if(o.f1)v.frequency.exponentialRampToValueAtTime(o.f1,t+dur);
   env(g,t,o.vol||.4,o.att||.002,dur);v.connect(g);out(g,o.wet);v.start(t);v.stop(t+dur+.05)}
+let _dist=null;function distCurve(){if(_dist)return _dist;const n=1024,c=new Float32Array(n),k=38;for(let i=0;i<n;i++){const x=i*2/n-1;c[i]=(1+k)*x/(1+k*Math.abs(x))}return _dist=c}
+function eGuitar(o){if(!AC||mute)return;graph();o=o||{};const t=AC.currentTime+(o.delay||0),R=[82.4,98,110,123.5,146.8,164.8],f=o.f||R[Math.floor(Math.random()*R.length)]*(Math.random()<.5?2:1),dur=o.dur||.55;
+  const sh=AC.createWaveShaper();sh.curve=distCurve();sh.oversample='2x';const pre=AC.createGain();pre.gain.value=1.6;const lp=AC.createBiquadFilter();lp.type='lowpass';lp.Q.value=1.2;lp.frequency.setValueAtTime(3600,t);lp.frequency.exponentialRampToValueAtTime(900,t+dur);
+  const cab=AC.createBiquadFilter();cab.type='peaking';cab.frequency.value=1800;cab.gain.value=5;cab.Q.value=.9;const g=AC.createGain();env(g,t,o.vol||.16,.004,dur);
+  pre.connect(sh);sh.connect(lp);lp.connect(cab);cab.connect(g);out(g,.22);
+  for(const [m,dt,ty] of [[1,0,'sawtooth'],[1.004,0,'sawtooth'],[1.498,0,'square'],[2,0,'sawtooth']]){const v=AC.createOscillator(),vg=AC.createGain();v.type=ty;v.frequency.setValueAtTime(f*m*1.01,t);v.frequency.exponentialRampToValueAtTime(f*m,t+.03);vg.gain.value=ty==='square'?.18:.28;v.connect(vg);vg.connect(pre);v.start(t);v.stop(t+dur+.05)}
+  const pk=AC.createBufferSource(),pf=AC.createBiquadFilter(),pg2=AC.createGain();pk.buffer=NB;pf.type='bandpass';pf.frequency.value=2600;pf.Q.value=1.5;env(pg2,t,.18,.001,.03);pk.connect(pf);pf.connect(pg2);pg2.connect(pre);pk.start(t,Math.random());pk.stop(t+.06)}
+function fluteTone(o){if(!AC||mute)return;graph();o=o||{};const t=AC.currentTime+(o.delay||0),N=[587,659,784,880,988,1175],f=o.f||N[Math.floor(Math.random()*N.length)],dur=o.dur||.42;
+  const g=AC.createGain();g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(o.vol||.13,t+.06);g.gain.setValueAtTime(o.vol||.13,t+dur*.6);g.gain.exponentialRampToValueAtTime(.0001,t+dur);out(g,.35);
+  const lfo=AC.createOscillator(),lg=AC.createGain();lfo.frequency.value=5.2;lg.gain.value=f*.012;lfo.connect(lg);
+  for(const [m,ty,vv] of [[1,'sine',.8],[2,'sine',.12],[3,'triangle',.05]]){const v=AC.createOscillator(),vg=AC.createGain();v.type=ty;v.frequency.setValueAtTime(f*m*.985,t);v.frequency.exponentialRampToValueAtTime(f*m,t+.07);lg.connect(v.frequency);vg.gain.value=vv;v.connect(vg);vg.connect(g);v.start(t);v.stop(t+dur+.05)}
+  lfo.start(t);lfo.stop(t+dur+.05);
+  const b=AC.createBufferSource(),bf=AC.createBiquadFilter(),bg=AC.createGain();b.buffer=NB;bf.type='bandpass';bf.frequency.value=f*2.2;bf.Q.value=2.5;bg.gain.setValueAtTime(.0001,t);bg.gain.exponentialRampToValueAtTime(.05,t+.03);bg.gain.exponentialRampToValueAtTime(.008,t+.15);bg.gain.exponentialRampToValueAtTime(.0001,t+dur);b.connect(bf);bf.connect(bg);out(bg,.2);b.start(t,Math.random());b.stop(t+dur+.05)}
 function clang(fs,dur,vol,wet){fs.forEach((f,i)=>osc(dur*(1-i*.15),{type:i?'sine':'triangle',f0:f,f1:f*.985,vol:vol/(1+i*.6),wet}))}
 const SFX={
   swing:()=>nz(.17,{type:'bandpass',f0:450,f1:2600,q:1.3,vol:.2,att:.06}),
@@ -923,7 +936,7 @@ const SFX={
   parry:()=>{clang([1250,1880,2900,3700],.7,.28,.35);nz(.03,{type:'highpass',f0:4000,vol:.35})},
   dodge:()=>nz(.2,{type:'bandpass',f0:1400,f1:3600,q:1.1,vol:.15,att:.04}),
   zap:()=>{nz(.09,{type:'highpass',f0:3000,vol:.32});nz(.16,{type:'bandpass',f0:5200,f1:1800,q:3,vol:.22,delay:.02});osc(.12,{type:'square',f0:1800,f1:300,vol:.04})},
-  note:()=>{const ns=[523,587,659,784,880,1046];osc(.32,{type:'triangle',f0:ns[Math.floor(Math.random()*ns.length)],vol:.12,att:.01,wet:.3})},
+  note:()=>{if(G.cls==='bard'){if(heroSkinOn(p)==='bard')fluteTone();else eGuitar();return}const ns=[523,587,659,784,880,1046];osc(.32,{type:'triangle',f0:ns[Math.floor(Math.random()*ns.length)],vol:.12,att:.01,wet:.3})},
   ice:()=>{clang([2600,3900,5200],.45,.08,.3);nz(.08,{type:'highpass',f0:5000,vol:.18})},
   howl:()=>{osc(.9,{type:'sawtooth',f0:260,f1:520,vol:.06,att:.2,wet:.4});osc(.9,{type:'triangle',f0:390,f1:700,vol:.08,att:.25,wet:.4})},
   wave:()=>{clang([660,990],.6,.12,.35);clang([880,1320],.7,.11,.35)},
