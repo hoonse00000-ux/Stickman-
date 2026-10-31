@@ -22,7 +22,8 @@
 *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 html{height:100%;box-sizing:border-box}
 html,body{background:var(--bg);color:var(--ink)}
-html,body{touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+*{touch-action:manipulation}
+html,body{overscroll-behavior:none;touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 body{height:100%;overflow:hidden;overscroll-behavior:none;font-family:var(--f-body);font-size:14px;line-height:1.5}
 .app{height:100%;max-width:1200px;margin:0 auto;padding-block:8px 10px;box-sizing:border-box;
   padding-left:max(10px,env(safe-area-inset-left,0px));padding-right:max(10px,env(safe-area-inset-right,0px));
@@ -3584,6 +3585,12 @@ function onlineEnd(win,msg){const O=G.online;if(!O||O.over)return;O.over=true;if
   $('#bLob').onclick=toLobby;$('#bLob').focus();try{window.ZMNET&&ZMNET.end()}catch(_){}}
 function onlineMenu(){if(!G.online||G.online.over)return;ov.hidden=false;card.innerHTML=`<h1>ONLINE</h1><p>온라인 대전 중에는 게임이 멈추지 않아요.</p><div class="row"><button class="btn" id="bRes">계속하기</button><button class="btn ghost" id="bGG">항복하고 나가기</button></div>`;$('#bRes').onclick=()=>{ov.hidden=true};$('#bGG').onclick=()=>{onlineEnd(false,'항복했어요')}}
 function setDev(on){DEV.on=!!on;G.adminOK=DEV.on;const ab=$('#adminBtn');if(ab)ab.hidden=!DEV.on;if(!DEV.on){$('#admPanel').hidden=true;$('#admCode').hidden=true}try{showBest()}catch(_){}try{if(!$('#shopBack').hidden)buildShop()}catch(_){}}
+/* block double-tap / pinch zoom (iOS Safari & Chrome ignore user-scalable=no) */
+{let lastT=0;const typing=t=>t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.isContentEditable);
+  document.addEventListener('touchend',e=>{const now=e.timeStamp||performance.now();if(now-lastT<350&&!typing(e.target)&&e.cancelable)e.preventDefault();lastT=now},{passive:false});
+  document.addEventListener('dblclick',e=>{if(!typing(e.target))e.preventDefault()},{passive:false});
+  for(const ev of['gesturestart','gesturechange','gestureend'])document.addEventListener(ev,e=>e.preventDefault(),{passive:false});
+  document.addEventListener('touchmove',e=>{if(e.touches&&e.touches.length>1&&e.cancelable)e.preventDefault()},{passive:false})}
 window.ZMG={setDev,startOnline,netState,netEvent,inLobby:()=>G.mode==='lobby',playing:()=>!!G.online,owned:()=>CLSK.filter(k=>k==='base'||ownC(k)),clsName:k=>CLS[k]?CLS[k].name:k,curCls:()=>SHOP.cls||'base',skinOn:k=>!!(SHOP.skinOn[k]&&ownS(k))};
 /* ---------- time attack ---------- */
 function fmtT(t){t=Math.max(0,t||0);const m=Math.floor(t/60),s2=t-m*60;return m+':'+(s2<10?'0':'')+s2.toFixed(2)}
