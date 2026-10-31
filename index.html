@@ -2803,7 +2803,7 @@ let shopI=0,shopDrag=null;const LOCKSVG='<svg viewBox="0 0 24 24" aria-hidden="t
 let shopPv=null;
 function openShop(){shopPv=null;shopI=Math.max(0,CLSK.indexOf(G.cls));$('#shopBack').hidden=false;buildShop()}
 function closeShop(){shopPv=null;$('#shopBack').hidden=true;showBest()}
-function buildShop(){const tr=$('#sTrack');tr.innerHTML=CLSK.map((k,i)=>{const c=CLS[k],own=SHOP.owned.includes(k);return`<div class="scard${own?' own':''}" data-i="${i}"><canvas data-k="${k}"></canvas><b>${own?c.name:'???'}</b><small>${own?(G.cls===k?'사용 중':'보유'):LOCKSVG+'잠김'}</small></div>`}).join('');
+function buildShop(){const tr=$('#sTrack');tr.innerHTML=CLSK.map((k,i)=>{const c=CLS[k],own=SHOP.owned.includes(k);return`<div class="scard${own?' own':''}" data-i="${i}"><canvas data-k="${k}"></canvas><b>${own?c.name:'???'}</b><small>${own?(G.cls===k?'사용 중':'보유'):LOCKSVG+(c.price||0).toLocaleString()+' EXP'}</small></div>`}).join('');
   tr.querySelectorAll('.scard').forEach(el=>el.addEventListener('click',()=>{if(shopDrag&&shopDrag.moved)return;const i=+el.dataset.i;if(i!==shopI){shopI=i;layoutShop()}}));layoutShop()}
 function layoutShop(dx){const st=$('#sStage').getBoundingClientRect(),cw=Math.max(110,Math.min(230,st.width*.3,(st.height*.94-46)/1.05));$('#sTrack').style.setProperty('--cw',cw+'px');
   $('#sTrack').querySelectorAll('.scard').forEach(el=>{const i=+el.dataset.i,off=i-shopI+(dx||0)/(cw*.95),ao=Math.abs(off),sc=ao<1?lerp(1,.76,ao):ao<2?lerp(.76,.6,ao-1):.6,bl=ao<1?ao*2:2+(ao-1)*1.5,op=ao<1?lerp(1,.5,ao):ao<2?lerp(.5,.28,ao-1):Math.max(0,.28-(ao-2)*.3);
@@ -2818,7 +2818,7 @@ function shopInfo(){const k=CLSK[shopI],c=CLS[k],own=SHOP.owned.includes(k),sel=
     ${c.vars&&own?`<div class="vars">${c.vars.map(([id,nm])=>`<button data-v="${id}" class="${id===v?'on':''}">${nm}</button>`).join('')}</div>`:''}</div>
   <div class="scol"><div class="sbox"><div class="sbt">필살기<b>${c.ult.en}</b><span>PC R · 모바일 ★</span></div><p>${c.ult.desc}</p><p style="font-size:11.5px">공격하거나 맞으면 ULT 게이지가 차요. 가득 차면 발동할 수 있어요.</p></div>
     <div class="sbox"><div class="sbt">고유 스킨<b>${sk.name}</b>${skOwn?'<span>보유</span>':(own?'<span>잠김 · 미리보기 가능</span>':'')}</div><p>${sk.desc}</p>${sbtn}${pvb}</div></div></div>`;
-  if(!own)$('#sInfo').innerHTML=`<div class="shd"><h3>???<span>LOCKED</span></h3>${btn}</div><div class="sgrid"><div class="scol"><p class="sdesc" style="color:var(--dim)">아직 잠겨 있는 캐릭터예요. 구매하면 모습과 무기, 전용 기술, 필살기, 고유 스킨이 공개돼요.</p></div></div>`;
+  if(!own)$('#sInfo').innerHTML=`<div class="shd"><h3>???<span>LOCKED</span><span>가격 · ${(c.price||0).toLocaleString()} EXP</span></h3>${btn}</div><div class="sgrid"><div class="scol"><p class="sdesc" style="color:var(--dim)">아직 잠겨 있는 캐릭터예요. 구매하면 모습과 무기, 전용 기술, 필살기, 고유 스킨이 공개돼요.</p></div></div>`;
   const pv=$('#sPvSkin');if(pv)pv.onclick=()=>{shopPv=shopPv===k?null:k;buildShop()};
   const act=$('#sAct');if(act)act.onclick=()=>{if(!own){if(!prevOk)return;SHOP.owned.push(k);sfx('wave')}SHOP.cls=k;G.cls=k;saveShop();buildShop()};
   const sb2=$('#sSkin');if(sb2)sb2.onclick=()=>{if(!skOwn){SHOP.skins.push(k);SHOP.skinOn[k]=true;sfx('wave')}else SHOP.skinOn[k]=!skOn;saveShop();buildShop()};
@@ -2848,11 +2848,11 @@ function openChar(){charPv=null;charSel=SHOP.cls||'base';$('#charBack').hidden=f
 function closeChar(){charPv=null;$('#charBack').hidden=true;showBest()}
 function progTxt(k){const g=getProg(k),m=Math.max(g.max||0,g.idx||0);return m>0?`최고 R${Math.floor(m/5)+1}-${m%5+1}`:'기록 없음'}
 function buildChar(){const cur=SHOP.cls||'base';$('#charCur').textContent=CLS[cur].name;
-  $('#charGrid').innerHTML=CLSK.map(k=>{const own=SHOP.owned.includes(k);return`<button class="ctile${k===charSel?' sel':''}${k===cur?' cur':''}${own?'':' lock'}" data-k="${k}"><canvas data-k="${k}"></canvas><b>${own?CLS[k].name:'???'}</b><small>${own?progTxt(k):LOCKSVG+'잠김'}</small></button>`}).join('');
+  $('#charGrid').innerHTML=CLSK.map(k=>{const own=SHOP.owned.includes(k);return`<button class="ctile${k===charSel?' sel':''}${k===cur?' cur':''}${own?'':' lock'}" data-k="${k}"><canvas data-k="${k}"></canvas><b>${own?CLS[k].name:'???'}</b><small>${own?progTxt(k):LOCKSVG+(CLS[k].price||0).toLocaleString()+' EXP'}</small></button>`}).join('');
   $('#charGrid').querySelectorAll('.ctile').forEach(b=>b.onclick=()=>{charSel=b.dataset.k;buildChar();sfx('dodge');if(innerWidth<=720){const cb=$('#charBack .cbody');try{cb.scrollTo({top:0,behavior:'smooth'})}catch(_){cb.scrollTop=0}}});
   const k=charSel,c=CLS[k],own=SHOP.owned.includes(k),sk=SKINS[k],skOwn=SHOP.skins.includes(k),skOn=!!SHOP.skinOn[k],v=(SHOP.vars||{})[k]||(c.vars?c.vars[0][0]:'');
   let btn;if(k===cur)btn='<button class="sbuy ghost" disabled>사용 중</button>';else if(own)btn='<button class="sbuy" id="cPick">이 캐릭터로 선택</button>';else btn='<button class="sbuy ghost" id="cShop">상점에서 구매하기</button>';
-  if(!own){$('#charInfo').innerHTML=`<h3>???<span>LOCKED</span></h3><p class="sdesc" style="font-size:13.5px;color:var(--dim)">아직 잠겨 있는 캐릭터예요. 상점에서 잠금 해제하면 모습과 능력이 공개돼요.</p><div class="cact">${btn}</div>`;const cs0=$('#cShop');if(cs0)cs0.onclick=()=>{closeChar();openShop();shopI=CLSK.indexOf(k);layoutShop();buildShop()};return}
+  if(!own){$('#charInfo').innerHTML=`<h3>???<span>LOCKED</span><span>가격 · ${(CLS[k].price||0).toLocaleString()} EXP</span></h3><p class="sdesc" style="font-size:13.5px;color:var(--dim)">아직 잠겨 있는 캐릭터예요. 상점에서 잠금 해제하면 모습과 능력이 공개돼요.</p><div class="cact">${btn}</div>`;const cs0=$('#cShop');if(cs0)cs0.onclick=()=>{closeChar();openShop();shopI=CLSK.indexOf(k);layoutShop();buildShop()};return}
   $('#charInfo').innerHTML=`<h3>${c.name}<span>${c.job}</span></h3><div class="crow"><span class="ctag">무기 · ${c.wpn}</span><span class="ctag">필살기 · ${c.ult.en}</span><span class="ctag">${progTxt(k)}</span></div>
     <p class="sdesc" style="font-size:13.5px;color:var(--dim)">${c.desc}</p>
     ${c.vars&&own?`<div class="vars">${c.vars.map(([id,nm])=>`<button data-v="${id}" class="${id===v?'on':''}">${nm}</button>`).join('')}</div>`:''}
