@@ -1435,9 +1435,7 @@ function hurtPlayer(dmg,dir,kb,src,nd){
 
 /* ---------- updates ---------- */
 function regen(dt){if(p.state!=='roll'&&p.state!=='wallclimb')p.sta=Math.min(100,p.sta+(p.regen||24)*dt)}
-const SCRW={type:'wall',scr:1,x0:0,x1:0,bot:-99,top:0};
-function clampPlayer(){let lo=G.camMin+.22,hi=1e9;if(G.tutorial){lo=.25;hi=(TSTEPS[TS.i]||{}).wall||27}const z=G.zone;if(z&&G.phase!=='travel'){lo=z.x0+.2;hi=z.x1-.2}if(G.cell){lo=Math.max(lo,G.cell.x0+.15);hi=Math.min(hi,G.cell.x1-.15)}const x0=p.x;p.x=clamp(p.x,lo,hi);
-  if(G.cls==='ninja'&&kitMode()&&!p.wallB){const side=x0>=hi-.001?1:x0<=lo+.001?-1:0;if(side&&(p.vx*side>0||inputDir()===side)){p.wall=side;if(p.gnd||p.scrTop==null)p.scrTop=G.camY+GY/U-.35;SCRW.top=p.scrTop;SCRW.x0=side>0?hi+.12:lo-50;SCRW.x1=side>0?hi+50:lo-.12;p.wallB=SCRW}}}
+function clampPlayer(){let lo=G.camMin+.22,hi=1e9;if(G.tutorial){lo=.25;hi=(TSTEPS[TS.i]||{}).wall||27}const z=G.zone;if(z&&G.phase!=='travel'){lo=z.x0+.2;hi=z.x1-.2}if(G.cell){lo=Math.max(lo,G.cell.x0+.15);hi=Math.min(hi,G.cell.x1-.15)}p.x=clamp(p.x,lo,hi)}
 function updPlayer(dt){
   p.inv=Math.max(0,p.inv-dt);p.flash-=dt;p.rl=Math.max(0,(p.rl||0)-dt);
   if(p.state==='pult'){if(p.pult){p.inv=Math.max(p.inv,.2);updPUlt(dt)}else p.state='idle';regen(dt);return}for(const k in p.cd)p.cd[k]=Math.max(0,p.cd[k]-dt);
@@ -1550,8 +1548,7 @@ function updPlayer(dt){
       p.face=p.wall;setState(p,'vault',1);sfx('roll');return}
     const ninW=G.cls==='ninja'&&!bt();
     if(ninW&&p.gnd&&toward&&rise>=.92&&(p.state==='walk'||p.state==='run')){p.gnd=false;p.vh=4;p.climbT=0;setState(p,'wallclimb');p.face=p.wall;dust(p.x,4,.8,p.h)}
-    if(B.scr&&ninW&&!p.gnd&&toward&&rise<.92){p.vh=Math.max(p.vh,0);p.vh=0;p.h=Math.min(p.h,B.top-.05);if(p.state!=='wallslide'){setState(p,'wallslide');p.face=p.wall}}
-    else if(!p.gnd&&toward&&(IN.jh||ninW)&&(p.state==='jump'||p.state==='wallslide'||p.state==='wallclimb')&&rise>.05&&rise<.92&&!B.scr){
+    if(!p.gnd&&toward&&(IN.jh||ninW)&&(p.state==='jump'||p.state==='wallslide'||p.state==='wallclimb')&&rise>.05&&rise<.92){
       p.face=p.wall;p.vx=0;p.vh=0;p.pk={top:B.top};
       if(rise<.4){p.pk.h0=p.h;p.pk.x0=p.x;p.pk.x1=p.x+p.face*(bw*2+.12);setState(p,'climb',.28)}
       else{p.h=B.top-.84;setState(p,'hang')}
