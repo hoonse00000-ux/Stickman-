@@ -3584,20 +3584,22 @@ requestAnimationFrame(frame);
 
 <!-- ===================== Google 로그인 + 클라우드 저장 (Firebase) ===================== -->
 <style>
-.acct{display:flex;align-items:center;gap:8px;width:100%;margin:0 0 10px;font-family:var(--f-body,system-ui)}
-.acct .gbtn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 0;background:#f5f5f5;color:#111;border:0;font-weight:700;font-size:14px;cursor:pointer}
-.acct .gbtn svg{width:18px;height:18px}
-.acct .who{flex:1;display:flex;align-items:center;gap:8px;min-width:0;color:var(--ink,#f5f5f5);font-size:13px}
-.acct .who img{width:26px;height:26px;border-radius:50%;flex:none}
-.acct .who span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.acct .who small{display:block;color:#8c8c8c;font-size:11px}
-.acct .out{padding:8px 10px;background:transparent;color:var(--ink,#f5f5f5);border:1px solid #555;font-size:12px;cursor:pointer}
+.acctbtn{position:fixed;z-index:32;top:calc(10px + env(safe-area-inset-top,0px));right:calc(78px + env(safe-area-inset-right,0px));font-family:var(--f-mono,monospace);font-size:10px;letter-spacing:.08em;background:transparent;color:#bdbdbd;border:1px solid #3a3a3a;padding:5px 9px;cursor:pointer;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.acctbtn img{width:14px;height:14px;border-radius:50%;flex:none}
+.acctbtn.on{color:#f5f5f5;border-color:#555}
+.acctpop{position:fixed;z-index:33;top:calc(40px + env(safe-area-inset-top,0px));right:calc(10px + env(safe-area-inset-right,0px));width:230px;background:#0b0b0b;border:1px solid #3a3a3a;padding:12px;font-family:var(--f-body,system-ui);color:#f5f5f5;font-size:12px;line-height:1.5;box-shadow:0 8px 24px rgba(0,0,0,.6)}
+.acctpop[hidden]{display:none}
+.acctpop .nm{font-weight:700;font-size:13px;word-break:break-all}
+.acctpop .st{color:#8c8c8c;font-size:11px;margin:2px 0 10px;word-break:break-all}
+.acctpop .msg{color:#d0d0d0;margin:0 0 10px}
+.acctpop button{width:100%;padding:8px 0;margin-top:6px;background:transparent;color:#f5f5f5;border:1px solid #555;font-size:12px;cursor:pointer}
+.acctpop button.pri{background:#f5f5f5;color:#111;border-color:#f5f5f5;font-weight:700}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
-/* ▼▼▼ Firebase 콘솔 > 프로젝트 설정 > 내 앱(웹)에서 받은 값으로 바꿔 넣으세요 ▼▼▼ */
+/* ▼▼▼ Firebase 콘솔 > 프로젝트 설정 > 내 앱(웹)에서 받은 값 ▼▼▼ */
 const FIREBASE_CONFIG={
   apiKey:"AIzaSyAdJYWIYLVOjF5X7tHzSuy827shbBHB-fU",
   authDomain:"stickman-2b76b.firebaseapp.com",
@@ -3606,30 +3608,68 @@ const FIREBASE_CONFIG={
 };
 /* ▲▲▲ 여기까지 ▲▲▲ */
 (function(){
-  const PREFIX='zm-fight-',SYNC='zm-fight-sync',menu=document.querySelector('.menu');if(!menu)return;
-  const box=document.createElement('div');box.className='acct';menu.insertBefore(box,menu.firstChild);
-  const GSVG='<svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>';
+  const PREFIX='zm-fight-',SYNC='zm-fight-sync',lobby=document.getElementById('lobby')||document.body,menu=document.querySelector('.menu');
+  const btn=document.createElement('button');btn.className='acctbtn';btn.type='button';btn.textContent='로그인';
+  const pop=document.createElement('div');pop.className='acctpop';pop.hidden=true;
+  lobby.appendChild(btn);lobby.appendChild(pop);
+  btn.onclick=e=>{e.stopPropagation();if(!user&&ready&&!inApp){doLogin();return}pop.hidden=!pop.hidden;if(!pop.hidden)renderPop()};
+  pop.onclick=e=>e.stopPropagation();
+  document.addEventListener('click',()=>{pop.hidden=true});
+  const ua=navigator.userAgent||'',isIOS=/iPhone|iPad|iPod/.test(ua),isAnd=/Android/.test(ua);
+  /* 앱 안 브라우저(네이버·카카오·인스타·구글앱 등)에서는 구글이 로그인을 막아요 */
+  const inApp=/NAVER\(inapp|KAKAOTALK|Instagram|FBAN|FBAV|Line\/|DaumApps|everytimeApp|GSA\/|; wv\)/i.test(ua)||(isIOS&&!/Safari\//.test(ua));
   const configured=!/YOUR_/.test(FIREBASE_CONFIG.apiKey);
-  if(!configured||!window.firebase){box.innerHTML='<div class="who"><span>Google 로그인 준비 안 됨<small>FIREBASE_CONFIG 값을 넣어주세요</small></span></div>';return}
-  firebase.initializeApp(FIREBASE_CONFIG);const auth=firebase.auth(),db=firebase.firestore();
-  let user=null,timer=0,status='';
+  let user=null,timer=0,status='',err='',ready=false,auth=null,db=null;
+  function renderBtn(){
+    if(user){btn.classList.add('on');btn.innerHTML=(user.photoURL?`<img src="${user.photoURL}" referrerpolicy="no-referrer" alt="">`:'')+'<span></span>';btn.querySelector('span').textContent=(user.displayName||user.email||'내 계정').split(' ')[0]}
+    else{btn.classList.remove('on');btn.textContent='로그인'}
+  }
+  function renderPop(){
+    let h='';
+    if(user){h=`<div class="nm"></div><div class="st"></div><button class="out">로그아웃</button>`}
+    else if(!configured||!window.firebase){h=`<div class="msg">로그인 준비가 안 됐어요. (Firebase 설정 필요)</div>`}
+    else if(inApp){h=`<div class="msg">지금 앱 안의 브라우저로 열려 있어서 구글이 로그인을 막아요.<br>${isAnd?'<b>Chrome</b>이나 <b>Safari</b>로':'<b>Safari</b>로'} 열어 주세요.${isIOS?'<br><span style="color:#8c8c8c">오른쪽 아래 ⋯ 또는 공유 버튼 → "Safari로 열기"</span>':''}</div>${isAnd?'<button class="pri chrome">Chrome으로 열기</button>':''}<button class="copy">주소 복사</button>`}
+    else{h=`${err?`<div class="msg">${err}</div>`:''}<button class="pri go">Google로 로그인</button>`}
+    pop.innerHTML=h;
+    if(user){pop.querySelector('.nm').textContent=user.displayName||user.email||'Google 계정';pop.querySelector('.st').textContent=status||'진행 상황이 계정에 저장돼요';pop.querySelector('.out').onclick=()=>{auth.signOut();pop.hidden=true}}
+    const go=pop.querySelector('.go');if(go)go.onclick=doLogin;
+    const cp=pop.querySelector('.copy');if(cp)cp.onclick=()=>{const u=location.href;(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>{cp.textContent='복사됐어요! Safari에 붙여 넣으세요'},()=>{prompt('이 주소를 복사하세요',u)})};
+    const ch=pop.querySelector('.chrome');if(ch)ch.onclick=()=>{location.href='intent://'+location.href.replace(/^https?:\/\//,'')+'#Intent;scheme=https;package=com.android.chrome;end'};
+  }
+  function showErr(m){err=m;user=null;renderBtn();pop.hidden=false;renderPop()}
+  const ERR={
+    'auth/popup-closed-by-user':'로그인 창이 닫혔어요. 다시 눌러 주세요. 계속 닫히면 팝업 차단을 꺼 주세요.',
+    'auth/cancelled-popup-request':'로그인 창이 닫혔어요. 다시 눌러 주세요.',
+    'auth/unauthorized-domain':'이 주소가 Firebase에 등록되지 않았어요. 승인된 도메인에 "'+location.hostname+'"을 추가해 주세요.',
+    'auth/operation-not-allowed':'Firebase에서 Google 로그인이 꺼져 있어요. Authentication → 로그인 방법에서 Google을 켜 주세요.',
+    'auth/network-request-failed':'인터넷 연결을 확인해 주세요.',
+    'auth/web-storage-unsupported':'브라우저 저장소가 막혀 있어요. 개인정보 보호(비공개) 모드를 끄고 다시 해 주세요.'
+  };
+  function doLogin(){
+    if(inApp){pop.hidden=false;renderPop();return}
+    err='';const pv=new firebase.auth.GoogleAuthProvider();pv.setCustomParameters({prompt:'select_account'});
+    auth.signInWithPopup(pv).catch(e=>{
+      if(e.code==='auth/popup-blocked'||e.code==='auth/operation-not-supported-in-this-environment'){auth.signInWithRedirect(pv).catch(x=>showErr(ERR[x.code]||('로그인 실패: '+x.code)));return}
+      showErr(ERR[e.code]||('로그인 실패 ('+(e.code||e.message)+')'))});
+  }
+  renderBtn();
+  if(!configured||!window.firebase)return;
+  firebase.initializeApp(FIREBASE_CONFIG);auth=firebase.auth();db=firebase.firestore();ready=true;
+  auth.getRedirectResult().catch(e=>showErr(ERR[e.code]||('로그인 실패 ('+e.code+')')));
   const keys=()=>{const o={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith(PREFIX)&&k!==SYNC)o[k]=localStorage.getItem(k)}return o};
   const getSync=()=>{try{return JSON.parse(localStorage.getItem(SYNC)||'null')}catch(_){return null}};
-  const setSync=v=>origSet.call(localStorage,SYNC,JSON.stringify(v));
-  const inLobby=()=>menu.offsetParent!==null;
-  function render(){if(!user){box.innerHTML=`<button class="gbtn">${GSVG}Google로 로그인</button>`;box.querySelector('.gbtn').onclick=()=>auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e=>{if(e.code==='auth/popup-blocked'||e.code==='auth/operation-not-supported-in-this-environment')auth.signInWithRedirect(new firebase.auth.GoogleAuthProvider());else alertMsg('로그인에 실패했어요: '+(e.message||e.code))});return}
-    box.innerHTML=`<div class="who">${user.photoURL?`<img src="${user.photoURL}" referrerpolicy="no-referrer" alt="">`:''}<span></span></div><button class="out">로그아웃</button>`;const sp=box.querySelector('.who span');sp.textContent=user.displayName||user.email||'Google 계정';const sm=document.createElement('small');sm.textContent=status||'진행 상황이 계정에 저장돼요';sp.appendChild(sm);
-    box.querySelector('.out').onclick=()=>auth.signOut()}
-  function alertMsg(m){status=m;render()}
-  async function upload(){if(!user)return;const t=Date.now();try{await db.collection('users').doc(user.uid).set({data:keys(),updatedAt:t,name:user.displayName||''});setSync({uid:user.uid,t});status='저장됨 · '+new Date(t).toLocaleTimeString();render()}catch(e){status='저장 실패 · 잠시 후 다시 시도해요';render()}}
   const origSet=Storage.prototype.setItem;
+  const setSync=v=>origSet.call(localStorage,SYNC,JSON.stringify(v));
+  const inLobby=()=>!lobby.hidden&&(!menu||menu.offsetParent!==null);
+  function upd(s){status=s;if(!pop.hidden)renderPop()}
+  async function upload(){if(!user)return;const t=Date.now();try{await db.collection('users').doc(user.uid).set({data:keys(),updatedAt:t,name:user.displayName||''});setSync({uid:user.uid,t});upd('저장됨 · '+new Date(t).toLocaleTimeString())}catch(e){upd('저장 실패 · 잠시 후 다시 시도해요')}}
   Storage.prototype.setItem=function(k,v){origSet.call(this,k,v);if(this===localStorage&&user&&typeof k==='string'&&k.startsWith(PREFIX)&&k!==SYNC){clearTimeout(timer);timer=setTimeout(upload,1500)}};
   function applyCloud(data,t,uid){const apply=()=>{for(const k of Object.keys(keys()))localStorage.removeItem(k);for(const k in data)origSet.call(localStorage,k,data[k]);setSync({uid,t});location.reload()};if(inLobby())apply();else{const iv=setInterval(()=>{if(inLobby()){clearInterval(iv);apply()}},800)}}
-  auth.onAuthStateChanged(async u=>{user=u;status='';render();if(!u)return;
+  auth.onAuthStateChanged(async u=>{user=u;status='';err='';renderBtn();if(!pop.hidden)renderPop();if(!u)return;
     try{const snap=await db.collection('users').doc(u.uid).get(),sync=getSync();
-      if(snap.exists){const d=snap.data();if(!sync||sync.uid!==u.uid||(d.updatedAt||0)>(sync.t||0)){status='계정에서 불러오는 중…';render();applyCloud(d.data||{},d.updatedAt||Date.now(),u.uid)}else{status='계정과 동기화됨';render()}}
+      if(snap.exists){const d=snap.data();if(!sync||sync.uid!==u.uid||(d.updatedAt||0)>(sync.t||0)){upd('계정에서 불러오는 중…');applyCloud(d.data||{},d.updatedAt||Date.now(),u.uid)}else upd('계정과 동기화됨')}
       else{if(sync&&sync.uid&&sync.uid!==u.uid){for(const k of Object.keys(keys()))localStorage.removeItem(k);await upload();location.reload()}else await upload()}
-    }catch(e){status='불러오기 실패 · 이 기기 저장으로 계속해요';render()}});
+    }catch(e){upd('불러오기 실패 · 이 기기 저장으로 계속해요 ('+(e.code||'')+')')}});
 })();
 </script>
 
