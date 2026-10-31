@@ -1827,7 +1827,7 @@ const CLS={
   druid:{name:'드루이드',job:'DRUID',wpn:'덩굴',price:9200,desc:'1번 공격으로 덩굴 채찍을 휘둘러 앞의 적 둘까지 때려요. 채찍 끝부분으로 맞히면 TIP! 강타가 들어가요. 뿌리와 가시 덤불, 꽃의 감옥으로 적을 묶고, 식충 식물과 거대 나무로 공격하는 식물의 힘을 다뤄요.'},
   shade:{name:'사신',job:'REAPER',wpn:'낫',price:10200,desc:'1번 공격으로 낫을 휘둘러 검은 구체를 날려요. 그림자 속으로 숨어 무적 상태로 움직이다 튀어나와 공격하고, 적 뒤로 순간이동하거나 분신을 불러내요.'},
 };
-const CLSK=Object.keys(CLS);
+const CLSK=Object.keys(CLS);CLSK.forEach((k,i)=>{CLS[k].price=i?Math.round(300*Math.pow(i,1.6)/100)*100:0});
 let EXP=0,SHOP={owned:['base'],cls:'base',vars:{}};
 try{EXP=+(localStorage.getItem('zm-fight-exp')||0)||0;SHOP=Object.assign(SHOP,JSON.parse(localStorage.getItem('zm-fight-shop')||'{}'))}catch(_){}
 if(!SHOP.owned.includes('base'))SHOP.owned.push('base');SHOP.skins=SHOP.skins||[];SHOP.skinOn=SHOP.skinOn||{};if((SHOP.vars||{}).sword==='laser')SHOP.vars.sword='katana';
@@ -2915,7 +2915,7 @@ function layoutShop(dx){const st=$('#sStage').getBoundingClientRect(),cw=Math.ma
   if(dx==null)shopInfo()}
 function shopInfo(){const k=CLSK[shopI],c=CLS[k],own=SHOP.owned.includes(k),sel=G.cls===k,prevOk=shopI===0||SHOP.owned.includes(CLSK[shopI-1]);$('#shopExp').textContent='';$('#shopExp').style.display='none';
   const v=(SHOP.vars||{})[k]||(c.vars?c.vars[0][0]:''),sk=SKINS[k],skOwn=SHOP.skins.includes(k),skOn=!!SHOP.skinOn[k],bar=n=>'<i class="on"></i>'.repeat(n)+'<i></i>'.repeat(5-n);
-  let btn;if(sel)btn='<button class="sbuy ghost" disabled>사용 중</button>';else if(own)btn='<button class="sbuy ghost" id="sAct">선택하기</button>';else if(!prevOk)btn=`<button class="sbuy" disabled>이전 캐릭터 먼저 잠금 해제</button>`;else btn=`<button class="sbuy" id="sAct">잠금 해제</button>`;
+  let btn;if(sel)btn='<button class="sbuy ghost" disabled>사용 중</button>';else if(own)btn='<button class="sbuy ghost" id="sAct">선택하기</button>';else if(!prevOk)btn=`<button class="sbuy" disabled>이전 캐릭터 먼저 잠금 해제</button>`;else if(EXP<(c.price||0))btn=`<button class="sbuy" disabled>EXP 부족 · ${EXP.toLocaleString()} / ${(c.price||0).toLocaleString()}</button>`;else btn=`<button class="sbuy" id="sAct">잠금 해제</button>`;
   let sbtn,pvb=own&&!(skOwn&&skOn)?`<button class="sbuy ghost" id="sPvSkin" style="margin-top:6px">${shopPv===k?'미리보기 끄기':'스킨 미리보기'}</button>`:'';if(!own)sbtn='<button class="sbuy" disabled>캐릭터를 먼저 잠금 해제하세요</button>';else if(!skOwn)sbtn=`<button class="sbuy" id="sSkin">스킨 잠금 해제</button>`;else sbtn=`<button class="sbuy ghost" id="sSkin">${skOn?'착용 해제':'착용하기'}</button>`;
   $('#sInfo').innerHTML=`<div class="shd"><h3>${c.name}<span>${c.job}</span><span>무기 · ${c.wpn}</span></h3>${btn}</div>
   <div class="sgrid"><div class="scol"><p class="sdesc">${c.desc}</p>${c.kit?`<div class="sbox"><div class="sbt">전용 기술</div><dl class="sstats" style="gap:7px 12px">${c.kit.map(q=>`<dt><kbd>${q[0]}</kbd></dt><dd style="display:block;font-size:12.5px;color:var(--dim)"><b style="color:var(--ink);font-weight:600">${q[1]}</b> · ${q[2]}</dd>`).join('')}</dl></div>`:''}<dl class="sstats"><dt>공격력</dt><dd>${bar(c.st[0])}</dd><dt>사거리</dt><dd>${bar(c.st[1])}</dd><dt>속도</dt><dd>${bar(c.st[2])}</dd></dl>
@@ -2924,7 +2924,7 @@ function shopInfo(){const k=CLSK[shopI],c=CLS[k],own=SHOP.owned.includes(k),sel=
     <div class="sbox"><div class="sbt">고유 스킨<b>${sk.name}</b>${skOwn?'<span>보유</span>':(own?'<span>잠김 · 미리보기 가능</span>':'')}</div><p>${sk.desc}</p>${sbtn}${pvb}</div></div></div>`;
   if(!own)$('#sInfo').innerHTML=`<div class="shd"><h3>???<span>LOCKED</span><span>가격 · ${(c.price||0).toLocaleString()} EXP</span></h3>${btn}</div><div class="sgrid"><div class="scol"><p class="sdesc" style="color:var(--dim)">아직 잠겨 있는 캐릭터예요. 구매하면 모습과 무기, 전용 기술, 필살기, 고유 스킨이 공개돼요.</p></div></div>`;
   const pv=$('#sPvSkin');if(pv)pv.onclick=()=>{shopPv=shopPv===k?null:k;buildShop()};
-  const act=$('#sAct');if(act)act.onclick=()=>{if(!own){if(!prevOk)return;SHOP.owned.push(k);sfx('wave')}SHOP.cls=k;G.cls=k;saveShop();buildShop()};
+  const act=$('#sAct');if(act)act.onclick=()=>{if(!own){if(!prevOk||EXP<(c.price||0))return;SHOP.owned.push(k);sfx('wave')}SHOP.cls=k;G.cls=k;saveShop();buildShop()};
   const sb2=$('#sSkin');if(sb2)sb2.onclick=()=>{if(!skOwn){SHOP.skins.push(k);SHOP.skinOn[k]=true;sfx('wave')}else SHOP.skinOn[k]=!skOn;saveShop();buildShop()};
   $('#sInfo').querySelectorAll('.vars button').forEach(b2=>b2.onclick=()=>{SHOP.vars=SHOP.vars||{};SHOP.vars[k]=b2.dataset.v;G.clsVar=SHOP.vars;saveShop();shopInfo()})}
 function shopGo(d){shopI=clamp(shopI+d,0,CLSK.length-1);layoutShop()}
