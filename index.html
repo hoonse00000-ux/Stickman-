@@ -1149,7 +1149,7 @@ function startGame(from,adm,opt){kfx=[];collectCoins(true);G.coins=[];G.runCoin=
   $('#lobby').hidden=true;$('#ov').hidden=true;G.mode='play';
 }
 const mult=()=>1+.3*(G.round-1);
-function startWave(){
+function startWave(){G.wUsed={};
   const wv=WAVES[G.wave];G.queue=wv.list.slice();G.phase='banner';G.pt=0;G.spawnT=0;let nm=wv.n;G.waveMax=wv.max;
   if(!wv.boss){const R=G.round||1,EX=['small','grunt','brute','ninja','thrower','shield','bomber','charger','spinner','jumper','healer'].filter(k=>TY[k]),pool=EX.slice(0,Math.min(EX.length,2+(R-1)*2)),extra=Math.min(10,Math.floor((R-1)*1.6+G.wave*.8));
     for(let i=0;i<extra;i++)G.queue.splice(Math.floor(Math.random()*(G.queue.length+1)),0,pool[Math.floor(Math.random()*pool.length)]);G.waveMax=Math.min(7,wv.max+Math.floor((R-1)/2)+(G.wave>=2?1:0));if(extra>0)nm+=` · ${G.queue.length}명`}
@@ -1843,7 +1843,7 @@ const CEXT={
   ninja:{st:[2,4,5],ult:{en:'PHANTOM STRIKE',dur:2.4,desc:'연기 속으로 사라졌다가 적들 사이에 번갈아 나타나며 7번 베고, 마지막에 벤 적들이 한꺼번에 다시 베여요.'}},
   bomber:{st:[4,3,2],ult:{en:'NUKE',dur:3.4,desc:'기폭 스위치를 누르면 하늘에서 핵폭탄이 떨어져요. 떨어진 자리에 거대한 버섯구름이 피어오르며 넓은 범위의 적을 모두 날려버려요.'}},
   gunner:{st:[3,4,3],ult:{en:'HEAVY MG',dur:2.7,desc:'거대한 기관총을 꺼내 가까운 적을 향해 쉬지 않고 긁어요. 탄피가 비처럼 쏟아져요.'}},
-  necro:{st:[2,3,2],ult:{en:'ARMY OF DEAD',dur:1.6,desc:'어둠의 파동으로 주변을 밀어내고, 보관함의 보스 영혼을 땅속에서 불러내요. 보스 영혼이 없으면 가장 강한 영혼들로 3명을 채워요.'}},
+  necro:{st:[2,3,2],ult:{en:'ARMY OF DEAD',dur:1.6,desc:'어둠의 파동으로 주변을 밀어내고, 보관함의 보스 영혼을 땅속에서 불러내요. 보스 영혼이 없으면 지금 화면에 있는 가장 강한 적의 영혼을 60% 능력치로 불러내요.'}},
   magician:{st:[3,4,3],ult:{en:'GRAND FINALE',dur:2.1,desc:'카드 12장이 몸 주위를 돌며 가까운 적을 베다가, 마지막에 사방으로 흩어져 날아가요.'}},
   porter:{st:[3,3,4],ult:{en:'HELL GATE',dur:3.7,desc:'가장 가까운 적을 지옥으로 통하는 포탈에 빨아들여요. 지옥에서 하데스에게 한 대 얻어맞은 적이 포탈 밖으로 튕겨 나와 땅에 처박혀요.'}},
   volt:{st:[3,4,3],ult:{en:'THUNDER DOMAIN',dur:.9,desc:'6초 동안 주변에 계속 번개가 떨어지고, 근처 적들 사이에 전류가 이어져 함께 감전돼요. 그동안 자유롭게 움직이며 싸울 수 있어요.'}},
@@ -2022,7 +2022,8 @@ function vaultSrc(){return G.tmpVault||VAULT}
 function saveVault(){try{if(!G.tmpVault)localStorage.setItem('zm-fight-vault',JSON.stringify(VAULT));localStorage.setItem('zm-fight-vsel',JSON.stringify({n:VSEL,b:VBSEL}))}catch(_){}}
 function soulCount(boss){const V=vaultSrc();let n=0;for(const k in V)if(TY[k]&&(boss==null||!!TY[k].boss===boss))n+=V[k];return n}
 function pickSoul(boss){const V=vaultSrc(),ks=Object.keys(V).filter(k=>V[k]>0&&TY[k]&&!!TY[k].boss===boss);if(!ks.length)return null;const sel=boss?VBSEL:VSEL;if(sel&&ks.includes(sel))return sel;return ks.sort((a,b)=>TY[b].hp-TY[a].hp)[0]}
-function useSoul(k){const V=vaultSrc();V[k]--;if(V[k]<=0)delete V[k];saveVault()}
+function useSoul(k){const V=vaultSrc();V[k]--;if(V[k]<=0)delete V[k];G.wUsed=G.wUsed||{};G.wUsed[k]=(G.wUsed[k]||0)+1;saveVault()}
+function refundSouls(){const U=G.wUsed;G.wUsed={};if(!U)return 0;const V=vaultSrc();let n=0;for(const k in U){V[k]=(V[k]||0)+U[k];n+=U[k]}if(n)saveVault();return n}
 function soulName(k){return TY[k]?(TY[k].name||k):k}
 function takeSoul(e){if(G.cls!=='necro'||bt()||!e.byP||e.clone!=null||e.undead||e.kind==='dummy'||!TY[e.kind])return;const t=TY[e.kind],mk=e.mark>G.T;
   if(!G.souls)G.souls=[];if(G.souls.length>40)G.souls.shift();
@@ -2046,7 +2047,7 @@ function drawSouls(c,X,Yh){if(G.cls!=='necro'||!G.souls||!G.souls.length)return;
     if(o.n>1){c.fillStyle='#dffff5';c.font=`700 ${Math.round(U*.1+6)}px ${FONT.mono}`;c.textAlign='center';c.fillText('×2',x+R*1.6,y-R*1.2)}
     c.restore()}}
 function raiseSoul(kind,o){o=o||{};if(G.tutorial)tutEv('raise');const t=TY[kind],x=p.x+p.face*(o.dx!=null?o.dx:.7+.25*t.size),d=t.dmg||{},base=d.punch||d.kick||d.spin||d.stomp||d.throw||8,gh=Math.max(0,floorAt(x,.1,p.h+.5));
-  allies.push({kind,undead:true,boss:!!t.boss,x,h:gh>-50?gh:p.h,vh:0,vx:0,gnd:true,face:p.face,size:t.size,state:'ultcast',st:0,dur:1,w:.3,phase:0,life:o.life||25,cd:.4,seed:rnd(0,9),hitDone:false,dmg:Math.round(base*(t.boss?.75:.9)),spd:Math.max(1.3,t.spd||1.4),rise:t.boss?1.3:.9,riseMax:t.boss?1.3:.9});crack(x,gh>-50?gh:p.h,.5+.35*t.size);sfx('rumble');
+  allies.push({kind,undead:true,boss:!!t.boss,x,h:gh>-50?gh:p.h,vh:0,vx:0,gnd:true,face:p.face,size:t.size,state:'ultcast',st:0,dur:1,w:.3,phase:0,life:o.life||25,cd:.4,seed:rnd(0,9),hitDone:false,dmg:Math.round(base*(t.boss?.75:.9)*(o.mul||1)),mul:o.mul||1,spd:Math.max(1.3,t.spd||1.4)*(o.mul?.85:1),rise:t.boss?1.3:.9,riseMax:t.boss?1.3:.9});crack(x,gh>-50?gh:p.h,.5+.35*t.size);sfx('rumble');
   fx.push({t:'r',x,y:p.h+.1,vx:0,vy:0,life:.45,max:.45,r:.7,w:3});dust(x,8,.9,p.h);for(let q=0;q<10;q++)fx.push({t:'e',x:x+rnd(-.25,.25),y:p.h,vx:0,vy:rnd(1,2.6),life:.7,max:.7,r:.022});sfx('dodge');texts.push({x,y:p.h+t.size+.2,txt:'RISE',big:true,life:.8,max:.8})}
 function scySw(e,o){return e&&e.state==='w_sword'&&o.wv}
 function scyGeoW(o,d){const h=o.fa[2],u=o.wv,L=Math.hypot(u[0],u[1])||1,ux=u[0]/L,uy=u[1]/L,H=[h[0]+ux*.17,h[1]+uy*.17];return scyGeo(H,[H[0]-ux,H[1]-uy],d,[-uy*d,ux*d])}
@@ -2476,7 +2477,7 @@ necro:{
   kick(){if(!slotSummon())p.cd.kick=.3},
   upper(){const V=vaultSrc(),ks=Object.keys(V).filter(k=>V[k]>0&&TY[k]&&!TY[k].boss).sort((a,b)=>(TY[a].hp||0)-(TY[b].hp||0));if(!ks.length){ftext(p.x,p.h+1.2,'NO SOUL');p.cd.upper=.3;return}
     const k=ks[0];useSoul(k);p.soulSh=Math.min(70,25+(TY[k].hp||40)*.25);p.soulT=10;kst('w_burst',.45,{});ringFx(p.x,p.h+.5,.9,4);ringFx(p.x,p.h+.5,.5,3);for(let i=0;i<12;i++)fx.push({t:'e',x:p.x+rnd(-.6,.6),y:p.h+rnd(0,1.2),vx:(p.x-p.x)*0,vy:rnd(.3,1.2),life:.6,max:.6,r:.03});sfx('shatter');ftext(p.x,p.h+1.2,'SOUL WARD',true)},
-  spin(){const L=allies.filter(a=>a.life>0&&!(a.rise>0));if(!L.length){ftext(p.x,p.h+1.2,'NO SUMMON');p.cd.spin=.3;return}kst('w_cast',.45,{times:[.25],fire(){for(const a of L){const r=1+.35*a.size;aoe(a.x,a.h,r,1.2,Math.round(24+a.size*10),3,'wpnH');ringFx(a.x,a.h+.4,r,5);ringFx(a.x,a.h+.4,r*.55,3);dust(a.x,10,1.3,a.h);for(let i=0;i<14;i++)fx.push({t:'e',x:a.x,y:a.h+.5*a.size,vx:rnd(-3,3),vy:rnd(-1,3.5),life:.5,max:.5,r:.035});bones(a.x,a.h+.5,8);fx.push({t:'x',x:a.x,y:a.h+.5*a.size,vx:0,vy:0,life:.4,max:.4,r:.9,rot:0});a.life=0}shake(.4);sfx('boom');sfx('shatter')}});ftext(p.x,p.h+1.2,'CORPSE BLAST',true)},
+  spin(pick){const L0=allies.filter(a=>a.life>0&&!(a.rise>0));if(!L0.length){ftext(p.x,p.h+1.2,'NO SUMMON');p.cd.spin=.3;return}if(!pick&&L0.length>1){openBlast(L0);return}const L=pick||L0;kst('w_cast',.45,{times:[.25],fire(){for(const a of L){const r=1+.35*a.size;aoe(a.x,a.h,r,1.2,Math.round(24+a.size*10),3,'wpnH');ringFx(a.x,a.h+.4,r,5);ringFx(a.x,a.h+.4,r*.55,3);dust(a.x,10,1.3,a.h);for(let i=0;i<14;i++)fx.push({t:'e',x:a.x,y:a.h+.5*a.size,vx:rnd(-3,3),vy:rnd(-1,3.5),life:.5,max:.5,r:.035});bones(a.x,a.h+.5,8);fx.push({t:'x',x:a.x,y:a.h+.5*a.size,vx:0,vy:0,life:.4,max:.4,r:.9,rot:0});a.life=0}shake(.4);sfx('boom');sfx('shatter')}});ftext(p.x,p.h+1.2,'CORPSE BLAST',true)},
   dash(){kst('w_dash',.42,{melee:{a0:.05,a1:.9,reach:.5,dmg:16,kb:1.4,both:1},upd(u){if(u<.75)p.vx=p.face*8.5;if(Math.random()<.5)fx.push({t:'e',x:p.x,y:p.h+rnd(.2,1),vx:-p.face,vy:0,life:.35,max:.35,r:.03})}});p.inv=Math.max(p.inv,.42);ftext(p.x,p.h+1.2,'PHANTOM DASH',true)},
   blast(){buff('link',10);p.cd.blast=13;kst('w_burst',.4,{});ringFx(p.x,p.h+.5,1.2,3);sfx('wave');ftext(p.x,p.h+1.2,allies.length?'SOUL LINK':'SOUL LINK · NO SUMMON',true)},
   flurry(){let n=0;kst('w_cast',.5,{times:[.25],fire(){for(const e of enemies){if(!alive(e)||Math.abs(e.x-p.x)>5.5||Math.abs(e.h-p.h)>2.5)continue;e.mark=G.T+14;n++;kfx.push({t:'beam',x:p.x+p.face*.3,h:p.h+.8,x2:e.x,h2:e.h+e.size*1.2,life:.25,max:.25,col:'#aaffe6'})}ftext(p.x,p.h+1.5,n?'MARKED ×'+n:'NO TARGET',!!n);sfx('glitch')}});ftext(p.x,p.h+1.2,'DEATH MARK',true)},
@@ -2726,7 +2727,7 @@ function updPUlt(dt){const u=p.pult,k=u.k;u.t+=dt;p.st=u.t;const t=u.t,f=p.face;
   case 'necro':p.pultPose='w_summon';p.pst=Math.min(.55,t*.8);p.pdur=.6;G.pdim=Math.max(G.pdim||0,t<1.3?.45:0);if(t>.45&&!u.fin){u.fin=1;const bk=u.plan?null:pickSoul(true);
       if(u.plan){u.plan.forEach((k,i)=>raiseSoul(k,{life:18,dx:TY[k].boss?1.3:(i%2?-1:1)*(.6+i*.4)}));if(u.plan.some(k=>TY[k].boss)){ftext(p.x,p.h+1.4,'BOSS RISE',true);shake(.4)}}
       else if(bk){useSoul(bk);raiseSoul(bk,{life:18,dx:1.3});ftext(p.x,p.h+1.4,'BOSS RISE · '+(TY[bk].en||''),true);shake(.4)}
-      else{let ii=0;while(allies.filter(a=>!a.boss).length<3&&ii<3){const k=pickSoul(false);if(k){useSoul(k);raiseSoul(k,{life:18,dx:(ii%2?-1:1)*(.6+ii*.35)})}else{summonSkel();const a=allies[allies.length-1];a.x=p.x+(ii%2?-1:1)*(.6+ii*.35);a.life=14;a.rise=.8;a.riseMax=.8}ii++}}
+      else{const vis=enemies.filter(e=>alive(e)&&e.state!=='dead'&&TY[e.kind]&&!e.undead&&e.kind!=='dummy'&&e.x>G.camX-.3&&e.x<G.camX+VIEWU+.3).sort((a,b)=>((TY[b.kind].boss?2:TY[b.kind].mid?1:0)-(TY[a.kind].boss?2:TY[a.kind].mid?1:0))||(TY[b.kind].hp||0)-(TY[a.kind].hp||0));const tg=vis[0];if(tg){kfx.push({t:'beam',x:tg.x,h:tg.h+tg.size*.8,x2:p.x+p.face*1.2,h2:p.h+.4,life:.35,max:.35,col:'#aaffe6'});wisps(tg.x,tg.h+tg.size*.6,10);raiseSoul(tg.kind,{life:18,dx:TY[tg.kind].boss?1.3:1,mul:.6});ftext(p.x,p.h+1.4,'SOUL STEAL · 60%',true);shake(.3)}else{let ii=0;while(allies.filter(a=>!a.boss).length<3&&ii<3){summonSkel();const a=allies[allies.length-1];a.x=p.x+(ii%2?-1:1)*(.6+ii*.35);a.life=14;a.rise=.8;a.riseMax=.8;ii++}}}
       fx.push({t:'r',x:p.x,y:p.h+.3,vx:0,vy:0,life:.5,max:.5,r:3,w:4});for(const e of foes(3))hitEnemy(e,15,'pult',Math.sign(e.x-p.x)||f,2);G.flash=.3;sfx('shatter')}break;
   case 'magician':u.ang=(u.ang||0)+dt*9;if(t<1.7){u.tick-=dt;if(u.tick<=0){u.tick=.14;for(const e of foes(1.5))hitEnemy(e,5,'pult',Math.sign(e.x-p.x)||f,.6);sfx('swing')}}
     else if(!u.fin){u.fin=1;for(let i=0;i<12;i++){const a=u.ang+i/12*Math.PI*2;pshots.push({x:p.x+Math.cos(a)*1.1,h:p.h+.6+Math.sin(a)*1.1,vx:Math.cos(a)*10,vh:Math.sin(a)*10,grav:0,dmg:12,kind:'card',pierce:1,life:.8,hitSet:new Set(),kb:1.8,rot:0,ult:1})}sfx('combohit');shake(.45);G.flash=.45;for(let q=0;q<3;q++)fx.push({t:'r',x:p.x,y:p.h+.6,vx:0,vy:0,life:.35+q*.12,max:.35+q*.12,r:1+q*.8,w:5-q})}break;
@@ -2887,8 +2888,10 @@ function openSummon(mode){const slots=Math.max(0,3-allies.filter(a=>!a.boss).len
   if(!ks.length){if(mode!=='ult')ftext(p.x,p.h+1.2,'NO SOULS');return false}
   if(mode!=='ult'&&slots<=0){ftext(p.x,p.h+1.2,'MAX 3');return false}
   VPLAN={mode,slots,sel:{}};G.mode='vault';buildSummon();$('#sumOv').hidden=false;return true}
-function planN(boss){let n=0;for(const k in VPLAN.sel)if(!!TY[k].boss===boss)n+=VPLAN.sel[k];return n}
-function buildSummon(){if(VPLAN&&VPLAN.mode==='slot')return buildSlot();$('#sumSlots').innerHTML='';const V=vaultSrc(),P=VPLAN,ks=sumKinds(P.mode),nN=planN(false),nB=planN(true);
+function planN(boss){if(VPLAN&&VPLAN.mode==='blast')return boss?0:Object.keys(VPLAN.sel).length;let n=0;for(const k in VPLAN.sel)if(!!TY[k].boss===boss)n+=VPLAN.sel[k];return n}
+function openBlast(L){VPLAN={mode:'blast',list:L.slice(),sel:{}};G.mode='vault';$('#sumOv .sumhd b').textContent='시체 폭발';buildSummon();$('#sumOv').hidden=false}
+function buildBlast(){const P=VPLAN,L=P.list;$('#sumSlots').innerHTML='';$('#sumSub').textContent='폭발시킬 소환수를 고르세요';const n=Object.keys(P.sel).length;$('#sumList').innerHTML=L.map((a,i)=>{const t=TY[a.kind]||{},on=!!P.sel[i],nm=a.kind==='skel'?'해골 병사':(t.name||a.kind);return`<div class="stile ${a.boss?'bs':t.mid?'md':''} ${on?'on':''}" data-i="${i}" style="cursor:pointer"><span class="tg">${a.boss?'BOSS':t.mid?'ELITE':''}</span><canvas data-i="${i}"></canvas><b class="nm">${nm}</b><small>${a.x<p.x?'왼쪽':'오른쪽'} ${Math.abs(a.x-p.x).toFixed(1)}m</small><div class="ct"><span style="white-space:nowrap;font-size:11px;${on?'color:#fff;font-weight:700':'opacity:.55'}">${on?'선택됨':'선택'}</span></div></div>`}).join('');requestAnimationFrame(()=>$('#sumList').querySelectorAll('canvas[data-i]').forEach(cv2=>{const a=L[+cv2.dataset.i],t=TY[a.kind]||{size:a.size||.72},d=Math.min(2,devicePixelRatio||1),w=cv2.clientWidth,h=cv2.clientHeight;if(!w)return;cv2.width=Math.round(w*d);cv2.height=Math.round(h*d);const c=cv2.getContext('2d');c.setTransform(d,0,0,d,0,0);const gy=h*.9;c.strokeStyle='rgba(245,245,245,.5)';c.lineWidth=1;c.beginPath();c.moveTo(w*.12,gy);c.lineTo(w*.88,gy);c.stroke();const e={kind:a.kind,face:1,state:'idle',st:0,dur:0,w:.3,phase:0,seed:1,size:a.size||t.size,flash:0,hp:1,max:1,undead:true};try{drawFig(c,e,pose(e,1),w/2,gy,h*.66/(a.boss?1.15:1))}catch(_){}}));$('#sumFt').innerHTML=`<span>선택 ${n}/${L.length}</span><button class="sbuy ghost" id="sumAll">${n===L.length?'모두 해제':'모두 선택'}</button><button class="sbuy ghost" id="sumCancel">취소</button><button class="sbuy" id="sumGo" ${n?'':'disabled'}>폭발</button>`;$('#sumList').querySelectorAll('.stile[data-i]').forEach(el=>el.onclick=()=>{const i=+el.dataset.i;if(P.sel[i])delete P.sel[i];else P.sel[i]=1;sfx('dodge');buildBlast()});$('#sumAll').onclick=()=>{if(Object.keys(P.sel).length===L.length)P.sel={};else L.forEach((_,i)=>P.sel[i]=1);buildBlast()};$('#sumCancel').onclick=()=>closeSummon(false);$('#sumGo').onclick=()=>closeSummon(true)}
+function buildSummon(){if(VPLAN&&VPLAN.mode==='slot')return buildSlot();if(VPLAN&&VPLAN.mode==='blast')return buildBlast();$('#sumOv .sumhd b').textContent='영혼 보관함';$('#sumSlots').innerHTML='';const V=vaultSrc(),P=VPLAN,ks=sumKinds(P.mode),nN=planN(false),nB=planN(true);
   $('#sumSub').textContent=P.mode==='ult'?`필살기 · 지금까지 쓰러뜨린 보스 ${ks.length}종 중 1명`:`잡은 적 ${ks.length}종 · 망자 ${P.slots}명까지 소환`;
   const sc0=$('#sumList').scrollTop;$('#sumList').innerHTML=ks.map(k=>{const t=TY[k],bs=!!t.boss,n=P.sel[k]||0,canUp=n<V[k]&&(bs?nB<1:nN<P.slots);return`<div class="stile ${bs?'bs':t.mid?'md':''} ${n?'on':''}"><span class="tg">${bs?'BOSS':t.mid?'ELITE':''}</span><canvas data-k="${k}"></canvas><b class="nm">${t.name||k}</b><small>보유 ${V[k]}</small><div class="ct"><button data-k="${k}" data-d="-1" ${n?'':'disabled'} aria-label="빼기">−</button><span>${n}</span><button data-k="${k}" data-d="1" ${canUp?'':'disabled'} aria-label="더하기">+</button></div></div>`}).join('');$('#sumList').scrollTop=sc0;
   requestAnimationFrame(()=>$('#sumList').querySelectorAll('canvas[data-k]').forEach(cv2=>{const k=cv2.dataset.k,t=TY[k],d=Math.min(2,devicePixelRatio||1),w=cv2.clientWidth,h=cv2.clientHeight;if(!w)return;cv2.width=Math.round(w*d);cv2.height=Math.round(h*d);const c=cv2.getContext('2d');c.setTransform(d,0,0,d,0,0);const gy=h*.9;
@@ -2897,7 +2900,7 @@ function buildSummon(){if(VPLAN&&VPLAN.mode==='slot')return buildSlot();$('#sumS
   $('#sumList').querySelectorAll('button[data-k]').forEach(b=>b.onclick=()=>{const k=b.dataset.k,d=+b.dataset.d;P.sel[k]=Math.max(0,(P.sel[k]||0)+d);if(!P.sel[k])delete P.sel[k];sfx('dodge');buildSummon()});
   $('#sumCancel').onclick=()=>closeSummon(false);$('#sumGo').onclick=()=>closeSummon(true)}
 $('#slotBtn').onclick=e=>{e.preventDefault();openSlotPanel()};window.openSlotPanel=openSlotPanel;$('#keyBtn').onclick=()=>openSettings();$('#setClose').onclick=closeSettings;document.querySelectorAll('#setBack [data-pre]').forEach(b=>b.onclick=()=>{BIND=Object.assign({},PRESET[b.dataset.pre==='L'?'L':'R']);saveBind();SETL=null;buildSettings()});
-function closeSummon(go){const P=VPLAN;$('#sumOv').hidden=true;VPLAN=null;G.mode='play';last=performance.now();if(!go||!P)return;
+function closeSummon(go){const P=VPLAN;$('#sumOv').hidden=true;VPLAN=null;G.mode='play';last=performance.now();if(P&&P.mode==='blast'){const pk=P.list.filter((a,i)=>P.sel[i]&&a.life>0);if(go&&pk.length)KIT.necro.spin(pk);else{p.cd.spin=0;p.sta=Math.min(100,p.sta+((SKILL.spin&&SKILL.spin.st)||0))}return}if(!go||!P)return;
   const list=[];for(const k in P.sel)for(let i=0;i<P.sel[k];i++)list.push(k);list.sort((a,b)=>(TY[b].boss?1:0)-(TY[a].boss?1:0));for(const k of list)useSoul(k);
   if(P.mode==='ult'){startPUlt();if(p.pult)p.pult.plan=list;return}
   kst('w_summon',.55,{});p.sumQ=(p.sumQ||[]).concat(list.map((k,i)=>({k,t:.25+i*.3,i})));ftext(p.x,p.h+1.2,'RAISE ×'+list.length,true)}
@@ -3532,13 +3535,13 @@ function recordBest(cleared){if(G.admin||G.ta||G.online)return[];
   return nb;
 }
 function gameOver(){
-  collectCoins(true);
+  collectCoins(true);let soulBk=0;if(G.cls==='necro')soulBk=refundSouls();
   if(G.online){onlineEnd(false);return}
   if(G.ta){taOver();return}
   G.mode='over';const nb=recordBest(false);ov.hidden=false;
   const ci=Math.max(0,G.segI|0);
   card.innerHTML=`<h1>K.O.</h1><div class="big"><i>R</i>${G.round}-${G.wave+1}</div><p>${Math.floor(G.maxX*2.4)}m 지점에서 쓰러졌어요</p>
-  <div class="runstats">KO ${G.ko} · 최고 콤보 ${G.bestCombo} · +${(G.runExp||0).toLocaleString()} EXP · +${(G.runCoin||0).toLocaleString()} 코인</div>${nb.length?`<div class="unl">최고 기록 갱신 · ${nb.join(' · ')}</div>`:''}
+  <div class="runstats">KO ${G.ko} · 최고 콤보 ${G.bestCombo} · +${(G.runExp||0).toLocaleString()} EXP · +${(G.runCoin||0).toLocaleString()} 코인</div>${nb.length?`<div class="unl">최고 기록 갱신 · ${nb.join(' · ')}</div>`:''}${soulBk?`<div class="unl">이번 웨이브에서 쓴 영혼 ${soulBk}개를 돌려받았어요</div>`:''}
   <div class="row">${ci>0?`<button class="btn" id="bCont">이어하기 · WAVE ${ci%5+1}</button>`:''}<button class="btn${ci>0?' ghost':''}" id="bRe">처음부터</button><button class="btn ghost" id="bLob">로비</button></div>`;
   $('#bRe').onclick=()=>startGame(0,G.admin);$('#bLob').onclick=toLobby;if(ci>0){$('#bCont').onclick=()=>startGame(ci,G.admin);$('#bCont').focus()}else $('#bRe').focus();
 }
@@ -3770,7 +3773,7 @@ sword:{kick:'달려들며 세 번 베고 칼을 넣는 돌진베기',upper:'뛰�
 ninja:{kick:'뒤로 물러나며 밟으면 기절하는 마름쇠를 뿌려요',upper:'뛰어올라 아래로 표창을 던지는 하늘 표창',spin:'사방으로 표창 8개를 던지는 회전 표창',dash:'가까운 적 뒤로 순간이동해 차는 그림자 걸음'},
 bomber:{kick:'밟으면 터지는 지뢰를 설치해요',upper:'발밑을 폭발시켜 높이 뛰는 로켓 점프',spin:'터지면서 작은 폭탄 3개로 갈라지는 집속탄',dash:'돌진한 뒤 폭발하는 폭풍 돌진'},
 gunner:{kick:'뒤로 공중제비를 돌며 쏘는 백덤블링 사격',upper:'발밑으로 쏴서 높이 뛰는 반동 점프',spin:'권총 · AK · 샷건 · 저격총을 바꿔 드는 무기 교체',dash:'미끄러지며 쏘는 슬라이딩 사격'},
-necro:{kick:'슬롯에 넣어둔 영혼을 번갈아 불러내 땅을 파고 올라오게 해요(중간보스까지). 슬롯은 스킬 버튼 위 [슬롯 변경하기]나 T 키로 바꿔요',upper:'영혼 하나를 소모해 피해를 막아주는 영혼 방패',spin:'불러낸 소환수를 모두 폭발시키는 시체 폭발',dash:'무적 상태로 관통하는 망령 돌진'},
+necro:{kick:'슬롯에 넣어둔 영혼을 번갈아 불러내 땅을 파고 올라오게 해요(중간보스까지). 슬롯은 스킬 버튼 위 [슬롯 변경하기]나 T 키로 바꿔요',upper:'영혼 하나를 소모해 피해를 막아주는 영혼 방패',spin:'불러낸 소환수 중 고른 것만 폭발시키는 시체 폭발(소환수가 둘 이상이면 고르는 창이 떠요)',dash:'무적 상태로 관통하는 망령 돌진'},
 magician:{kick:'상자를 깔아두고, 다시 누르면 다른 곳에서 상자 속으로 들어가 깔아둔 상자에서 튀어나오는 상자 마술',upper:'적을 따라가는 비둘기 3마리',spin:'카드를 사방으로 흩날리는 카드 회오리',dash:'잠시 사라져 모든 공격을 피하는 사라지기'},
 porter:{kick:'뒤로 순간이동하며 쏘는 후퇴 포탈',upper:'위로 순간이동해 아래로 쏘는 상공 게이트',spin:'주변을 날려버리는 차원 균열',dash:'가까운 적 앞으로 순간이동해 차는 점멸 일격'},
 baseball:{kick:'배트로 적을 직접 후려쳐 멀리 날려보내는 직접 타격',upper:'배트를 회전시켜 던지면 적을 뚫고 갔다가 손으로 되돌아오며 한 번 더 때려요',spin:'양쪽을 휘두르는 회전 풀스윙',dash:'미끄러지며 다리를 거는 도루 슬라이딩'},
