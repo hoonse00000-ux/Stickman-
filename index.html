@@ -1302,7 +1302,7 @@ const CLSM={sword:[.88,.93],ninja:[.86,.9],gunner:[.66,.75],wolf:[.8,.85],volt:[
 const SHB={shield:1,golem:.25,m_titan:.8,titan:.45};
 function shieldBreak(e,dir){e.noShield=true;e.shHP=0;const sx=e.x+e.face*.14*e.size,sh=e.h+.55*e.size;ftext(e.x,e.h+1.2*e.size,'SHIELD BREAK',true);sfx('shatter');shake(.25);sparks(sx,sh,-dir,14,1.3);
   for(let q=0;q<9;q++)kfx.push({t:'shell',x:sx,h:sh+rnd(-.2,.2)*e.size,vx:-dir*rnd(-1,3),vh:rnd(1.5,4),life:1.2,max:1.2,r:rnd(0,6),big:1});if(!TY[e.kind].boss)setState(e,'hurt',.9);else e.flash=.2}
-function hitEnemy(e,dmg,kind,dir,kb){if(e.hell)return;if(e.ptrans>0){if(Math.random()<.3)ftext(e.x,e.h+e.size*1.1,'IMMUNE');return}if(CLSM[G.cls]&&!bt()&&kind!=='ally')dmg*=CLSM[G.cls][kind==='pult'?1:0];if(POW[kind]||ATK[kind])dmg*=p.atk||1;if(kind!=='ally')dmg*=(G.wk||1)*pBuffMul();if(POW[kind]||ATK[kind]||kind==='ally'||kind==='pult')e.byP=true;if(p&&kind!=='pult'&&!bfOn('wolf')&&(POW[kind]||ATK[kind]||kind==='ally')&&!bt())p.ultG=Math.min(100,(p.ultG||0)+dmg*.45*(G.cls==='necro'?.4:1));
+function hitEnemy(e,dmg,kind,dir,kb){if(e.hell)return;if(e.ptrans>0){if(Math.random()<.3)ftext(e.x,e.h+e.size*1.1,'IMMUNE');return}if(CLSM[G.cls]&&!bt()&&kind!=='ally')dmg*=CLSM[G.cls][kind==='pult'?1:0];if(POW[kind]||ATK[kind])dmg*=p.atk||1;if(kind!=='ally')dmg*=(G.wk||1)*pBuffMul();if(POW[kind]||ATK[kind]||kind==='ally'||kind==='pult')e.byP=true;if(p&&kind!=='pult'&&!bfOn('wolf')&&(POW[kind]||ATK[kind]||kind==='ally')&&!bt()&&!p.pult)p.ultG=Math.min(100,(p.ultG||0)+dmg*.45*(G.cls==='necro'?.4:1));
   if(SHB[e.kind]&&!e.noShield&&e.face===-dir&&e.state!=='dead'&&BREAK[kind]&&e.state!=='hurt'){if(e.shHP==null){e.shMax=e.max*SHB[e.kind];e.shHP=e.shMax}e.shHP-=dmg*.5;e.shFl=.12;if(e.shHP<=0)shieldBreak(e,dir)}
   if(SHB[e.kind]&&!e.noShield&&e.face===-dir&&e.state!=='hurt'&&e.state!=='dead'&&!BREAK[kind]){if(e.shHP==null){e.shMax=e.max*SHB[e.kind];e.shHP=e.shMax}e.shHP-=dmg;e.shFl=.12;const bd=Math.max(1,Math.round(dmg*.15));e.hp-=bd;e.flash=.05;e.vx=dir*.6;if(e.shHP<=0){shieldBreak(e,dir);if(e.hp<=0)kill(e,dir);return}
     ftext(e.x,e.h+1.15*e.size,'BLOCK');sparks(e.x+e.face*.14*e.size,e.h+.55*e.size,-dir,5,.8);sfx('block');if(e.hp<=0)kill(e,dir);return}
@@ -1392,7 +1392,7 @@ function ph2Ult(u,e,z){const k=u.type;
   else if(k==='warlord'){u.dur=4.4;u.sp=[];const sd=Math.sign(p.x-e.x)||1;let i=0;for(let x=e.x+sd*.7;x>z.x0+.2&&x<z.x1-.2;x+=sd*.42)u.sp.push({x,t0:.5+(i++)*.07});u.sp.push({x:0,t0:2.3,big:1,track:1},{x:0,t0:3,big:1,track:1},{x:0,t0:3.6,big:1,track:1})}
   else if(k==='archmage'){u.dur=5.4;u.beams=[1.1,1.9,2.7,3.5,4.3].map((t0,i)=>({t0,low:i<4?i%2===0:Math.random()<.5}))}
   else if(k==='emperor'){u.dur=6.4}}
-function ph2Echo(e){const wd=Math.round((TY[e.kind].dmg.wave||14));waves.push({x:e.x,dir:1,life:1.3,max:1.3,hit:false,dmg:wd},{x:e.x,dir:-1,life:1.3,max:1.3,hit:false,dmg:wd});shake(.35);sfx('pound');try{if(BHZ[e.kind])bossHazard(e)}catch(_){}}
+function ph2Echo(e){const wd=Math.round((TY[e.kind].dmg.wave||14));waves.push({x:e.x,dir:1,life:1.3,max:1.3,hit:false,dmg:wd,ult:1},{x:e.x,dir:-1,life:1.3,max:1.3,hit:false,dmg:wd,ult:1});shake(.35);sfx('pound');try{if(BHZ[e.kind])bossHazard(e)}catch(_){}}
 function drawBossAura(c,X,Yh){for(const e of enemies){if(!e.ph||e.state==='dead'||e.gone||!e.active)continue;if(e.ph===1&&!e.ptrans)continue;const x=X(e.x),y=Yh(e.h),S=U*e.size,T2=G.T,tr=e.ptrans>0?1-e.ptrans/PTRANS:1;
   c.save();c.shadowBlur=0;const g=c.createRadialGradient(x,y-S*.55,S*.1,x,y-S*.55,S*(.9+.1*Math.sin(T2*5)));g.addColorStop(0,'rgba(255,60,60,0)');g.addColorStop(.7,`rgba(255,60,60,${.1*tr})`);g.addColorStop(1,'rgba(255,60,60,0)');c.fillStyle=g;c.beginPath();c.arc(x,y-S*.55,S,0,Math.PI*2);c.fill();
   c.strokeStyle=`rgba(255,110,110,${(.35+.25*Math.sin(T2*6))*tr})`;c.lineWidth=2;c.beginPath();c.ellipse(x,y,S*(.45+.05*Math.sin(T2*4)),S*.08,0,0,Math.PI*2);c.stroke();
@@ -1401,7 +1401,8 @@ function drawBossAura(c,X,Yh){for(const e of enemies){if(!e.ph||e.state==='dead'
 const DODGE_T=.42;function rDodge(){return p.state==='roll'&&(p.st||0)<DODGE_T}
 function hurtPlayer(dmg,dir,kb,src,nd){
   if(p.state==='dead')return false;
-  if(rDodge()){if(src&&!src.dodged){src.dodged=true;ftext(p.x,p.h+1.05,'DODGE');sfx('dodge')}return false}
+  const ultA=G.ultHit||nd==='ult';if(ultA&&p.state==='roll'&&p.inv<=DODGE_T+.01)p.inv=0;
+  if(rDodge()&&!ultA){if(src&&!src.dodged){src.dodged=true;ftext(p.x,p.h+1.05,'DODGE');sfx('dodge')}return false}
   if(p.inv>0)return false;
   if(p.state==='guard'&&p.face===-dir){
     if(G.T-p.gStart<.18){p.inv=.25;G.stop=.08;shake(.14);sfx('parry');sparks(p.x+p.face*.15,p.h+.55,p.face,10,1.2);ftext(p.x,p.h+1.15,'PARRY',true);if(G.tutorial)tutEv('parry');
@@ -1412,7 +1413,7 @@ function hurtPlayer(dmg,dir,kb,src,nd){
   }
   if(bfOn('def'))dmg*=.65;if(bfOn('rage'))dmg*=1.2;if(p.soulSh>0){const raw=dmg*mult(),ab=Math.min(p.soulSh,raw);p.soulSh-=ab;dmg=(raw-ab)/mult();ftext(p.x,p.h+1.2,'WARD');if(dmg<.5){p.inv=.35;sparks(p.x,.5+p.h,dir,6,1);sfx('block');if(p.soulSh<=0)ftext(p.x,p.h+1.5,'WARD BROKEN',true);return true}}
   if(src&&src.kind&&TY[src.kind]&&TY[src.kind].boss)dmg*=1+.045*btier();
-  {const bp=bossPh();if(bp)dmg*=bp===1?.85:1.12}dmg=Math.round(dmg*mult());p.hp=Math.max(0,p.hp-dmg);if(!G.tutorial&&!bfOn('wolf'))p.ultG=Math.min(100,(p.ultG||0)+dmg*.6*(G.cls==='necro'?.4:1));p.inv=.55;p.flash=.1;p.combo=0;
+  {const bp=bossPh();if(bp)dmg*=bp===1?.85:1.12}dmg=Math.round(dmg*mult());p.hp=Math.max(0,p.hp-dmg);if(!G.tutorial&&!bfOn('wolf')&&!p.pult)p.ultG=Math.min(100,(p.ultG||0)+dmg*.6*(G.cls==='necro'?.4:1));p.inv=.55;p.flash=.1;p.combo=0;
   sparks(p.x,.5+p.h,dir,8,1.1);ftext(p.x,1+p.h,'-'+dmg,true);hitShake(dmg*1.4,dir);sfx('hurt');G.stop=.06;
   if(p.hp<=0){setState(p,'dead');p.vx=dir*2;G.overT=0;return true}
   setState(p,'hurt',.34);p.vx=dir*kb;p.face=-dir;return true;
@@ -2911,7 +2912,7 @@ function updUlts(dt){
   if(G.ultName){G.ultName.t+=dt;if(G.ultName.t>1.7)G.ultName=null}
   if(G.shatter){G.shatter.t+=dt;if(G.shatter.t>1.6)G.shatter=null}
   let dark=0,gl=0;
-  for(const u of ults){u.t+=dt;const e=u.e,t=u.t,z=zoneB(),T=TY[e.kind];
+  G.ultHit=true;for(const u of ults){u.t+=dt;const e=u.e,t=u.t,z=zoneB(),T=TY[e.kind];
     if(e.state==='dead'||e.gone){u.t=u.dur;continue}
     switch(u.type){
     case 'boss':{
@@ -2920,15 +2921,15 @@ function updUlts(dt){
       else if(!u.hit){const fl=Math.max(0,floorAt(e.x,.1,9));e.h=Math.max(fl,e.h-dt*50);
         if(e.h<=fl+.001){u.hit=1;e.h=fl;e.gnd=true;e.vh=0;e.ultMove=false;if(u.mk)u.mk.life=0;shake(.8);G.flash=.55;sfx('pound');sfx('boom');crack(e.x,fl,2.4);groundWave(e.x,fl,2);
           for(let k=0;k<3;k++)fx.push({t:'r',x:e.x,y:fl+.2,vx:0,vy:0,life:.4+k*.15,max:.4+k*.15,r:1.2+k*.9,w:5-k});
-          waves.push({x:e.x,dir:1,life:1.6,max:1.6,hit:false,dmg:T.udmg.wave},{x:e.x,dir:-1,life:1.6,max:1.6,hit:false,dmg:T.udmg.wave});u.wq=[2.05,2.35];
+          waves.push({x:e.x,dir:1,life:1.6,max:1.6,hit:false,dmg:T.udmg.wave,ult:1},{x:e.x,dir:-1,life:1.6,max:1.6,hit:false,dmg:T.udmg.wave,ult:1});u.wq=[2.05,2.35];
           if(Math.abs(p.x-e.x)<1.4&&p.h-fl<.8)hurtPlayer(Math.round(T.udmg.slam*1.3),Math.sign(p.x-e.x)||1,4,u,1)}}
-      if(u.wq&&u.wq.length&&t>=u.wq[0]){u.wq.shift();waves.push({x:e.x,dir:1,life:1.4,max:1.4,hit:false,dmg:T.udmg.wave},{x:e.x,dir:-1,life:1.4,max:1.4,hit:false,dmg:T.udmg.wave});shake(.25);sfx('pound')}
+      if(u.wq&&u.wq.length&&t>=u.wq[0]){u.wq.shift();waves.push({x:e.x,dir:1,life:1.4,max:1.4,hit:false,dmg:T.udmg.wave,ult:1},{x:e.x,dir:-1,life:1.4,max:1.4,hit:false,dmg:T.udmg.wave,ult:1});shake(.25);sfx('pound')}
       break}
     case 'shadow':{dark=Math.max(dark,.88*clamp(Math.min(t/.4,(u.dur-t)/.4),0,1));
       for(const s of u.slashes){if(!s.done&&t>=s.t0+.65){s.done=true;sfx('swing');sfx('hit');shake(.15);if(bandHit(s.low))hurtPlayer(Math.round(T.udmg.kick*1.3),s.dir,2.4,s)}}break}
     case 'golem':{if(!RM)G.shake=Math.max(G.shake,.1);if(Math.random()<dt*30)fx.push({t:'s',x:rnd(z.x0,z.x1),y:3.2,vx:0,vy:-1,life:.6,max:.6});
       for(const r of u.rocks){if(!r.mk&&t>=r.t0){r.mk=1;if(r.track)r.x=clamp(p.x,z.x0+.4,z.x1-.4);r.fl=Math.max(0,floorAt(r.x,.05,9));marks.push({x:r.x,h:r.fl,life:1.05,max:1.05,r:.7});r.at=t+.45}
-        if(r.at&&!r.done&&t>=r.at){r.done=true;eshots.push({x:r.x,h:r.fl+5.6,vx:0,vh:-3,grav:1,kind:'rock',dmg:T.udmg.rock,life:4,tr:[]})}}break}
+        if(r.at&&!r.done&&t>=r.at){r.done=true;eshots.push({x:r.x,h:r.fl+5.6,vx:0,vh:-3,grav:1,kind:'rock',dmg:T.udmg.rock,life:4,tr:[],ult:1})}}break}
     case 'bomblord':{if(t>=.6&&!u.land){u.land=1;sfx('land');shake(.2)}
       if(t>=.6&&t<3.4){const n=3-Math.floor((t-.6)/.934);if(n!==u.n){u.n=n;sfx('heart');G.flash=Math.max(G.flash,.08)}}
       if(t>=3.4&&!u.boom){u.boom=1;G.flash=.95;shake(.9);sfx('boom');sfx('pound');const fl=Math.max(0,floorAt(u.bx,.05,9));crack(u.bx,fl,2.6);groundWave(u.bx,fl,u.R);
@@ -2937,7 +2938,7 @@ function updUlts(dt){
         if(Math.abs(p.x-u.bx)<u.R&&p.h<2.2)hurtPlayer(Math.round(T.udmg.bomb*1.8),Math.sign(p.x-u.bx)||1,4.5,u,1);
         for(const o of enemies)if(o!==e&&!TY[o.kind].boss&&o.state!=='dead'&&Math.abs(o.x-u.bx)<u.R)hitEnemy(o,40,'boomx',Math.sign(o.x-u.bx)||1,3)}break}
     case 'storm':{dark=Math.max(dark,.62*clamp(Math.min(t/.4,(u.dur-t)/.4),0,1));if(Math.random()<dt*1.6)G.flash=Math.max(G.flash,.3);
-      u.nt-=dt;if(u.nt<=0&&t<u.dur-.9){u.nt=u.ni||.19;const x=Math.random()<.3?clamp(p.x+rnd(-.3,.3),z.x0+.3,z.x1-.3):rnd(z.x0+.3,z.x1-.3);bolts.push({x,t:0,warn:.75,dmg:Math.round(T.udmg.bolt*.8),struck:false})}break}
+      u.nt-=dt;if(u.nt<=0&&t<u.dur-.9){u.nt=u.ni||.19;const x=Math.random()<.3?clamp(p.x+rnd(-.3,.3),z.x0+.3,z.x1-.3):rnd(z.x0+.3,z.x1-.3);bolts.push({x,t:0,warn:.75,dmg:Math.round(T.udmg.bolt*.8),struck:false,ult:1})}break}
     case 'titan':{if(t<1.6){if(!RM)G.shake=Math.max(G.shake,.14);if(Math.random()<dt*40)fx.push({t:'s',x:rnd(z.x0,z.x1),y:3.4,vx:0,vy:-1,life:.6,max:.6})}
       if(t>=1.6&&!u.fell){u.fell=1;sfx('rumble');for(let x=z.x0+.25;x<z.x1;x+=.5){if(u.safe.some(sf=>x>sf[0]-.15&&x<sf[1]+.15))continue;u.chunks.push({x:x+rnd(-.08,.08),w:rnd(.36,.55),hh:rnd(.25,.45),h:6+rnd(0,1.6),vh:0,landed:false,rot:rnd(-.3,.3)})}}
       let snd=0;for(const ch of u.chunks){if(ch.landed)continue;ch.vh-=GRAV*dt;ch.h+=ch.vh*dt;if(ch.h<=0){ch.h=0;ch.landed=true;dust(ch.x,3,1,0);if(snd++<1)sfx('pound');shake(.2);
@@ -2956,7 +2957,7 @@ function updUlts(dt){
       break}
     case 'warlord':{if(t<.3&&!RM)G.shake=Math.max(G.shake,.2);if(!u.cry){u.cry=1;fx.push({t:'r',x:e.x,y:e.h+1.4,vx:0,vy:0,life:.6,max:.6,r:2.4,w:4})}
       for(const sp of u.sp){if(!sp.mk&&t>=sp.t0){sp.mk=1;if(sp.track)sp.x=clamp(p.x,z.x0+.4,z.x1-.4);sp.fl=Math.max(0,floorAt(sp.x,.05,9));marks.push({x:sp.x,h:sp.fl,life:.8,max:.8,r:sp.big?.55:.25});sp.at=t+.3}
-        if(sp.at&&!sp.done&&t>=sp.at){sp.done=true;eshots.push({x:sp.x,h:sp.fl+5.5,vx:0,vh:-6,grav:1,kind:'spear',big:!!sp.big,dmg:sp.big?T.udmg.slam:Math.round(T.udmg.punch*.8),life:3,tr:[]})}}break}
+        if(sp.at&&!sp.done&&t>=sp.at){sp.done=true;eshots.push({ult:1,x:sp.x,h:sp.fl+5.5,vx:0,vh:-6,grav:1,kind:'spear',big:!!sp.big,dmg:sp.big?T.udmg.slam:Math.round(T.udmg.punch*.8),life:3,tr:[]})}}break}
     case 'archmage':{const fl=Math.max(0,floorAt(e.x,.1,0));if(t<.6)e.h=lerp(u.h0,fl+1.5,ease(t/.6));else if(t<u.dur-.5)e.h=fl+1.5+Math.sin(t*3)*.08;else e.h=lerp(fl+1.5,fl,ease((t-(u.dur-.5))/.5));e.gnd=false;e.vh=0;
       e.face=Math.sign(p.x-e.x)||e.face;
       for(const b of u.beams){if(t>=b.t0-.85&&b.dir==null)b.dir=Math.sign(p.x-e.x)||1;
@@ -2973,6 +2974,7 @@ function updUlts(dt){
         if(ph[1]==='warn'&&u.lastPh!==ph[0]+'w'){u.lastPh=ph[0]+'w';sfx('glitch')}if(ph[1]==='on'&&u.lastPh!==ph[0]+'o'){u.lastPh=ph[0]+'o';sfx('beam');shake(.25)}}
       break}
     }}
+  G.ultHit=false;
   G.dark=lerp(G.dark||0,dark,1-Math.exp(-8*dt));G.glitch=Math.max(gl,G.glitchS);
   ults=ults.filter(u=>{if(u.t>=u.dur){endUlt(u);return false}return true});
 }
@@ -3061,7 +3063,7 @@ function update(dt){
   tickBuffs(dt);for(const e of enemies)updEnemy(e,dt);updUlts(dt);updPshots(dt);updAllies(dt);
   separate();
   enemies=enemies.filter(e=>!(e.state==='dead'&&e.st>1.4)&&!e.gone&&!(e.x<G.maxX-9&&!e.inZone));
-  for(const w of waves){w.x+=w.dir*3.6*dt;w.life-=dt;if(!w.hit&&Math.abs(p.x-w.x)<.2&&p.h<.18&&hurtPlayer(w.dmg||TY.boss.dmg.wave,w.dir,2.6,w,1))w.hit=true}
+  for(const w of waves){w.x+=w.dir*3.6*dt;w.life-=dt;if(!w.hit&&Math.abs(p.x-w.x)<.2&&p.h<.18&&hurtPlayer(w.dmg||TY.boss.dmg.wave,w.dir,2.6,w,w.ult?'ult':1))w.hit=true}
   waves=waves.filter(w=>w.life>0&&(!G.zone||(w.x>G.zone.x0&&w.x<G.zone.x1)));
   for(const sh of shots){sh.tr.push([sh.x,sh.h]);if(sh.tr.length>8)sh.tr.shift();sh.x+=sh.dir*5.5*dt;sh.life-=dt;
     for(const b of blocks){if(b.type!=='plat'&&sh.x>b.x0&&sh.x<b.x1&&sh.h>b.bot&&sh.h<b.top){sh.life=0;sparks(sh.x,sh.h,-sh.dir,5,.8)}}
@@ -3074,13 +3076,13 @@ function update(dt){
   for(const sh of eshots){sh.life-=dt;sh.rot=(sh.rot||0)+dt*18;if(eshotBlock(sh))continue;
     if(sh.grav){if(sh.fuse!=null){sh.fuse-=dt;if(sh.fuse<=0){boom(sh.x,sh.h,.9,sh.dmg);sh.life=0}continue}
       sh.vh-=GRAV*dt;sh.x+=sh.vx*dt;sh.h+=sh.vh*dt;const fl=floorAt(sh.x,.05,sh.h+.2);
-      if(sh.vh<0&&fl>-50&&sh.h<=fl){sh.h=fl;if(sh.kind==='bomb'){sh.fuse=.45;sh.vx=0;sh.vh=0}else if(sh.kind==='spear'){spearLand(sh,fl);sh.life=0}else{boom(sh.x,fl,.75,sh.dmg);crack(sh.x,fl,1);sh.life=0}}continue}
+      if(sh.vh<0&&fl>-50&&sh.h<=fl){G.ultHit=!!sh.ult;sh.h=fl;if(sh.kind==='bomb'){sh.fuse=.45;sh.vx=0;sh.vh=0}else if(sh.kind==='spear'){spearLand(sh,fl);sh.life=0}else{boom(sh.x,fl,.75,sh.dmg);crack(sh.x,fl,1);sh.life=0}G.ultHit=false}continue}
     sh.x+=sh.dir*(sh.spd||4.2)*dt;
     for(const b of blocks){if(b.type!=='plat'&&sh.x>b.x0&&sh.x<b.x1&&sh.h>b.bot&&sh.h<b.top)sh.life=0}
     if(sh.life>0&&Math.abs(sh.x-p.x)<.14&&sh.h>p.h&&sh.h<p.h+.8){if(rDodge()){if(!sh.dodged){sh.dodged=true;ftext(p.x,p.h+1.05,'DODGE');sfx('dodge')}}else if(hurtPlayer(sh.dmg,sh.dir,1.6,null))sh.life=0}}
   eshots=eshots.filter(q=>q.life>0);
   updHazards(dt);for(const b of bolts){b.t+=dt;if(!b.struck&&b.t>=b.warn){b.struck=true;shake(.25);sfx('thunder');sparks(b.x,.2,1,8,1.2);sparks(b.x,.2,-1,8,1.2);crack(b.x,Math.max(0,floorAt(b.x,.05,9)),.8);
-    if(Math.abs(p.x-b.x)<.42)hurtPlayer(b.dmg,p.face,2.4,null,1)}}
+    if(Math.abs(p.x-b.x)<.42)hurtPlayer(b.dmg,p.face,2.4,null,b.ult?'ult':1)}}
   bolts=bolts.filter(b=>b.t<b.warn+.3);
   for(const m of marks)m.life-=dt;marks=marks.filter(m=>m.life>0);
   for(const k of spikes){k.t+=dt;if(!k.struck&&k.t>=k.delay+k.warn){k.struck=true;sparks(k.x,k.h+.1,1,4,.8);dust(k.x,3,.8,k.h);if(Math.abs(p.x-k.x)<.3&&p.h-k.h<.45)hurtPlayer(k.dmg,Math.sign(p.x-k.x)||1,2.6,null)}}
