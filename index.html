@@ -1132,7 +1132,7 @@ let p=null,enemies=[],fx=[],texts=[],waves=[],shots=[],pwaves=[],eshots=[],bolts
 let best={w:0,wl:'—',k:0,c:0,d:0};
 try{best=Object.assign(best,JSON.parse(localStorage.getItem('zm-fight-best')||'{}'))}catch(_){}
 function showBest(){{const sb=$('#shopBtn');if(sb)sb.innerHTML=`<small>SHOP</small><b class="coinhud"><svg class="dico coini" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/></svg>${coinTxt()}</b>`;const prb=$('#practiceBtn');if(prb)prb.textContent=(SHOP.cls||'base')==='base'?'튜토리얼':'튜토리얼 · '+CLS[SHOP.cls].name;const chb=$('#charBtn');if(chb)chb.innerHTML=`<small>CHARACTER</small><b>${CLS[SHOP.cls||'base'].name}</b>`}const cc=SHOP.cls||'base',cn=CLS[cc].name,sv=getProg(cc);
-  {const mx=Math.max(sv.max||0,sv.idx||0),wb=$('#waveBtn');wb.hidden=!(mx>0);wb.textContent='웨이브 선택';wb.onclick=()=>openWaves(mx,sv.idx)}const cb=$('#contBtn');if(sv.idx>0){cb.hidden=false;cb.textContent=`이어하기 · ${cn} · R${Math.floor(sv.idx/5)+1} WAVE ${sv.idx%5+1}${sv.idx%5===4?' (BOSS)':''}`;cb.onclick=()=>{closeTut();startGame(sv.idx)}}else cb.hidden=true;$('#bW').textContent=best.wl||'—';$('#bD').textContent=Math.floor(best.d)+'m';$('#bC').textContent=best.c}
+  {const mx=DEV.on?49:Math.max(sv.max||0,sv.idx||0),wb=$('#waveBtn');wb.hidden=!(mx>0);wb.textContent='웨이브 선택';wb.onclick=()=>openWaves(mx,sv.idx,DEV.on?{dev:1}:{})}const cb=$('#contBtn');if(sv.idx>0){cb.hidden=false;cb.textContent=`이어하기 · ${cn} · R${Math.floor(sv.idx/5)+1} WAVE ${sv.idx%5+1}${sv.idx%5===4?' (BOSS)':''}`;cb.onclick=()=>{closeTut();startGame(sv.idx)}}else cb.hidden=true;$('#bW').textContent=best.wl||'—';$('#bD').textContent=Math.floor(best.d)+'m';$('#bC').textContent=best.c}
 
 function applyStats(full){const rr=Math.max(1,G.round|0);p.lvl=rr;p.maxHp=100+15*(rr-1);p.atk=1+.12*(rr-1);p.regen=24*(1+.06*(rr-1));if(full)p.hp=p.maxHp}
 function newPlayer(){return{kind:'hero',size:HERO,x:1.6,h:0,gnd:true,wall:0,wallB:null,wallT:0,wallDir:0,noSteer:0,safe:{x:1.6,h:0},pk:null,vx:0,face:1,state:'idle',st:0,dur:0,w:.2,phase:0,vh:0,ultG:0,cd:{upper:0,spin:0,dash:0},hp:100,maxHp:100,atk:1,regen:24,lvl:1,sta:100,inv:0,combo:0,lastHit:-9,hitSet:new Set(),seed:0,flash:0}}
@@ -3851,7 +3851,7 @@ let ufTimer=0;function showUnlock(a){const d=UDESC[a]?unlockInfo(a):null;if(!d)r
   $('#ufDesc').textContent=`'${d[0]}' 스킬이 잠금 해제되었어요 · ${km(d[1]+'')} 키 · 모바일 ${d[2]} 버튼 — ${d[3]}`;el.hidden=true;void el.offsetWidth;el.hidden=false;
   clearTimeout(ufTimer);ufTimer=setTimeout(()=>{el.hidden=true},3300);sfx('pound')}
 /* ---------- wave select ---------- */
-function openWaves(mx,last,opt){opt=opt||{};const rounds=opt.admin?10:Math.max(10,Math.floor(mx/5)+2),b=$('#waveBody');let h='<p class="whelp">지금 장착한 캐릭터로 한 번이라도 도달한 웨이브만 다시 들어갈 수 있어요. 캐릭터마다 진행 상황이 따로 저장돼요. 그 라운드까지 이긴 보스만큼 해금 스킬도 열린 채로 시작해요.</p>';
+function openWaves(mx,last,opt){opt=opt||{};const rounds=opt.admin||opt.dev?10:Math.max(10,Math.floor(mx/5)+2),b=$('#waveBody');let h='<p class="whelp">지금 장착한 캐릭터로 한 번이라도 도달한 웨이브만 다시 들어갈 수 있어요. 캐릭터마다 진행 상황이 따로 저장돼요. 그 라운드까지 이긴 보스만큼 해금 스킬도 열린 채로 시작해요.</p>';
   h+='<div class="wrounds">';
   for(let r2=1;r2<=rounds;r2++){const rl=(r2-1)*5>mx;h+=`<section class="wcard${rl?' rlock':''}"><div class="wround">ROUND ${r2}<span>${rl?'LOCKED':TY[BOSSES[(r2-1)%BOSSES.length]].name}</span></div><div class="wgrid">`;
     for(let w=0;w<5;w++){const idx=(r2-1)*5+w,boss=w===4,j=idx-Math.floor(idx/5),mid=!boss&&j%3===2,lock=idx>mx;
@@ -3859,7 +3859,7 @@ function openWaves(mx,last,opt){opt=opt||{};const rounds=opt.admin?10:Math.max(1
       const LK='<svg class="lk" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.2 10.5V7.6a3.8 3.8 0 0 1 7.6 0v2.9" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="15.5" r="1.4" fill="currentColor"/></svg>';
       h+=`<button class="wcell${boss?' boss':''}${mid?' mid':''}${idx===last?' cur':''}${lock?' locked':''}" data-i="${idx}" ${lock?'disabled aria-label="잠김"':''}>${lock?LK:`<b>${boss?'BOSS':w+1}</b>`}<small>${lock?(boss?'BOSS':'WAVE '+(w+1)):sub}</small></button>`}
     h+='</div></section>'}
-  h+='</div>';b.innerHTML=h;$('#waveInfo').textContent=opt.admin?`ADMIN · ${CLS[admSel].name} · 전체 열림`:`${CLS[SHOP.cls||'base'].name} · 최고 R${Math.floor(mx/5)+1}-${mx%5+1}`;$('#waveBack').hidden=false;
+  h+='</div>';b.innerHTML=h;$('#waveInfo').textContent=opt.admin?`ADMIN · ${CLS[admSel].name} · 전체 열림`:opt.dev?`개발자 · ${CLS[SHOP.cls||'base'].name} · 전체 열림`:`${CLS[SHOP.cls||'base'].name} · 최고 R${Math.floor(mx/5)+1}-${mx%5+1}`;$('#waveBack').hidden=false;
   b.querySelectorAll('.wcell:not(.locked)').forEach(el=>el.onclick=()=>{$('#waveBack').hidden=true;closeTut();if(opt.admin){G.cls=admSel;G.adminSkin=$('#admSkin').checked;$('#admPanel').hidden=true;startGame(+el.dataset.i,true)}else startGame(+el.dataset.i)})}
 $('#waveClose').onclick=()=>{$('#waveBack').hidden=true};
 $('#waveBack').addEventListener('click',e=>{if(e.target.id==='waveBack')$('#waveBack').hidden=true});
