@@ -4030,9 +4030,9 @@ const FIREBASE_CONFIG={
   const ready=!!(window.firebase&&firebase.apps&&firebase.apps.length&&firebase.database&&typeof FIREBASE_CONFIG!=='undefined'&&!/YOUR_/.test(FIREBASE_CONFIG.databaseURL||'YOUR_'));
   let db=null,auth=null,me=null,myNick='',offs=[],friends={},fst={},fnick={},reqs={},chIn={},out=null,match=null,note='',noteEr=false,pick=null,toastFor=null;
   const TS=()=>firebase.database.ServerValue.TIMESTAMP;
-  function on(ref,ev,fn){ref.on(ev,fn,err=>{note='온라인 연결 오류 · '+(err&&err.code||'');noteEr=true;render()});offs.push(()=>ref.off(ev,fn))}
+  function on(ref,ev,fn){ref.on(ev,fn,err=>{note=dbErr(err);noteEr=true;render()});offs.push(()=>ref.off(ev,fn))}
   function cleanup(){offs.forEach(f=>{try{f()}catch(_){}});offs=[];friends={};fst={};fnick={};reqs={};chIn={};out=null;myNick='';toast.hidden=true}
-  function open(){ov.hidden=false;render()}
+  function open(){ov.hidden=false;render();if(db&&me&&!myNick){withTO(db.ref('users/'+me.uid+'/nick').get(),8000).then(s2=>{if(s2.val()){myNick=s2.val();render()}}).catch(e=>say(dbErr(e),1))}}
   function close(){ov.hidden=true}
   window.ZMONLINE={open,close};
   function say(m,er){note=m;noteEr=!!er;render()}
@@ -4063,15 +4063,18 @@ const FIREBASE_CONFIG={
     box.querySelectorAll('[data-ch]').forEach(b=>b.onclick=()=>challenge(b.dataset.ch));
     box.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const u=b.dataset.del;db.ref(`friends/${me.uid}/${u}`).remove();db.ref(`friends/${u}/${me.uid}`).remove()})}
   const NICK=/^[가-힣a-zA-Z0-9_]{2,12}$/;
-  async function setNick(n){if(!NICK.test(n))return say('닉네임은 2~12자의 한글·영문·숫자·_ 만 쓸 수 있어요.',1);const key=n.toLowerCase();
-    try{const r=await db.ref('nicks/'+key).transaction(cur=>cur&&cur!==me.uid?undefined:me.uid);if(!r.committed)return say('이미 쓰는 사람이 있는 닉네임이에요.',1);
-      if(myNick&&myNick.toLowerCase()!==key)await db.ref('nicks/'+myNick.toLowerCase()).remove().catch(()=>{});await db.ref('users/'+me.uid).update({nick:n});myNick=n;say('닉네임을 저장했어요.')}catch(e){say('저장 실패 · '+(e.code||e.message),1)}}
+  function dbErr(e){const c=String(e&&(e.code||e.message)||e||'');if(/timeout/i.test(c))return'데이터베이스에 연결되지 않아요. Firebase에서 Realtime Database를 만들었는지, 위치를 미국(us-central1)으로 골랐는지 확인해 주세요.';if(/permission/i.test(c))return'권한이 없어요. Realtime Database → 규칙 탭에 안내받은 규칙을 붙여 넣고 게시했는지 확인해 주세요.';return'오류 · '+c}
+  const withTO=(pr,ms)=>Promise.race([pr,new Promise((_,rj)=>setTimeout(()=>rj({code:'timeout'}),ms||8000))]);
+  async function setNick(n){if(!NICK.test(n))return say('닉네임은 2~12자의 한글·영문·숫자·_ 만 쓸 수 있어요.',1);const key=n.toLowerCase();say('저장하는 중…');
+    try{const cur=(await withTO(db.ref('nicks/'+key).get())).val();if(cur&&cur!==me.uid)return say('이미 쓰는 사람이 있는 닉네임이에요.',1);
+      await withTO(db.ref('nicks/'+key).set(me.uid));
+      if(myNick&&myNick.toLowerCase()!==key)await db.ref('nicks/'+myNick.toLowerCase()).remove().catch(()=>{});await withTO(db.ref('users/'+me.uid).update({nick:n}));myNick=n;say('닉네임을 저장했어요.')}catch(e){say(dbErr(e),1)}}
   async function addFriend(n){if(!n)return;if(n.toLowerCase()===myNick.toLowerCase())return say('내 닉네임이에요.',1);try{const s=await db.ref('nicks/'+n.toLowerCase()).get();const u=s.val();if(!u)return say('그 닉네임을 쓰는 사람이 없어요.',1);if(friends[u])return say('이미 친구예요.',1);
-      await db.ref(`friendReq/${u}/${me.uid}`).set({nick:myNick,t:TS()});say(n+'님에게 친구 요청을 보냈어요. 수락하면 친구가 돼요.')}catch(e){say('요청 실패 · '+(e.code||e.message),1)}}
-  async function acceptReq(u){const r=reqs[u];if(!r)return;try{await db.ref(`friends/${me.uid}/${u}`).set({nick:r.nick,t:TS()});await db.ref(`friends/${u}/${me.uid}`).set({nick:myNick,t:TS()});await db.ref(`friendReq/${me.uid}/${u}`).remove();say(r.nick+'님과 친구가 됐어요!')}catch(e){say('수락 실패 · '+(e.code||e.message),1)}}
+      await db.ref(`friendReq/${u}/${me.uid}`).set({nick:myNick,t:TS()});say(n+'님에게 친구 요청을 보냈어요. 수락하면 친구가 돼요.')}catch(e){say(dbErr(e),1)}}
+  async function acceptReq(u){const r=reqs[u];if(!r)return;try{await db.ref(`friends/${me.uid}/${u}`).set({nick:r.nick,t:TS()});await db.ref(`friends/${u}/${me.uid}`).set({nick:myNick,t:TS()});await db.ref(`friendReq/${me.uid}/${u}`).remove();say(r.nick+'님과 친구가 됐어요!')}catch(e){say(dbErr(e),1)}}
   /* ---- challenges ---- */
   async function challenge(u){if(out)return;const cls=pick||'base',nick=fnick[u]||friends[u].nick;const ref=db.ref(`challenges/${u}/${me.uid}`);
-    try{await ref.set({nick:myNick,cls,sk:ZMG.skinOn(cls)?1:0,t:TS(),st:'wait'})}catch(e){return say('신청 실패 · '+(e.code||e.message),1)}
+    try{await ref.set({nick:myNick,cls,sk:ZMG.skinOn(cls)?1:0,t:TS(),st:'wait'})}catch(e){return say(dbErr(e),1)}
     out={u,nick,cls,ref,tm:setTimeout(()=>{if(out&&out.u===u){cancelOut();say(nick+'님이 응답하지 않았어요.',1)}},40000)};
     const fn=snap=>{const v=snap.val();if(!out||out.u!==u)return;if(!v){ref.off('value',fn);clearTimeout(out.tm);out=null;render();return}
       if(v.st==='declined'){ref.off('value',fn);clearTimeout(out.tm);out=null;ref.remove();say(nick+'님이 대결을 거절했어요.',1)}
@@ -4082,7 +4085,7 @@ const FIREBASE_CONFIG={
     const u=ks[0],v=chIn[u];toastFor=u;toast.innerHTML=`<div><b>${esc(v.nick)}</b>님이 <b>${esc(cname(v.cls))}</b> 미러전 대결을 신청했어요!</div><div class="rowi"><button class="pri" id="tAcc">수락</button><button id="tDec">거절</button></div>`;toast.hidden=false;
     toast.querySelector('#tAcc').onclick=()=>acceptCh(u);toast.querySelector('#tDec').onclick=()=>{db.ref(`challenges/${me.uid}/${u}`).update({st:'declined'});delete chIn[u];showToast()}}
   async function acceptCh(u){const v=chIn[u];if(!v)return;toast.hidden=true;if(window.ZMG&&!ZMG.inLobby()){say('로비에서만 대결을 시작할 수 있어요.',1);return}
-    const rid=db.ref('rooms').push().key;try{await db.ref('rooms/'+rid).set({a:u,b:me.uid,cls:v.cls,t:TS()});await db.ref(`challenges/${me.uid}/${u}`).update({st:'accepted',room:rid,ask:ZMG.skinOn(v.cls)?1:0})}catch(e){return say('수락 실패 · '+(e.code||e.message),1)}
+    const rid=db.ref('rooms').push().key;try{await db.ref('rooms/'+rid).set({a:u,b:me.uid,cls:v.cls,t:TS()});await db.ref(`challenges/${me.uid}/${u}`).update({st:'accepted',room:rid,ask:ZMG.skinOn(v.cls)?1:0})}catch(e){return say(dbErr(e),1)}
     delete chIn[u];startMatch(rid,u,v.nick,v.cls,1,!!v.sk)}
   /* ---- match ---- */
   function startMatch(rid,opp,oppNick,cls,side,oppSkin){endMatch();const sref=db.ref(`rooms/${rid}/s/${opp}`),eref=db.ref(`rooms/${rid}/e`),mine=db.ref(`rooms/${rid}/s/${me.uid}`);mine.onDisconnect().remove();
