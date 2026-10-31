@@ -791,13 +791,14 @@ const heroWeapon=(c,o,d,T,S,st,fl,e)=>{const cl=e.cls||G.cls;if(!cl||cl==='base'
     const hp=o.hip,t2=performance.now()/1000,sw=Math.sin(t2*6)*.06,ta=[hp[0]-d*.04,hp[1]-.02],tm=[hp[0]-d*.26,hp[1]-.02+sw],tb=[hp[0]-d*.44,hp[1]-.22+sw],A2=T(ta),M2=T(tm),B2=T(tb);c.lineWidth=Math.max(2,S*(big?.05:.035));c.beginPath();c.moveTo(A2[0],A2[1]);c.quadraticCurveTo(M2[0],M2[1],B2[0],B2[1]);c.stroke();
     if(tg){c.lineWidth=Math.max(1,S*.014);c.save();c.strokeStyle='#0b0b0b';c.shadowBlur=0;for(const q of[.35,.6,.82]){const x=(1-q)*(1-q)*ta[0]+2*(1-q)*q*tm[0]+q*q*tb[0],y=(1-q)*(1-q)*ta[1]+2*(1-q)*q*tm[1]+q*q*tb[1];line([x-.02,y-.03],[x+.02,y+.03])}c.restore()}break}
   case 'bard':{const fl2=heroSkinOn(e)==='bard',play=e.state==='w_play'||(e===p&&p.pult&&p.pult.k==='bard');c.lineWidth=Math.max(1.4,S*.024);
-    if(fl2){const m=play?[hc[0]+d*r*.55,hc[1]+r*.6]:[o.hip[0]-d*.12,o.hip[1]+.04],fh=play?o.fa[2]:[o.hip[0]+d*.14,o.hip[1]-.34],dx=play?d*.968:fh[0]-m[0],dy=play?.25:fh[1]-m[1],dl=Math.hypot(dx,dy)||1,ux=dx/dl,uy=dy/dl,L=play?.6:.5,e2=[m[0]+ux*L,m[1]+uy*L],nx=-uy,ny=ux,P=(a,b)=>T([m[0]+ux*a+nx*b,m[1]+uy*a+ny*b]);
+    if(!play&&!e._back){c.save();c.shadowBlur=0;c.lineWidth=Math.max(1,S*.014);c.globalAlpha*=.85;line([o.sh[0]+d*.035,o.sh[1]+.03],[o.hip[0]-d*.1,o.hip[1]-.02]);c.restore();break}
+    if(fl2){const m=play?[hc[0]+d*r*.55,hc[1]+r*.6]:[o.hip[0]-d*.2,o.hip[1]+.03],fh=play?o.fa[2]:[o.sh[0]+d*.05,o.sh[1]-.26],dx=play?d*.968:fh[0]-m[0],dy=play?.25:fh[1]-m[1],dl=Math.hypot(dx,dy)||1,ux=dx/dl,uy=dy/dl,L=play?.6:.5,e2=[m[0]+ux*L,m[1]+uy*L],nx=-uy,ny=ux,P=(a,b)=>T([m[0]+ux*a+nx*b,m[1]+uy*a+ny*b]);
       c.save();c.lineCap='round';c.lineWidth=Math.max(2.4,S*.04);line(m,e2);c.strokeStyle='rgba(11,11,11,.55)';c.shadowBlur=0;c.lineWidth=Math.max(.8,S*.01);line([m[0]+ux*.03,m[1]+uy*.03],[e2[0]-ux*.03,e2[1]-uy*.03]);c.strokeStyle=st.ink;c.lineWidth=Math.max(1,S*.012);
       for(const a of[L*.28,L*.62]){const a1=P(a,-.026),a2=P(a,.026);c.beginPath();c.moveTo(a1[0],a1[1]);c.lineTo(a2[0],a2[1]);c.stroke()}
       const lp=P(.07,-.012);c.beginPath();c.ellipse(lp[0],lp[1],S*.022,S*.011,Math.atan2(uy,ux*d)*d,0,Math.PI*2);c.fillStyle='#0b0b0b';c.fill();c.stroke();
       c.fillStyle=st.ink;for(let i=0;i<6;i++){const q=P(L*(.36+i*.085),-.021);c.beginPath();c.arc(q[0],q[1],Math.max(1.1,S*.011),0,Math.PI*2);c.fill()}for(let i=0;i<2;i++){const q=P(L*(.38+i*.2),.02);c.fillRect(q[0]-1,q[1]-1,2.4,2.4)}
       const ec=P(L,0);c.beginPath();c.arc(ec[0],ec[1],Math.max(1.4,S*.016),0,Math.PI*2);c.stroke();c.restore();break}
-    let base,ne;if(play){base=[o.hip[0]+d*.06,o.hip[1]-.07];ne=[o.ba[2][0]+d*.07,o.ba[2][1]-.05]}else{base=[o.hip[0]-d*.16,o.hip[1]-.1];ne=[o.sh[0]-d*.24,o.sh[1]-.02]}
+    let base,ne;if(play){base=[o.hip[0]+d*.06,o.hip[1]-.07];ne=[o.ba[2][0]+d*.07,o.ba[2][1]-.05]}else{base=[o.hip[0]-d*.21,o.hip[1]+.06];ne=[o.sh[0]+d*.04,o.sh[1]-.3]}
     {const B=T(base),N=T(ne),an=Math.atan2(N[1]-B[1],N[0]-B[0]),bs=S*.085,L=Math.max(bs*3.8,Math.hypot(N[0]-B[0],N[1]-B[1])+bs*.4);c.save();c.translate(B[0],B[1]);c.rotate(an);if(d<0)c.scale(1,-1);c.lineJoin='round';c.lineCap='round';const ink=st.ink;
       c.fillStyle='#161616';c.strokeStyle=ink;c.lineWidth=Math.max(1.3,S*.018);c.beginPath();c.moveTo(-bs,0);c.bezierCurveTo(-bs,-bs*1.15,bs*.75,-bs*1.2,bs*1.05,-bs*.6);c.bezierCurveTo(bs*1.3,-bs*.98,bs*2.35,-bs*.95,bs*2.4,0);c.bezierCurveTo(bs*2.35,bs*.95,bs*1.3,bs*.98,bs*1.05,bs*.6);c.bezierCurveTo(bs*.75,bs*1.2,-bs,bs*1.15,-bs,0);c.closePath();c.fill();c.stroke();
       c.save();c.clip();const gl=c.createLinearGradient(0,-bs,0,bs);gl.addColorStop(0,'rgba(255,255,255,.16)');gl.addColorStop(.45,'rgba(255,255,255,0)');c.fillStyle=gl;c.fillRect(-bs,-bs*1.2,bs*3.5,bs*2.4);c.restore();
@@ -842,6 +843,7 @@ function drawFig(c,e,P,X,Y,S,alpha=1){
   c.save();c.lineCap='round';c.lineJoin='round';c.lineWidth=Math.max(1.4,st.lw*S);
   c.strokeStyle=fl?'#fff':st.ink;c.fillStyle=fl?'#fff':st.ink;
   c.shadowColor=fl?'rgba(255,255,255,1)':st.glowC;c.shadowBlur=(fl?.35:st.glow)*S;
+  if(e.kind==='hero'&&(e.cls||G.cls)==='bard'&&!(e.state==='w_play'||(e===p&&p.pult&&p.pult.k==='bard'))){c.save();c.globalAlpha=alpha*.92;e._back=1;try{heroWeapon(c,o,d,T,S,st,fl,e)}catch(_){}e._back=0;c.restore();c.lineCap='round';c.lineJoin='round';c.lineWidth=Math.max(1.4,st.lw*S);c.strokeStyle=fl?'#fff':st.ink;c.fillStyle=fl?'#fff':st.ink;c.shadowColor=fl?'rgba(255,255,255,1)':st.glowC;c.shadowBlur=(fl?.35:st.glow)*S}
   const kb=P.kl==='bl';
   c.globalAlpha=alpha*.42;c.beginPath();poly(o.ba);poly(kb?o.fl:o.bl);c.stroke();
   c.globalAlpha=alpha;c.beginPath();poly([o.hip,o.sh,o.nk]);poly(kb?o.bl:o.fl);poly(o.fa);c.stroke();
@@ -1351,8 +1353,20 @@ function drawGroove(c,X,Yh){if(G.cls!=='bard'||G.mode!=='play'||!kitMode()||p.st
   c.save();c.shadowBlur=0;c.strokeStyle=`rgba(255,236,160,${.18+.55*q})`;c.lineWidth=1.5+1.5*q;c.beginPath();c.ellipse(x,y,U*(.34+.16*q),U*(.07+.03*q),0,0,Math.PI*2);c.stroke();
   const hy=Yh(p.h+p.size*1.32);for(let i=0;i<4;i++){const px=x+(i-1.5)*U*.11,on=i<g;c.fillStyle=on?(g>=4?`rgba(255,244,190,${.75+.25*Math.sin(G.T*16)})`:'rgba(255,236,160,.95)'):'rgba(255,255,255,.16)';if(on){c.shadowColor='rgba(255,220,120,1)';c.shadowBlur=g>=4?10:5}else c.shadowBlur=0;c.beginPath();c.ellipse(px,hy,U*.026,U*.02,-.4,0,Math.PI*2);c.fill();c.fillRect(px+U*.022,hy-U*.075,Math.max(1,U*.008),U*.075)}
   c.restore()}
+function drNoteShot(c,s,x,y,dr){const R=U*.17*(s.sc||1),wob=Math.sin(G.T*14+(s.px||0))*.22;c.translate(x,y+Math.sin(G.T*18+(s.px||0))*U*.03);c.rotate(wob);c.scale(dr,1);
+  c.fillStyle='#fff8d8';c.strokeStyle='#fff8d8';c.shadowColor='rgba(255,226,130,1)';c.shadowBlur=14;c.lineWidth=Math.max(2,R*.16);c.lineCap='round';
+  const head=(hx,hy)=>{c.beginPath();c.ellipse(hx,hy,R*.36,R*.26,-.45,0,Math.PI*2);c.fill()};
+  if(s.dbl){head(-R*.34,R*.55);head(R*.42,R*.4);c.beginPath();c.moveTo(-R*.02,R*.5);c.lineTo(-R*.02,-R*.7);c.lineTo(R*.76,-R*.85);c.lineTo(R*.76,R*.35);c.stroke();c.lineWidth*=1.6;c.beginPath();c.moveTo(-R*.02,-R*.62);c.lineTo(R*.76,-R*.77);c.stroke()}
+  else{head(0,R*.5);c.beginPath();c.moveTo(R*.32,R*.42);c.lineTo(R*.32,-R*.85);c.stroke();c.beginPath();c.moveTo(R*.32,-R*.85);c.quadraticCurveTo(R*.9,-R*.55,R*.62,-R*.05);c.stroke()}
+  c.globalAlpha*=.35;c.shadowBlur=0;c.lineWidth=Math.max(1,R*.08);for(let i=1;i<=2;i++){c.beginPath();c.arc(-R*(.5+i*.35),R*.1,R*(.35+i*.2),-.9,.9);c.stroke()}}
+function drSheet(c,s,x,y,dr){const W2=U*.5,H2=U*.36,ph=s.ph||0,rot=Math.sin(G.T*9+ph)*.18,fl2=Math.sin(G.T*12+ph)*.12;c.translate(x,y);c.rotate(rot);c.scale(dr,1);c.transform(1,0,fl2,1,0,0);
+  c.shadowColor='rgba(255,226,130,.9)';c.shadowBlur=12;c.fillStyle='rgba(255,250,232,.95)';c.strokeStyle='#fff3c4';c.lineWidth=1.5;c.beginPath();c.moveTo(-W2/2,-H2/2);c.lineTo(W2/2-U*.05,-H2/2);c.lineTo(W2/2,-H2/2+U*.05);c.lineTo(W2/2,H2/2);c.lineTo(-W2/2,H2/2);c.closePath();c.fill();c.stroke();
+  c.shadowBlur=0;c.strokeStyle='rgba(40,32,18,.75)';c.lineWidth=Math.max(.8,U*.006);const top=-H2*.28,gap=H2*.13;for(let i=0;i<5;i++){c.beginPath();c.moveTo(-W2*.44,top+i*gap);c.lineTo(W2*.44,top+i*gap);c.stroke()}
+  c.lineWidth=Math.max(1,U*.009);c.beginPath();const cx=-W2*.36;c.moveTo(cx,top+gap*4.6);c.bezierCurveTo(cx+W2*.08,top+gap*2,cx-W2*.07,top-gap*.6,cx,top-gap*.8);c.bezierCurveTo(cx+W2*.06,top+gap*1.4,cx-W2*.08,top+gap*3.6,cx+W2*.04,top+gap*2.6);c.stroke();
+  c.fillStyle='rgba(40,32,18,.85)';const NT=[[-.16,3.5],[.0,2],[.14,2.5],[.28,1]];for(const [nx,ny] of NT){const hx=W2*nx,hy=top+gap*ny;c.beginPath();c.ellipse(hx,hy,gap*.6,gap*.42,-.4,0,Math.PI*2);c.fill();c.beginPath();c.moveTo(hx+gap*.55,hy);c.lineTo(hx+gap*.55,hy-gap*2.8);c.stroke()}
+  c.beginPath();c.moveTo(W2*.0+gap*.55,top+gap*2-gap*2.8);c.lineTo(W2*.14+gap*.55,top+gap*2.5-gap*2.8);c.lineWidth=Math.max(1.5,U*.014);c.stroke()}
 function eqTrail(s,dt){s.eqd=(s.eqd||0)+Math.abs(s.vx)*dt;while(s.eqd>.16){s.eqd-=.16;const by=gnd(s.x,s.h-.22);fx.push({t:'eq',x:s.x-Math.sign(s.vx)*.1,y:by,by,vx:0,vy:0,hh:rnd(.25,.7),life:.38,max:.38})}}
-function trebTrail(s,dt){if(Math.random()<dt*10)notes(s.x,s.h,1);if(Math.random()<dt*40)fx.push({t:'s',x:s.x,y:s.h+rnd(-.05,.05),vx:-s.vx*.12,vy:rnd(-.4,.4),life:.18,max:.18})}
+function trebTrail(s,dt){if(Math.random()<dt*16)notes(s.x-Math.sign(s.vx)*.2,s.h,1)}
 function drSpeaker(c,k,a,X,Yh){const x=X(k.x),y=Yh(k.h),q=1-a;c.shadowBlur=0;c.strokeStyle='#fff8d8';for(let i=0;i<4;i++){const t=q*1.6-i*.18;if(t<=0||t>1)continue;c.globalAlpha=a*(1-t);c.lineWidth=3-i*.5;c.beginPath();c.ellipse(x,y,U*(.3+t*2.2),U*(.06+t*.32),0,0,Math.PI*2);c.stroke()}}
 function drSnap(c,k,a,X,Yh){const x=X(k.x),y=Yh(k.h);c.strokeStyle='#fff8d8';c.shadowColor='rgba(255,230,140,1)';c.shadowBlur=10;c.lineWidth=1.4;for(let i=0;i<5;i++){const yy=y-U*.08+i*U*.04,amp=U*.03*a*Math.sin(G.T*90+i);c.beginPath();c.moveTo(x,yy);c.quadraticCurveTo(x+k.f*U*.35,yy+amp,x+k.f*U*.7,yy);c.stroke()}}
 function drOrbit(c,k,a,X,Yh){const al=Math.min(1,k.life*2,(k.max-k.life)*4),x=X(p.x),y=Yh(p.h+p.size*.55),T2=G.T*(k.sty==='haste'?4:2.4);c.globalAlpha=al*.9;c.fillStyle=c.strokeStyle=k.sty==='haste'?'#fff3c4':'#fff8d8';c.shadowColor='rgba(255,230,140,.9)';c.shadowBlur=6;c.lineWidth=Math.max(1,U*.01);
@@ -1421,7 +1435,9 @@ function hurtPlayer(dmg,dir,kb,src,nd){
 
 /* ---------- updates ---------- */
 function regen(dt){if(p.state!=='roll'&&p.state!=='wallclimb')p.sta=Math.min(100,p.sta+(p.regen||24)*dt)}
-function clampPlayer(){let lo=G.camMin+.22,hi=1e9;if(G.tutorial){lo=.25;hi=(TSTEPS[TS.i]||{}).wall||27}const z=G.zone;if(z&&G.phase!=='travel'){lo=z.x0+.2;hi=z.x1-.2}if(G.cell){lo=Math.max(lo,G.cell.x0+.15);hi=Math.min(hi,G.cell.x1-.15)}p.x=clamp(p.x,lo,hi)}
+const SCRW={type:'wall',scr:1,x0:0,x1:0,bot:-99,top:0};
+function clampPlayer(){let lo=G.camMin+.22,hi=1e9;if(G.tutorial){lo=.25;hi=(TSTEPS[TS.i]||{}).wall||27}const z=G.zone;if(z&&G.phase!=='travel'){lo=z.x0+.2;hi=z.x1-.2}if(G.cell){lo=Math.max(lo,G.cell.x0+.15);hi=Math.min(hi,G.cell.x1-.15)}const x0=p.x;p.x=clamp(p.x,lo,hi);
+  if(G.cls==='ninja'&&kitMode()&&!p.wallB){const side=x0>=hi-.001?1:x0<=lo+.001?-1:0;if(side&&(p.vx*side>0||inputDir()===side)){p.wall=side;if(p.gnd||p.scrTop==null)p.scrTop=G.camY+GY/U-.35;SCRW.top=p.scrTop;SCRW.x0=side>0?hi+.12:lo-50;SCRW.x1=side>0?hi+50:lo-.12;p.wallB=SCRW}}}
 function updPlayer(dt){
   p.inv=Math.max(0,p.inv-dt);p.flash-=dt;p.rl=Math.max(0,(p.rl||0)-dt);
   if(p.state==='pult'){if(p.pult){p.inv=Math.max(p.inv,.2);updPUlt(dt)}else p.state='idle';regen(dt);return}for(const k in p.cd)p.cd[k]=Math.max(0,p.cd[k]-dt);
@@ -1534,7 +1550,8 @@ function updPlayer(dt){
       p.face=p.wall;setState(p,'vault',1);sfx('roll');return}
     const ninW=G.cls==='ninja'&&!bt();
     if(ninW&&p.gnd&&toward&&rise>=.92&&(p.state==='walk'||p.state==='run')){p.gnd=false;p.vh=4;p.climbT=0;setState(p,'wallclimb');p.face=p.wall;dust(p.x,4,.8,p.h)}
-    if(!p.gnd&&toward&&(IN.jh||ninW)&&(p.state==='jump'||p.state==='wallslide'||p.state==='wallclimb')&&rise>.05&&rise<.92){
+    if(B.scr&&ninW&&!p.gnd&&toward&&rise<.92){p.vh=Math.max(p.vh,0);p.vh=0;p.h=Math.min(p.h,B.top-.05);if(p.state!=='wallslide'){setState(p,'wallslide');p.face=p.wall}}
+    else if(!p.gnd&&toward&&(IN.jh||ninW)&&(p.state==='jump'||p.state==='wallslide'||p.state==='wallclimb')&&rise>.05&&rise<.92&&!B.scr){
       p.face=p.wall;p.vx=0;p.vh=0;p.pk={top:B.top};
       if(rise<.4){p.pk.h0=p.h;p.pk.x0=p.x;p.pk.x1=p.x+p.face*(bw*2+.12);setState(p,'climb',.28)}
       else{p.h=B.top-.84;setState(p,'hang')}
@@ -1759,9 +1776,9 @@ const CLS={
   magician:{name:'마술사',job:'MAGICIAN',wpn:'카드',price:3100,desc:'1번 공격으로 카드 3장을 던져요. 상자를 깔아두고 다른 곳에서 상자를 통해 튀어나오거나, 잠시 사라져 공격을 피하고, 모자로 적과 투사체를 빨아들여요. 앙코르로 직전에 쓴 스킬을 약하게 한 번 더 써요.'},
   porter:{name:'텔레포터',job:'TELEPORTER',wpn:'포탈건',price:3900,desc:'1번 공격으로 포탈을 쏘고, 포탈이 닿은 자리로 순간이동하며 적을 쳐요.'},
   baseball:{name:'야구선수',job:'SLUGGER',wpn:'야구공 · 배트',price:4800,desc:'1번 공격으로 공을 던져요. 공이 날아가 있는 동안 1번을 누르고 있으면 스윙 게이지가 차고, 손을 떼면 그만큼 세게 휘둘러요. 적에게 맞고 빠르게 돌아오는 공을 게이지 가득(MAX)으로 치면 홈런!'},
-  volt:{name:'전기술사',job:'ELECTROMANCER',wpn:'전기 구체',price:5600,desc:'1번 공격으로 닿으면 옆 적에게 번개가 튀는 전기 구체를 쏴요. 번개 사슬, 전기 지뢰, 전기 장벽, 낙뢰로 적을 감전시켜 잠깐 멈추게 해요.'},
+  volt:{name:'전기기술자',job:'ELECTRICIAN',wpn:'전기 구체',price:5600,desc:'1번 공격으로 닿으면 옆 적에게 번개가 튀는 전기 구체를 쏴요. 번개 사슬, 전기 지뢰, 전기 장벽, 낙뢰로 적을 감전시켜 잠깐 멈추게 해요.'},
   wolf:{name:'늑대인간',job:'WEREWOLF',wpn:'발톱',price:6500,desc:'1번 공격으로 발톱을 3연속 휘둘러요. 이동이 빠르고, 포효로 적을 겁먹게 하고, 포식으로 체력을 회복해요. 필살기로 거대한 늑대가 되면 모든 기본 공격이 강해져요.'},
-  bard:{name:'기타리스트',job:'GUITARIST',wpn:'기타',price:7400,desc:'1번 공격으로 기타를 쳐서 적을 관통하는 음파를 쏴요. 발밑 박자 고리가 빛나는 순간에 맞춰 치면 그루브(♪)가 쌓여 피해가 늘고, 4개를 채우는 순간 쓴 스킬은 앙코르로 강화돼요. 선율로 자신을 강하게 만들고, 음파 장벽으로 투사체를 막아요.'},
+  bard:{name:'기타리스트',job:'GUITARIST',wpn:'기타',price:7400,desc:'1번 공격으로 기타를 쳐서 적을 관통하는 음표를 날려요. 발밑 박자 고리가 빛나는 순간에 맞춰 치면 그루브(♪)가 쌓여 피해가 늘고, 4개를 채우는 순간 쓴 스킬은 앙코르로 강화돼요. 선율로 자신을 강하게 만들고, 음파 장벽으로 투사체를 막아요.'},
   frost:{name:'빙결술사',job:'CRYOMANCER',wpn:'얼음 창',price:8300,desc:'1번 공격으로 맞은 적을 느리게 만드는 얼음 창을 던져요. 빙판, 얼음 벽, 눈보라로 전장을 얼리고 얼음 감옥으로 적을 가둬요.'},
   druid:{name:'드루이드',job:'DRUID',wpn:'덩굴',price:9200,desc:'1번 공격으로 덩굴 채찍을 휘둘러 앞의 적 둘까지 때려요. 채찍 끝부분으로 맞히면 TIP! 강타가 들어가요. 뿌리와 가시 덤불, 꽃의 감옥으로 적을 묶고, 식충 식물과 거대 나무로 공격하는 식물의 힘을 다뤄요.'},
   shade:{name:'사신',job:'REAPER',wpn:'낫',price:10200,desc:'1번 공격으로 낫을 휘둘러 검은 구체를 날려요. 그림자 속으로 숨어 무적 상태로 움직이다 튀어나와 공격하고, 적 뒤로 순간이동하거나 분신을 불러내요.'},
@@ -1860,7 +1877,7 @@ function wcfg(){const c=G.cls,v=(G.clsVar||{})[c]||(CLS[c]&&CLS[c].vars?CLS[c].v
   case 'volt':return{st:'w_gun',t:.42,times:[.3],fire:()=>{const n=bfOn('over')?2:1;cshot({dr:DRW.zorb,up:trail(0,'zap',14),spd:7.5,dmg:12,life:1.4,onHit(s,e){hitEnemy(e,s.dmg,'wpn',Math.sign(s.vx)||p.face,1);chainZap(e.x,e.h+e.size*.55,n,4,2.4,new Set([e]),.12)}});sfx('zap')}};
   case 'wolf':{const W=bfOn('wolf'),Rg=bfOn('rage'),k=G.T-(p.swT||-9)<.6?((p.swN||0)+1)%3:0;p.swN=k;const t=(W?.32:.3)*(Rg?.85:1);p.swT=G.T+t;
     return{st:'w_sword',t,swk:[0,2,1][k],claw:1,melee:{a0:.3,a1:.62,reach:W?1:.7,dmg:W?16:11,kb:W?2.6:1.4,kind:k===2?'wpnH':'wpn',hy:W?.4:0},times:[.35],fire:()=>{kfx.push({t:'claw',x:p.x+p.face*(W?.75:.45),h:p.h+(W?.8:.6),f:p.face,s:W?1.8:1,life:.2,max:.2,dr:DRW.claw});if(W&&k===2)cshot({dr:DRW.clawwave,up:(s2,dt)=>{if(Math.random()<dt*20)fx.push({t:'e',x:s2.x,y:s2.h+rnd(-.15,.15),vx:-s2.vx*.1,vy:0,life:.25,max:.25,r:.02})},spd:11,dmg:12,life:.42,pierce:1,kb:2.2});sfx('swing')}}}
-  case 'bard':{const on=grooveHit(),m=grvMul();return{st:'w_play',t:.4,times:[.25],fire:()=>{cshot({dr:DRW.sonic,sc:on?1.45:1,up:trail(0,'note',on?10:5),spd:on?11:9,dmg:Math.round((on?14:10)*m),life:1,pierce:1,kb:on?2:1.4});if(on)notes(p.x+p.face*.4,p.h+.9,2);sfx('note')}}}
+  case 'bard':{const on=grooveHit(),m=grvMul();return{st:'w_play',t:.4,times:[.25],fire:()=>{cshot({dr:drNoteShot,sc:on?1.3:1,dbl:on,up:trail(0,'note',on?8:4),spd:on?11:9,dmg:Math.round((on?14:10)*m),life:1,pierce:1,kb:on?2:1.4});if(on)notes(p.x+p.face*.4,p.h+.9,2);sfx('note')}}}
   case 'frost':if(heroSkinOn(p)==='frost'){const i=pickIce();if(i>=0)return{st:'w_cast',t:.36,times:[.12],fire:()=>{const q=iceWorld(i);p.iceR[i]=G.T+ICEREG;iceBits(q.x,q.h,4);cshot({x:q.x,h:q.h,dr:DRW.icespear,up:trail(0,'ice',30),spd:13,dmg:13,life:1.2,kb:1.6,onHit(s,e){hitEnemy(e,s.dmg,'wpn',Math.sign(s.vx)||p.face,s.kb);slowE(e,1.6);shards(e.x,e.h+.5,5)}});sfx('ice')}}}
     return{st:'w_throw',t:.45,times:[.32],fire:()=>{cshot({dr:DRW.icespear,up:trail(0,'ice',30),spd:12,dmg:13,life:1.2,kb:1.6,onHit(s,e){hitEnemy(e,s.dmg,'wpn',Math.sign(s.vx)||p.face,s.kb);slowE(e,1.6);shards(e.x,e.h+.5,5)}});sfx('ice')}};
   case 'druid':return{st:'w_cast',t:.42,times:[.12],fire:()=>{const hp=handPos(),L=2.5,k={t:'whip',x:hp.x,h:hp.h,f:p.face,L,life:.45,max:.45,dr:PDR.whip};kfx.push(k);let n=0;const tg=enemies.filter(e=>alive(e)&&(e.x-p.x)*p.face>-.1&&(e.x-p.x)*p.face<L+.16*e.size&&e.h-p.h>-.6&&e.h-p.h<1.4).sort((a,b)=>Math.abs(a.x-p.x)-Math.abs(b.x-p.x));for(const e of tg){if(n>=2)break;n++;const rel=(e.x-p.x)*p.face,tip=rel>L*.66,fu=e.snT&&G.T-e.snT<1.1;let dm=13,txt='';if(fu){dm=24;txt='FOLLOW-UP';e.snT=0}else if(tip){dm=21;txt='TIP!'}hitEnemy(e,dm,tip||fu?'wpnH':'wpn',p.face,tip?2.6:1.6);k.hit=1;if(txt){k.crack=1;ftext(e.x,e.h+e.size+.35,txt,true);sfx('combohit');sparks(e.x,e.h+e.size*.5,p.face,10,1.3)}else sparks(e.x,e.h+e.size*.5,p.face,5,.9)}sfx('swing');if(n)sfx('kick')}};
@@ -2414,7 +2431,7 @@ wolf:{
 bard:{
   kick(){const on=grooveHit(),m=grvMul(),enc=encoreOn(on);const wave=()=>{for(const d of[1,-1])cshot({dr:DRW.gwave,dir:d,spd:7.5,dmg:Math.round(16*m),h:p.h+.22,life:.85,pierce:1,kb:2.4,up:eqTrail,onHit(s,e){hitEnemy(e,s.dmg,'quake',Math.sign(s.vx)||1,s.kb);launch(e,enc?3.6:2.8)}});kfx.push({t:'spk',x:p.x,h:p.h,life:.5,max:.5,dr:drSpeaker});dust(p.x,10,1.3,p.h);shake(.22);sfx('slam')};
     kst('w_play',enc?.6:.45,{times:enc?[.2,.42]:[.22],fire(){wave()}});p.cd.kick=1;ftext(p.x,p.h+1.2,enc?'BASS DROP · ENCORE':'BASS DROP',true)},
-  upper(){const on=grooveHit(),m=grvMul(),enc=encoreOn(on),angs=enc?[-.17,0,.17]:[0];kst('w_play',.38,{times:[.2],fire(){const hp=handPos();for(const a of angs)cshot({ang:a,dr:DRW.treble,up:trebTrail,spd:20,dmg:Math.round(18*m),life:.9,pierce:1,heavy:1,kb:1.3});kfx.push({t:'snap',x:hp.x,h:hp.h,f:p.face,life:.22,max:.22,dr:drSnap});sparks(hp.x,hp.h,p.face,5,.8);sfx('note')}});ftext(p.x,p.h+1.2,enc?'TREBLE SLICE · ENCORE':'TREBLE SLICE',true)},
+  upper(){const on=grooveHit(),m=grvMul(),enc=encoreOn(on),angs=enc?[-.17,0,.17]:[0];kst('w_play',.38,{times:[.2],fire(){const hp=handPos();for(const a of angs)cshot({ang:a,dr:drSheet,up:trebTrail,spd:17,ph:Math.random()*6,dmg:Math.round(18*m),life:.9,pierce:1,heavy:1,kb:1.3});kfx.push({t:'snap',x:hp.x,h:hp.h,f:p.face,life:.22,max:.22,dr:drSnap});sparks(hp.x,hp.h,p.face,5,.8);sfx('note')}});ftext(p.x,p.h+1.2,enc?'SHEET MUSIC · ENCORE':'SHEET MUSIC',true)},
   spin(){const on=grooveHit(),m=grvMul(),enc=encoreOn(on);buff('def',8);p.cd.spin=12;kst('w_play',.5,{times:[.1,.3],fire(){sfx('note');notes(p.x,p.h+1,4)}});
     aoe(p.x,p.h,1.7,1.1,Math.round(8*m),3.4,'wpn');for(let i=0;i<3;i++)fx.push({t:'r',x:p.x,y:p.h+.5,vx:0,vy:0,life:.3+i*.1,max:.3+i*.1,r:.6+i*.5,w:4-i});
     kfx.push({t:'orbn',sty:'guard',life:8,max:8,up(k){if(!bfOn('def'))k.life=0},dr:drOrbit});if(enc){const hl=Math.round(p.maxHp*.15);p.hp=Math.min(p.maxHp,p.hp+hl);texts.push({x:p.x,y:p.h+1.5,txt:'+'+hl+' HP',big:true,life:1,max:1})}
@@ -2518,7 +2535,7 @@ porter:{kick:[IC.back,'후퇴','후퇴 포탈'],upper:[IC.up,'상공','상공 �
 baseball:{kick:[IC.ball,'번트','번트'],upper:[IC.ball,'타격','직접 타격'],spin:[IC.spin,'회전','회전 풀스윙'],dash:[IC.slide,'도루','도루 슬라이딩'],blast:[IC.ball,'강속구','강속구'],flurry:[IC.multi,'연투','연속 투구'],quake:[IC.rain,'메테오','메테오 볼'],dive:[IC.dive,'다이빙','다이빙 슬램']},
 volt:{kick:[IC.zap,'사슬','번개 사슬'],upper:[IC.mine,'지뢰','전기 지뢰'],spin:[IC.burst,'방전','순간 방전'],dash:[IC.shield,'장벽','전기 장벽'],blast:[IC.zap,'낙뢰','낙뢰'],flurry:[IC.beam,'과충전','과충전'],quake:[IC.rain,'폭풍','번개 폭풍'],dive:[IC.dive,'낙하','전자기 낙하']},
 wolf:{kick:[IC.dash,'돌진','맹수 돌진'],upper:[IC.wave,'포효','포효'],spin:[IC.spin,'꼬리','꼬리 휘두르기'],dash:[IC.aim,'본능','사냥 본능'],blast:[IC.up,'도약','야수 도약'],flurry:[IC.burst,'광폭','광폭화'],quake:[IC.claw,'발톱','야수의 발톱'],dive:[IC.skull,'포식','포식']},
-bard:{kick:[IC.quake,'저음','저음 충격파'],upper:[IC.wave,'고음','고음 절단파'],spin:[IC.shield,'방어','방어의 선율'],dash:[IC.dash,'속도','속도의 선율'],blast:[IC.burst,'폭음','폭음'],flurry:[IC.note,'장벽','음파 장벽'],quake:[IC.multi,'진동','진동 폭발'],dive:[IC.dive,'최후','최후의 연주']},
+bard:{kick:[IC.quake,'저음','저음 충격파'],upper:[IC.note,'악보','악보 날리기'],spin:[IC.shield,'방어','방어의 선율'],dash:[IC.dash,'속도','속도의 선율'],blast:[IC.burst,'폭음','폭음'],flurry:[IC.note,'장벽','음파 장벽'],quake:[IC.multi,'진동','진동 폭발'],dive:[IC.dive,'최후','최후의 연주']},
 frost:{kick:[IC.slide,'빙판','빙판 생성'],upper:[IC.shield,'벽','얼음 벽'],spin:[IC.rise,'가시','얼음 가시'],dash:[IC.orb,'구체','빙결 구체'],blast:[IC.rain,'눈보라','눈보라'],flurry:[IC.ice,'감옥','얼음 감옥'],quake:[IC.quake,'빙하','빙하 낙하'],dive:[IC.burst,'폭발','빙결 폭발']},
 druid:{kick:[IC.hand,'뿌리','뿌리 구속'],upper:[IC.rise,'덤불','가시 덤불'],spin:[IC.burst,'꽃가루','꽃가루 폭발'],dash:[IC.leaf,'식충','식충 식물'],blast:[IC.back,'낚아','덩굴 낚아채기'],flurry:[IC.up,'나무','거대 나무'],quake:[IC.shield,'감옥','꽃의 감옥'],dive:[IC.multi,'습격','숲의 습격']},
 shade:{kick:[IC.moon,'잠행','그림자 잠행'],upper:[IC.hand,'손','그림자 손'],spin:[IC.spin,'칼날','그림자 칼날'],dash:[IC.dash,'이동','그림자 이동'],blast:[IC.orb,'늪','그림자 늪'],flurry:[IC.multi,'분신','그림자 분신'],quake:[IC.burst,'폭발','암흑 폭발'],dive:[IC.dive,'낙하','그림자 낙하']}};
@@ -3593,7 +3610,7 @@ porter:{kick:'뒤로 순간이동하며 쏘는 후퇴 포탈',upper:'위로 순�
 baseball:{kick:'짧게 밀어내는 번트',upper:'배트로 적을 직접 후려쳐 멀리 날려보내는 직접 타격',spin:'양쪽을 휘두르는 회전 풀스윙',dash:'미끄러지며 다리를 거는 도루 슬라이딩'},
 volt:{kick:'적 4명 사이를 튀어 다니는 번개 사슬',upper:'밟으면 터져 감전시키는 전기 지뢰',spin:'몸에서 전기를 터뜨리는 순간 방전',dash:'투사체를 막고 닿은 적을 감전시키는 전기 장벽'},
 wolf:{kick:'앞으로 들이받으며 달리는 맹수 돌진',upper:'주변 적을 겁먹게 해 멈추고 느리게 만드는 포효',spin:'양쪽을 쓸어버리는 꼬리 휘두르기',dash:'7초 동안 빨라지고 세지고 때릴 때마다 회복하는 사냥 본능'},
-bard:{kick:'양쪽 바닥을 따라 달리며 적을 띄우는 저음 충격파 (앙코르: 두 번)',upper:'멀리까지 꿰뚫는 고음 절단파 (앙코르: 세 갈래)',spin:'8초 동안 받는 피해를 줄이고 주변을 밀쳐내는 방어의 선율 (앙코르: 체력 회복)',dash:'8초 동안 빨라지고 다른 스킬 쿨타임을 절반으로 줄이는 속도의 선율 (앙코르: 쿨타임 초기화)'},
+bard:{kick:'양쪽 바닥을 따라 달리며 적을 띄우는 저음 충격파 (앙코르: 두 번)',upper:'음표가 그려진 악보를 날려 멀리까지 꿰뚫어요 (앙코르: 세 장)',spin:'8초 동안 받는 피해를 줄이고 주변을 밀쳐내는 방어의 선율 (앙코르: 체력 회복)',dash:'8초 동안 빨라지고 다른 스킬 쿨타임을 절반으로 줄이는 속도의 선율 (앙코르: 쿨타임 초기화)'},
 frost:{kick:'밟은 적을 느리게 만드는 빙판 생성',upper:'적과 투사체를 막는 얼음 벽',spin:'앞으로 차례로 솟는 얼음 가시',dash:'천천히 날아가다 터지며 얼리는 빙결 구체'},
 druid:{kick:'가까운 적 발밑에서 뿌리가 솟아 띄우고 묶는 뿌리 구속. 적이 공격하려는 순간(! 표시) 쓰면 COUNTER로 더 세고 오래 묶어요',upper:'가시 덩굴 아치가 밟은 적을 찌르고 느리게 해요. 묶인 적은 두 배로 찔려요',spin:'덤불이 자라난 뒤 터지는 꽃가루 폭발. 고리가 하얗게 빛날 때 한 번 더 누르면 PERFECT BLOOM으로 훨씬 크게 터져요',dash:'가까운 적을 물어뜯는 식충 식물(최대 2개). 묶인 적은 두 배로 물어요'},
 shade:{kick:'그림자 속으로 숨어 무적으로 빨리 움직이다 튀어나오며 공격하는 그림자 잠행',upper:'땅에서 손이 솟아 적을 붙잡는 그림자 손',spin:'칼날이 몸 주위를 도는 그림자 칼날',dash:'가까운 적 뒤로 순간이동해 베는 그림자 이동'}};
