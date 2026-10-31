@@ -132,6 +132,9 @@ body:not(.desk) .keys{display:none}
 .menu .sm{grid-column:span 2;font-size:13px;padding:10px 4px;border-color:var(--line);color:var(--dim)}
 .menu:has(#waveBtn[hidden]) .sm{grid-column:span 3}
 .menu .kbonly{grid-column:span 6!important}body:not(.desk) .kbonly{display:none}
+.dico{display:inline-block;vertical-align:-3px;flex:none}
+.modebtn{display:flex;align-items:center;justify-content:center;gap:6px}
+#taTimer{display:inline-flex;align-items:center;gap:5px}#taTimer[hidden]{display:none}
 .menu .modebtn{grid-column:span 3;color:var(--ink);border-color:#666}
 .tag-ta{font-family:var(--f-mono);font-size:12px;color:var(--ink);border:1px solid var(--ink);padding:2px 6px;margin-left:6px}
 .taov .tabox{width:min(520px,100%);max-height:86vh;overflow:auto;background:#0c0c0c;border:1px solid var(--ink);padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:0 0 24px rgba(255,255,255,.15)}
@@ -333,12 +336,12 @@ body:not(.desk) .keys{display:none}
 
 <div class="app">
   <div class="hud">
-    <div class="dist"><span class="mtag" id="rtag">R1</span><i>w</i><span id="wv">1</span><small>/ 5</small><small id="dm">0m</small><span id="taTimer" hidden>⏱ 0:00.00</span><span class="ztag" id="combo" hidden>0 HIT</span></div>
+    <div class="dist"><span class="mtag" id="rtag">R1</span><i>w</i><span id="wv">1</span><small>/ 5</small><small id="dm">0m</small><span id="taTimer" hidden><svg class="dico" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 13.5V9.5M12 13.5l2.6 1.6M9.5 2.5h5M12 2.5V6M18.6 6.4l1.6-1.6"/></svg><b id="taT">0:00.00</b></span><span class="ztag" id="combo" hidden>0 HIT</span></div>
     <div class="right">
       <div class="energy" hidden><span>HP</span><div class="bar hp" id="hpbar"><b id="hpb"></b></div></div>
       <div class="energy"><span>ULT</span><div class="bar ult" id="ultbar"><b id="ultb" style="width:0%"></b></div></div><div class="energy"><span>ST</span><div class="bar"><b id="stb"></b></div></div>
       <span class="ko" id="ko">KO 0</span><span class="ko" id="expv">EXP 0</span>
-      <button class="hbtn" id="sndBtn" aria-label="소리 켜기/끄기">♪</button>
+      <button class="hbtn" id="sndBtn" aria-label="소리 켜기/끄기"><svg class="dico" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18.3 6.5a8 8 0 0 1 0 11"/></svg></button>
       <button class="hbtn" id="pauseBtn" aria-label="일시정지">II</button>
     </div>
   </div>
@@ -350,23 +353,23 @@ body:not(.desk) .keys{display:none}
     </div>
     <div class="joy" id="joy"><div class="knob" id="knob"></div></div>
     <div class="act">
-      <div class="grp g-move"><button data-c="ult" aria-label="필살기">★<small>필살</small></button><button data-c="roll" aria-label="구르기">↻<small>구르기</small></button></div>
+      <div class="grp g-move"><button data-c="ult" aria-label="필살기"><svg class='ico' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6-4.5-4.2 6.1-.7z"/></svg><small>필살</small></button><button data-c="roll" aria-label="구르기"><svg class='ico' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d="M19 12a7 7 0 1 1-2.1-5"/><path d="M19.5 3.5v4.2h-4.2"/></svg><small>구르기</small></button></div>
       <div class="rcol">
       <div class="skrow">
         <button class="slotchg" id="slotBtn" hidden>슬롯<br>변경</button>
-        <button class="sk" data-c="upper" aria-label="어퍼컷">⤒<small>어퍼</small></button>
-        <button class="sk" data-c="spin" aria-label="회전 발차기">↺<small>회전</small></button>
-        <button class="sk" data-c="dash" aria-label="돌진 정권">≫<small>돌진</small></button>
-        <button class="sk" data-c="blast" aria-label="장풍" hidden>◉<small>장풍</small></button>
-        <button class="sk" data-c="flurry" aria-label="연속 발차기" hidden>≋<small>연속</small></button>
-        <button class="sk" data-c="quake" aria-label="지진 밟기" hidden>⩔<small>지진</small></button>
-        <button class="sk" data-c="dive" aria-label="낙하 킥" hidden>↘<small>낙하</small></button>
+        <button class="sk" data-c="upper" aria-label="어퍼컷"><svg class='ico' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d="M5 4h14M12 20V8M7.5 12.5L12 8l4.5 4.5"/></svg><small>어퍼</small></button>
+        <button class="sk" data-c="spin" aria-label="회전 발차기"><svg class='ico' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d="M5 12a7 7 0 1 0 2.1-5"/><path d="M4.5 3.5v4.2h4.2"/></svg><small>회전</small></button>
+        <button class="sk" data-c="dash" aria-label="돌진 정권"><svg class='ico' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d="M5 6l6 6-6 6M12 6l6 6-6 6"/></svg><small>돌진</small></button>
+        <button class="sk" data-c="blast" aria-label="장풍" hidden><svg class='ico' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="3"/></svg><small>장풍</small></button>
+        <button class="sk" data-c="flurry" aria-label="연속 발차기" hidden><svg class='ico' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d="M3 8c3-2 5 2 9 0s6-2 9 0M3 12c3-2 5 2 9 0s6-2 9 0M3 16c3-2 5 2 9 0s6-2 9 0"/></svg><small>연속</small></button>
+        <button class="sk" data-c="quake" aria-label="지진 밟기" hidden><svg class='ico' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d="M12 3v10M8 9l4 4 4-4M3 20h18M6 17l-2 3M18 17l2 3"/></svg><small>지진</small></button>
+        <button class="sk" data-c="dive" aria-label="낙하 킥" hidden><svg class='ico' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d="M6 5l12 12M18 9v8h-8"/></svg><small>낙하</small></button>
       </div>
       <div class="grp g-atk">
         <button data-c="punch" aria-label="펀치">P<small>펀치</small></button>
         <button data-c="kick" aria-label="발차기">K<small>발차기</small></button>
-        <button data-c="guard" aria-label="가드">⛉<small>가드</small></button>
-        <button data-c="jump" aria-label="점프">▲<small>점프</small></button>
+        <button data-c="guard" aria-label="가드"><svg class='ico' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d="M12 3l7 3v5c0 5-3.2 8.2-7 10-3.8-1.8-7-5-7-10V6z"/></svg><small>가드</small></button>
+        <button data-c="jump" aria-label="점프"><svg class='ico' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d="M12 4l7 10H5z"/><path d="M12 14v6"/></svg><small>점프</small></button>
       </div>
       </div>
     </div>
@@ -402,8 +405,8 @@ body:not(.desk) .keys{display:none}
     <button class="go" id="goBtn">START</button>
     <button class="tutbtn mt" id="charBtn">캐릭터 선택</button>
     <button class="tutbtn mt" id="shopBtn">상점</button>
-    <button class="tutbtn sm modebtn" id="taBtn">⏱ 타임어택</button>
-    <button class="tutbtn sm modebtn" id="onBtn">⚔ 온라인 대전</button>
+    <button class="tutbtn sm modebtn" id="taBtn"><svg class="dico" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 13.5V9.5M12 13.5l2.6 1.6M9.5 2.5h5M12 2.5V6M18.6 6.4l1.6-1.6"/></svg> 타임어택</button>
+    <button class="tutbtn sm modebtn" id="onBtn"><svg class="dico" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3l9.5 9.5M3 4l9.5 9.5M3 3h3.5L15 11.5M20 3l-9.5 9.5M21 4l-9.5 9.5M21 3h-3.5L9 11.5"/><path d="M6.5 14.5l-3 3M5 16l3 3M3 18.5L5.5 21M17.5 14.5l3 3M19 16l-3 3M21 18.5L18.5 21"/></svg> 온라인 대전</button>
     <button class="tutbtn" id="contBtn" hidden>이어하기</button>
     <button class="tutbtn sm" id="waveBtn" hidden>웨이브 선택</button>
     <button class="tutbtn sm" id="practiceBtn">튜토리얼</button>
@@ -985,7 +988,8 @@ const SFX={
 };
 SFX.slam=SFX.pound;
 const sfx=k=>{try{SFX[k]&&SFX[k]()}catch(_){}};
-$('#sndBtn').onclick=e=>{mute=!mute;e.currentTarget.classList.toggle('off',mute);e.currentTarget.textContent=mute?'×':'♪';e.currentTarget.blur()};
+const SND_ON='<svg class="dico" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18.3 6.5a8 8 0 0 1 0 11"/></svg>',SND_OFF='<svg class="dico" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg>';
+$('#sndBtn').onclick=e=>{mute=!mute;e.currentTarget.classList.toggle('off',mute);e.currentTarget.innerHTML=mute?SND_OFF:SND_ON;e.currentTarget.blur()};
 
 /* ---------- input ---------- */
 const IN={gd:false,jh:false,l:false,r:false,runK:false,runT:false,dash:false,jx:0,buf:null,tap:{d:0,t:0}};
@@ -1381,7 +1385,7 @@ function kill(e,dir){
 /* ---- guitarist groove ---- */
 const BEAT=.5;function beatPh(){return((G.T%BEAT)+BEAT)%BEAT}
 function grooveHit(){if(G.cls!=='bard')return false;const ph=beatPh(),off=Math.min(ph,BEAT-ph),on=off<.12;p.grvT=G.T;
-  if(on){p.grv=Math.min(4,(p.grv||0)+1);p.grvFl=.35;texts.push({x:p.x,y:p.h+1.5,txt:p.grv>=4?'♪ FULL GROOVE':'♪ ON BEAT',big:p.grv>=4,life:.6,max:.6});fx.push({t:'r',x:p.x,y:p.h+.05,vx:0,vy:0,life:.3,max:.3,r:.55,w:2})}
+  if(on){p.grv=Math.min(4,(p.grv||0)+1);p.grvFl=.35;texts.push({x:p.x,y:p.h+1.5,txt:p.grv>=4?'FULL GROOVE':'ON BEAT',big:p.grv>=4,life:.6,max:.6});fx.push({t:'r',x:p.x,y:p.h+.05,vx:0,vy:0,life:.3,max:.3,r:.55,w:2})}
   else p.grv=Math.max(0,(p.grv||0)-1);return on}
 function grvMul(){return G.cls==='bard'?1+.1*(p.grv||0):1}
 function encoreOn(on){if(on&&(p.grv||0)>=4){p.grv=0;G.flash=Math.max(G.flash||0,.18);texts.push({x:p.x,y:p.h+1.85,txt:'ENCORE!',big:true,life:1,max:1});notes(p.x,p.h+1.1,8);return true}return false}
@@ -3485,7 +3489,7 @@ let hintCache={};
 function updHud(){
   if(!document.body.classList.contains('desk'))for(const a of['punch','kick','jump']){const h=comboHint(a);if(hintCache[a]!==h){hintCache[a]=h;const b=document.querySelector(`.act [data-c="${a}"]`);if(b){b.classList.toggle('hint',!!h);b.dataset.hint=h}}}
   {const sn=G.cls==='necro'&&kitMode()&&p.state!=='dead'&&!!soulNear();if(hud.soulN!==sn){hud.soulN=sn;const b=document.querySelector('.act [data-c="kick"]');if(b)b.classList.toggle('soulg',sn);const k=document.querySelector('#keys [data-a="kick"]');if(k)k.classList.toggle('soulg',sn)}}
-  setTxt('rtag','R'+G.round);setTxt('wv',String(G.wave+1));setTxt('ko','KO '+G.ko);setTxt('expv','EXP '+EXP.toLocaleString());{const ug=(p.ultG||0);$('#ultb').style.width=ug+'%';$('#ultbar').classList.toggle('full',ug>=100);const ub=document.querySelector('.act [data-c="ult"]');if(ub){ub.style.setProperty('--ug',(ug/100).toFixed(3));ub.classList.toggle('ready',ug>=100)}const kl=document.querySelector('#keys [data-a="ult"]');if(kl)kl.classList.toggle('cool',ug<100)}setTxt('dm',Math.floor(G.maxX*2.4)+'m');{const tt=$('#taTimer');if(tt){tt.hidden=!G.ta;if(G.ta){const s2='⏱ '+fmtT(G.ta.t);if(tt.textContent!==s2)tt.textContent=s2}}}
+  setTxt('rtag','R'+G.round);setTxt('wv',String(G.wave+1));setTxt('ko','KO '+G.ko);setTxt('expv','EXP '+EXP.toLocaleString());{const ug=(p.ultG||0);$('#ultb').style.width=ug+'%';$('#ultbar').classList.toggle('full',ug>=100);const ub=document.querySelector('.act [data-c="ult"]');if(ub){ub.style.setProperty('--ug',(ug/100).toFixed(3));ub.classList.toggle('ready',ug>=100)}const kl=document.querySelector('#keys [data-a="ult"]');if(kl)kl.classList.toggle('cool',ug<100)}setTxt('dm',Math.floor(G.maxX*2.4)+'m');{const tt=$('#taTimer');if(tt){tt.hidden=!G.ta;if(G.ta){const s2=fmtT(G.ta.t),tb=$('#taT');if(tb.textContent!==s2)tb.textContent=s2}}}
   $('#hpb').style.width=(p.hp/p.maxHp*100)+'%';$('#hpbar').classList.toggle('low',p.hp<p.maxHp*.25);$('#stb').style.width=p.sta+'%';
   document.querySelector('.act [data-c="roll"]').style.setProperty('--st',clamp(p.sta/100,0,1));
   for(const a in SKILL){const r=1-p.cd[a]/SKILL[a].cd;document.querySelector(`.act [data-c="${a}"]`).style.setProperty('--cd',r.toFixed(3));
@@ -3926,7 +3930,7 @@ const FIREBASE_CONFIG={
       h+=`<div class="ttl2">로그인 방법 선택</div>`+(err?`<div class="msg er"></div>`:'');
       h+=`<button class="pri go${inApp?' dim':''}">${GSVG}Google로 로그인</button>`;
       if(inApp)h+=`<div class="msg sm">앱 안 브라우저에서는 구글 로그인이 막혀요. Safari${isAnd?'·Chrome':''}에서 열거나 이메일로 로그인해 주세요.</div>`;
-      h+=`<button class="pick-em">✉ 이메일로 로그인</button>`;
+      h+=`<button class="pick-em"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px;margin-right:6px"><rect x="3" y="5.5" width="18" height="13" rx="1.5"/><path d="M3.5 6.5l8.5 6.5 8.5-6.5"/></svg>이메일로 로그인</button>`;
       if(inApp)h+=`<button class="copy">주소 복사 (Safari에서 열기)</button>`;
     }
     else{
