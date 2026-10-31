@@ -1,0 +1,11 @@
+{
+  "rules": {
+    "users":      { "$uid": { ".read": "auth != null", ".write": "auth.uid === $uid" } },
+    "nicks":      { "$nick": { ".read": "auth != null", ".write": "auth != null && (!data.exists() || data.val() === auth.uid)", ".validate": "newData.val() === auth.uid" } },
+    "status":     { "$uid": { ".read": "auth != null", ".write": "auth.uid === $uid" } },
+    "friendReq":  { "$to": { ".read": "auth.uid === $to", "$from": { ".read": "auth.uid === $from", ".write": "auth.uid === $to || auth.uid === $from" } } },
+    "friends":    { "$uid": { ".read": "auth.uid === $uid", "$o": { ".write": "auth.uid === $uid || auth.uid === $o" } } },
+    "challenges": { "$to": { ".read": "auth.uid === $to", "$from": { ".read": "auth.uid === $from", ".write": "auth.uid === $to || auth.uid === $from" } } },
+    "rooms":      { "$r": { ".read": "auth != null", ".write": "auth != null" } }
+  }
+}
