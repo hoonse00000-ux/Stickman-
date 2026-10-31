@@ -132,7 +132,7 @@ body:not(.desk) .keys{display:none}
 .menu .sm{grid-column:span 2;font-size:13px;padding:10px 4px;border-color:var(--line);color:var(--dim)}
 .menu:has(#waveBtn[hidden]) .sm{grid-column:span 3}
 .menu .kbonly{grid-column:span 6!important}body:not(.desk) .kbonly{display:none}
-.coinhud{display:inline-flex;align-items:center;gap:4px;color:#ffd75e}.coinhud.fl{text-shadow:0 0 8px rgba(255,210,80,.9)}.coini{vertical-align:-2px}
+.coinhud{display:inline-flex;align-items:center;gap:4px;color:var(--ink)}.coinhud .coini{filter:drop-shadow(0 0 3px rgba(255,255,255,.9)) drop-shadow(0 0 6px rgba(255,255,255,.5))}.coinhud.fl{text-shadow:0 0 10px rgba(255,255,255,1)}.coinhud.fl .coini{filter:drop-shadow(0 0 6px #fff) drop-shadow(0 0 12px #fff)}.coini{vertical-align:-2px}
 .dico{display:inline-block;vertical-align:-3px;flex:none}
 .modebtn{display:flex;align-items:center;justify-content:center;gap:6px}
 #taTimer{display:inline-flex;align-items:center;gap:5px}#taTimer[hidden]{display:none}
@@ -219,6 +219,7 @@ body:not(.desk) .keys{display:none}
 .act [data-c="ult"].ready{opacity:.95;border-color:#fff;box-shadow:0 0 18px rgba(255,255,255,.8);animation:upulse 1s ease-in-out infinite}
 @keyframes upulse{50%{box-shadow:0 0 6px rgba(255,255,255,.3)}}
 .bar.ult.full b{animation:blink .5s steps(2) infinite}
+.admbtn[hidden]{display:none}
 .admbtn{position:fixed;z-index:32;top:calc(10px + env(safe-area-inset-top,0px));right:calc(10px + env(safe-area-inset-right,0px));font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;background:transparent;color:#6a6a6a;border:1px solid #2a2a2a;padding:5px 8px;cursor:pointer}
 .admbox{width:min(320px,100%);background:#0c0c0c;border:1px solid var(--ink);padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:0 0 24px rgba(255,255,255,.15)}
 .admbox p{margin:0;font-size:13px;color:var(--dim)}
@@ -386,7 +387,7 @@ body:not(.desk) .keys{display:none}
 </div>
 
 <section class="lobby" id="lobby">
-  <button class="admbtn" id="adminBtn" aria-label="관리자">ADMIN</button>
+  <button class="admbtn" id="adminBtn" aria-label="관리자" hidden>ADMIN</button>
   <div class="lob">
     <div class="ttl">
       <div class="eyebrow">STICK BRAWL · X-AXIS ARENA</div>
@@ -1127,7 +1128,7 @@ let pshots=[],allies=[],fires=[],fwPops=[];
 let p=null,enemies=[],fx=[],texts=[],waves=[],shots=[],pwaves=[],eshots=[],bolts=[],marks=[],spikes=[],ults=[];
 let best={w:0,wl:'—',k:0,c:0,d:0};
 try{best=Object.assign(best,JSON.parse(localStorage.getItem('zm-fight-best')||'{}'))}catch(_){}
-function showBest(){{const sb=$('#shopBtn');if(sb)sb.innerHTML=`<small>SHOP</small><b class="coinhud"><svg class="dico coini" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/></svg>${COIN.toLocaleString()}</b>`;const prb=$('#practiceBtn');if(prb)prb.textContent=(SHOP.cls||'base')==='base'?'튜토리얼':'튜토리얼 · '+CLS[SHOP.cls].name;const chb=$('#charBtn');if(chb)chb.innerHTML=`<small>CHARACTER</small><b>${CLS[SHOP.cls||'base'].name}</b>`}const cc=SHOP.cls||'base',cn=CLS[cc].name,sv=getProg(cc);
+function showBest(){{const sb=$('#shopBtn');if(sb)sb.innerHTML=`<small>SHOP</small><b class="coinhud"><svg class="dico coini" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/></svg>${coinTxt()}</b>`;const prb=$('#practiceBtn');if(prb)prb.textContent=(SHOP.cls||'base')==='base'?'튜토리얼':'튜토리얼 · '+CLS[SHOP.cls].name;const chb=$('#charBtn');if(chb)chb.innerHTML=`<small>CHARACTER</small><b>${CLS[SHOP.cls||'base'].name}</b>`}const cc=SHOP.cls||'base',cn=CLS[cc].name,sv=getProg(cc);
   {const mx=Math.max(sv.max||0,sv.idx||0),wb=$('#waveBtn');wb.hidden=!(mx>0);wb.textContent='웨이브 선택';wb.onclick=()=>openWaves(mx,sv.idx)}const cb=$('#contBtn');if(sv.idx>0){cb.hidden=false;cb.textContent=`이어하기 · ${cn} · R${Math.floor(sv.idx/5)+1} WAVE ${sv.idx%5+1}${sv.idx%5===4?' (BOSS)':''}`;cb.onclick=()=>{closeTut();startGame(sv.idx)}}else cb.hidden=true;$('#bW').textContent=best.wl||'—';$('#bD').textContent=Math.floor(best.d)+'m';$('#bC').textContent=best.c}
 
 function applyStats(full){const rr=Math.max(1,G.round|0);p.lvl=rr;p.maxHp=100+15*(rr-1);p.atk=1+.12*(rr-1);p.regen=24*(1+.06*(rr-1));if(full)p.hp=p.maxHp}
@@ -1869,7 +1870,7 @@ const SKINS={
   druid:{name:'꽃의 정령',price:5500,ink:'#ffeef5',glow:'rgba(255,140,190,.9)',desc:'머리에 꽃 화관을 쓴 꽃의 정령. 덤불과 나무 대신 꽃이 피어나고, 잎 대신 꽃잎이 흩날려요.'},
   shade:{name:'심연',price:6000,ink:'#e0e0e0',glow:'rgba(255,70,70,.8)',desc:'붉은 눈이 빛나는 심연의 그림자. 너덜너덜한 망토가 휘날려요.'},
 };
-function heroSkinOn(e){const cl=(e&&e.cls)||G.cls||'base';if(e&&e.skin!=null)return e.skin?cl:null;if(bt())return null;if(G.admin)return G.adminSkin?cl:null;return SHOP.skinOn[cl]&&SHOP.skins.includes(cl)?cl:null}
+function heroSkinOn(e){const cl=(e&&e.cls)||G.cls||'base';if(e&&e.skin!=null)return e.skin?cl:null;if(bt())return null;if(G.admin)return G.adminSkin?cl:null;return SHOP.skinOn[cl]&&ownS(cl)?cl:null}
 function heroStyle(e){const sk=heroSkinOn(e),up=e===p&&p&&p.pult;if(!sk)return up?{...STY.hero,glow:.5,glowC:'rgba(255,255,255,1)'}:STY.hero;const S2=SKINS[sk];return{ink:S2.ink,glow:up?.55:.22,glowC:S2.glow,lw:STY.hero.lw}}
 function drawSkinAcc(sk,c,o,d,T,S,st,e){const hc=o.hc,r=SK.head,line=(a0,b0)=>{const a=T(a0),b=T(b0);c.beginPath();c.moveTo(a[0],a[1]);c.lineTo(b[0],b[1]);c.stroke()},t=performance.now()/1000;
   c.strokeStyle=st.ink;c.fillStyle=st.ink;c.shadowColor=st.glowC;c.shadowBlur=S*.1;c.lineWidth=Math.max(1.3,S*.022);
@@ -1899,6 +1900,7 @@ G.cls=SHOP.cls;G.clsVar=SHOP.vars;
 let PROG={};try{const o=JSON.parse(localStorage.getItem('zm-fight-save')||'{}')||{};if(o.idx!=null||o.max!=null)PROG={base:{idx:o.idx||0,max:Math.max(o.max||0,o.idx||0)}};else PROG=o}catch(_){}
 function getProg(c){return PROG[c]||{idx:0,max:0}}
 function saveProg(idx){const c=G.cls||'base',o=getProg(c);PROG[c]={idx,max:Math.max(o.max||0,idx)};try{localStorage.setItem('zm-fight-save',JSON.stringify(PROG))}catch(_){}}
+var DEV={on:false};function ownC(k){return DEV.on||SHOP.owned.includes(k)}function ownS(k){return DEV.on?!!SKINS[k]:SHOP.skins.includes(k)}function coinOK(n){return DEV.on||COIN>=n}function coinTxt(){return DEV.on?'∞':COIN.toLocaleString()}
 let COIN=0;try{COIN=+(localStorage.getItem('zm-fight-coin')||0)||0}catch(_){}
 function saveShop(){try{localStorage.setItem('zm-fight-exp',String(EXP));localStorage.setItem('zm-fight-coin',String(COIN));localStorage.setItem('zm-fight-shop',JSON.stringify(SHOP))}catch(_){}}
 const EXPV={small:4,grunt:6,brute:12,thrower:6,bomber:5,ninja:8,shield:9,charger:8,spinner:8,healer:7,jumper:6};
@@ -1907,7 +1909,7 @@ function giveExp(e){if(G.tutorial||G.admin||G.ta||G.online||e.clone!=null)return
 function dropCoins(e,v){if(!G.coins)G.coins=[];const k=Math.min(8,Math.max(1,Math.round(v/12)));let left=v;for(let i=0;i<k;i++){const pv=i===k-1?left:Math.floor(v/k);left-=pv;G.coins.push({x:e.x+rnd(-.15,.15),h:e.h+e.size*.6,vx:rnd(-2.2,2.2),vh:rnd(2.5,4.5),v:pv,t:0,gnd:false})}}
 function collectCoins(all){if(!G.coins||!G.coins.length)return;let got=0;for(const c of G.coins){if(all||c.got){got+=c.v;c.dead=1}}if(got){COIN+=got;G.runCoin=(G.runCoin||0)+got;saveShop()}G.coins=G.coins.filter(c=>!c.dead)}
 function updCoins(dt){if(!G.coins||!G.coins.length)return;for(const c of G.coins){c.t+=dt;if(c.t<.55){c.vh-=GRAV*dt;c.x+=c.vx*dt;c.h+=c.vh*dt;const fl=floorAt(c.x,.05,c.h+.2);if(fl>-50&&c.h<fl){c.h=fl;c.vh=Math.abs(c.vh)*.35;c.vx*=.6}}else{const dx=p.x-c.x,dh=(p.h+.5)-c.h,d=Math.hypot(dx,dh)||1,sp=Math.min(16,4+(c.t-.55)*22);c.x+=dx/d*sp*dt;c.h+=dh/d*sp*dt;if(d<.25){c.got=1;if(Math.random()<.5)sfx('dodge')}}}const before=G.coins.some(c=>c.got);collectCoins(false);if(before)G.coinFlash=.25}
-function drawCoins(c,X,Yh){if(!G.coins||!G.coins.length)return;c.save();for(const k of G.coins){const x=X(k.x),y=Yh(k.h),r=U*.06,sq=Math.abs(Math.cos(G.T*9+k.x*3));c.fillStyle='#ffd75e';c.strokeStyle='#fff3b8';c.shadowColor='rgba(255,200,60,.95)';c.shadowBlur=10;c.lineWidth=1.4;c.beginPath();c.ellipse(x,y,r*Math.max(.25,sq),r,0,0,Math.PI*2);c.fill();c.stroke();c.shadowBlur=0;c.strokeStyle='rgba(120,80,0,.7)';c.beginPath();c.ellipse(x,y,r*.5*Math.max(.25,sq),r*.5,0,0,Math.PI*2);c.stroke()}c.restore()}
+function drawCoins(c,X,Yh){if(!G.coins||!G.coins.length)return;c.save();for(const k of G.coins){const x=X(k.x),y=Yh(k.h),r=U*.065,sq=Math.max(.22,Math.abs(Math.cos(G.T*8+k.x*3)));c.fillStyle='#0b0b0b';c.strokeStyle='#f5f5f5';c.shadowColor='rgba(255,255,255,.95)';c.shadowBlur=U*.12;c.lineWidth=Math.max(1.6,U*.022);c.beginPath();c.ellipse(x,y,r*sq,r,0,0,Math.PI*2);c.fill();c.stroke();c.shadowBlur=U*.06;c.lineWidth=Math.max(1,U*.012);c.beginPath();c.ellipse(x,y,r*.48*sq,r*.48,0,0,Math.PI*2);c.stroke();if(sq>.6){c.shadowBlur=0;c.fillStyle='rgba(255,255,255,.85)';c.beginPath();c.ellipse(x-r*.35*sq,y-r*.4,r*.12*sq,r*.2,0,0,Math.PI*2);c.fill()}}c.restore()}
 function wcfg(){const c=G.cls,v=(G.clsVar||{})[c]||(CLS[c]&&CLS[c].vars?CLS[c].vars[0][0]:'');
   switch(c){
   case 'archer':return{st:'w_bow',t:.5,times:[.55],fire:()=>pshot({kind:'arrow',spd:10,dmg:15,h:.62,vh:.6,grav:.12})};
@@ -2913,15 +2915,15 @@ let shopI=0,shopDrag=null;const LOCKSVG='<svg viewBox="0 0 24 24" aria-hidden="t
 let shopPv=null;
 function openShop(){shopPv=null;shopI=Math.max(0,CLSK.indexOf(G.cls));$('#shopBack').hidden=false;buildShop()}
 function closeShop(){shopPv=null;$('#shopBack').hidden=true;showBest()}
-function buildShop(){const tr=$('#sTrack');tr.innerHTML=CLSK.map((k,i)=>{const c=CLS[k],own=SHOP.owned.includes(k);return`<div class="scard${own?' own':''}" data-i="${i}"><canvas data-k="${k}"></canvas><b>${own?c.name:'???'}</b><small>${own?(G.cls===k?'사용 중':'보유'):LOCKSVG+(c.price||0).toLocaleString()+' 코인'}</small></div>`}).join('');
+function buildShop(){const tr=$('#sTrack');tr.innerHTML=CLSK.map((k,i)=>{const c=CLS[k],own=ownC(k);return`<div class="scard${own?' own':''}" data-i="${i}"><canvas data-k="${k}"></canvas><b>${own?c.name:'???'}</b><small>${own?(G.cls===k?'사용 중':'보유'):LOCKSVG+(c.price||0).toLocaleString()+' 코인'}</small></div>`}).join('');
   tr.querySelectorAll('.scard').forEach(el=>el.addEventListener('click',()=>{if(shopDrag&&shopDrag.moved)return;const i=+el.dataset.i;if(i!==shopI){shopI=i;layoutShop()}}));layoutShop()}
 function layoutShop(dx){const st=$('#sStage').getBoundingClientRect(),cw=Math.max(110,Math.min(230,st.width*.3,(st.height*.94-46)/1.05));$('#sTrack').style.setProperty('--cw',cw+'px');
   $('#sTrack').querySelectorAll('.scard').forEach(el=>{const i=+el.dataset.i,off=i-shopI+(dx||0)/(cw*.95),ao=Math.abs(off),sc=ao<1?lerp(1,.76,ao):ao<2?lerp(.76,.6,ao-1):.6,bl=ao<1?ao*2:2+(ao-1)*1.5,op=ao<1?lerp(1,.5,ao):ao<2?lerp(.5,.28,ao-1):Math.max(0,.28-(ao-2)*.3);
     const xo=Math.sign(off)*(ao<1?ao*cw*.95:cw*.95+(Math.min(ao,3)-1)*cw*.72);el.style.transform=`translate(calc(-50% + ${xo}px),-50%) scale(${sc})`;el.style.filter='none';el.style.opacity=(op*(ao<.05?1:.85)).toFixed(2);el.style.zIndex=String(10-Math.round(ao*2));el.style.pointerEvents=ao>2.5?'none':'auto';el.classList.toggle('dragging',dx!=null)});
   if(dx==null)shopInfo()}
-function shopInfo(){const k=CLSK[shopI],c=CLS[k],own=SHOP.owned.includes(k),sel=G.cls===k,prevOk=shopI===0||SHOP.owned.includes(CLSK[shopI-1]);$('#shopExp').innerHTML='<span class="coinhud"><svg class=\"dico coini\" viewBox=\"0 0 24 24\" width=\"14\" height=\"14\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"8.5\"/><circle cx=\"12\" cy=\"12\" r=\"4.5\"/></svg>'+COIN.toLocaleString()+'</span>';$('#shopExp').style.display='';
-  const v=(SHOP.vars||{})[k]||(c.vars?c.vars[0][0]:''),sk=SKINS[k],skOwn=SHOP.skins.includes(k),skOn=!!SHOP.skinOn[k],bar=n=>'<i class="on"></i>'.repeat(n)+'<i></i>'.repeat(5-n);
-  let btn;if(sel)btn='<button class="sbuy ghost" disabled>사용 중</button>';else if(own)btn='<button class="sbuy ghost" id="sAct">선택하기</button>';else if(!prevOk)btn=`<button class="sbuy" disabled>이전 캐릭터 먼저 잠금 해제</button>`;else if(COIN<(c.price||0))btn=`<button class="sbuy" disabled>코인 부족 · ${COIN.toLocaleString()} / ${(c.price||0).toLocaleString()}</button>`;else btn=`<button class="sbuy" id="sAct">구매 · ${(c.price||0).toLocaleString()} 코인</button>`;
+function shopInfo(){const k=CLSK[shopI],c=CLS[k],own=ownC(k),sel=G.cls===k,prevOk=shopI===0||ownC(CLSK[shopI-1]);$('#shopExp').innerHTML='<span class="coinhud"><svg class=\"dico coini\" viewBox=\"0 0 24 24\" width=\"14\" height=\"14\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"8.5\"/><circle cx=\"12\" cy=\"12\" r=\"4.5\"/></svg>'+coinTxt()+'</span>';$('#shopExp').style.display='';
+  const v=(SHOP.vars||{})[k]||(c.vars?c.vars[0][0]:''),sk=SKINS[k],skOwn=ownS(k),skOn=!!SHOP.skinOn[k],bar=n=>'<i class="on"></i>'.repeat(n)+'<i></i>'.repeat(5-n);
+  let btn;if(sel)btn='<button class="sbuy ghost" disabled>사용 중</button>';else if(own)btn='<button class="sbuy ghost" id="sAct">선택하기</button>';else if(!prevOk)btn=`<button class="sbuy" disabled>이전 캐릭터 먼저 잠금 해제</button>`;else if(!coinOK(c.price||0))btn=`<button class="sbuy" disabled>코인 부족 · ${COIN.toLocaleString()} / ${(c.price||0).toLocaleString()}</button>`;else btn=`<button class="sbuy" id="sAct">구매 · ${(c.price||0).toLocaleString()} 코인</button>`;
   let sbtn,pvb=own&&!(skOwn&&skOn)?`<button class="sbuy ghost" id="sPvSkin" style="margin-top:6px">${shopPv===k?'미리보기 끄기':'스킨 미리보기'}</button>`:'';if(!own)sbtn='<button class="sbuy" disabled>캐릭터를 먼저 잠금 해제하세요</button>';else if(!skOwn)sbtn=`<button class="sbuy" id="sSkin">스킨 잠금 해제</button>`;else sbtn=`<button class="sbuy ghost" id="sSkin">${skOn?'착용 해제':'착용하기'}</button>`;
   $('#sInfo').innerHTML=`<div class="shd"><h3>${c.name}<span>${c.job}</span><span>무기 · ${c.wpn}</span></h3>${btn}</div>
   <div class="sgrid"><div class="scol"><p class="sdesc">${c.desc}</p>${c.kit?`<div class="sbox"><div class="sbt">전용 기술</div><dl class="sstats" style="gap:7px 12px">${c.kit.map(q=>`<dt><kbd>${q[0]}</kbd></dt><dd style="display:block;font-size:12.5px;color:var(--dim)"><b style="color:var(--ink);font-weight:600">${q[1]}</b> · ${q[2]}</dd>`).join('')}</dl></div>`:''}<dl class="sstats"><dt>공격력</dt><dd>${bar(c.st[0])}</dd><dt>사거리</dt><dd>${bar(c.st[1])}</dd><dt>속도</dt><dd>${bar(c.st[2])}</dd></dl>
@@ -2930,7 +2932,7 @@ function shopInfo(){const k=CLSK[shopI],c=CLS[k],own=SHOP.owned.includes(k),sel=
     <div class="sbox"><div class="sbt">고유 스킨<b>${sk.name}</b>${skOwn?'<span>보유</span>':(own?'<span>잠김 · 미리보기 가능</span>':'')}</div><p>${sk.desc}</p>${sbtn}${pvb}</div></div></div>`;
   if(!own)$('#sInfo').innerHTML=`<div class="shd"><h3>???<span>LOCKED</span><span>가격 · ${(c.price||0).toLocaleString()} 코인</span></h3>${btn}</div><div class="sgrid"><div class="scol"><p class="sdesc" style="color:var(--dim)">아직 잠겨 있는 캐릭터예요. 구매하면 모습과 무기, 전용 기술, 필살기, 고유 스킨이 공개돼요.</p></div></div>`;
   const pv=$('#sPvSkin');if(pv)pv.onclick=()=>{shopPv=shopPv===k?null:k;buildShop()};
-  const act=$('#sAct');if(act)act.onclick=()=>{if(!own){if(!prevOk||COIN<(c.price||0))return;COIN-=(c.price||0);SHOP.owned.push(k);sfx('wave')}SHOP.cls=k;G.cls=k;saveShop();buildShop()};
+  const act=$('#sAct');if(act)act.onclick=()=>{if(!own){if(!prevOk||!coinOK(c.price||0))return;if(!DEV.on)COIN-=(c.price||0);SHOP.owned.push(k);sfx('wave')}SHOP.cls=k;G.cls=k;saveShop();buildShop()};
   const sb2=$('#sSkin');if(sb2)sb2.onclick=()=>{if(!skOwn){SHOP.skins.push(k);SHOP.skinOn[k]=true;sfx('wave')}else SHOP.skinOn[k]=!skOn;saveShop();buildShop()};
   $('#sInfo').querySelectorAll('.vars button').forEach(b2=>b2.onclick=()=>{SHOP.vars=SHOP.vars||{};SHOP.vars[k]=b2.dataset.v;G.clsVar=SHOP.vars;saveShop();shopInfo()})}
 function shopGo(d){shopI=clamp(shopI+d,0,CLSK.length-1);layoutShop()}
@@ -2958,9 +2960,9 @@ function openChar(){charPv=null;charSel=SHOP.cls||'base';$('#charBack').hidden=f
 function closeChar(){charPv=null;$('#charBack').hidden=true;showBest()}
 function progTxt(k){const g=getProg(k),m=Math.max(g.max||0,g.idx||0);return m>0?`최고 R${Math.floor(m/5)+1}-${m%5+1}`:'기록 없음'}
 function buildChar(){const cur=SHOP.cls||'base';$('#charCur').textContent=CLS[cur].name;
-  $('#charGrid').innerHTML=CLSK.map(k=>{const own=SHOP.owned.includes(k);return`<button class="ctile${k===charSel?' sel':''}${k===cur?' cur':''}${own?'':' lock'}" data-k="${k}"><canvas data-k="${k}"></canvas><b>${own?CLS[k].name:'???'}</b><small>${own?progTxt(k):LOCKSVG+(CLS[k].price||0).toLocaleString()+' 코인'}</small></button>`}).join('');
+  $('#charGrid').innerHTML=CLSK.map(k=>{const own=ownC(k);return`<button class="ctile${k===charSel?' sel':''}${k===cur?' cur':''}${own?'':' lock'}" data-k="${k}"><canvas data-k="${k}"></canvas><b>${own?CLS[k].name:'???'}</b><small>${own?progTxt(k):LOCKSVG+(CLS[k].price||0).toLocaleString()+' 코인'}</small></button>`}).join('');
   $('#charGrid').querySelectorAll('.ctile').forEach(b=>b.onclick=()=>{charSel=b.dataset.k;buildChar();sfx('dodge');if(innerWidth<=720){const cb=$('#charBack .cbody');try{cb.scrollTo({top:0,behavior:'smooth'})}catch(_){cb.scrollTop=0}}});
-  const k=charSel,c=CLS[k],own=SHOP.owned.includes(k),sk=SKINS[k],skOwn=SHOP.skins.includes(k),skOn=!!SHOP.skinOn[k],v=(SHOP.vars||{})[k]||(c.vars?c.vars[0][0]:'');
+  const k=charSel,c=CLS[k],own=ownC(k),sk=SKINS[k],skOwn=ownS(k),skOn=!!SHOP.skinOn[k],v=(SHOP.vars||{})[k]||(c.vars?c.vars[0][0]:'');
   let btn;if(k===cur)btn='<button class="sbuy ghost" disabled>사용 중</button>';else if(own)btn='<button class="sbuy" id="cPick">이 캐릭터로 선택</button>';else btn='<button class="sbuy ghost" id="cShop">상점에서 구매하기</button>';
   if(!own){$('#charInfo').innerHTML=`<h3>???<span>LOCKED</span><span>가격 · ${(CLS[k].price||0).toLocaleString()} 코인</span></h3><p class="sdesc" style="font-size:13.5px;color:var(--dim)">아직 잠겨 있는 캐릭터예요. 상점에서 잠금 해제하면 모습과 능력이 공개돼요.</p><div class="cact">${btn}</div>`;const cs0=$('#cShop');if(cs0)cs0.onclick=()=>{closeChar();openShop();shopI=CLSK.indexOf(k);layoutShop();buildShop()};return}
   $('#charInfo').innerHTML=`<h3>${c.name}<span>${c.job}</span></h3><div class="crow"><span class="ctag">무기 · ${c.wpn}</span><span class="ctag">필살기 · ${c.ult.en}</span><span class="ctag">${progTxt(k)}</span></div>
@@ -2976,20 +2978,20 @@ function buildChar(){const cur=SHOP.cls||'base';$('#charCur').textContent=CLS[cu
 function drawCharFig(cv2,k,demo,dt,T,key){const d=Math.min(2,devicePixelRatio||1),w=cv2.clientWidth,h=cv2.clientHeight;if(!w)return;if(cv2.width!==Math.round(w*d)){cv2.width=Math.round(w*d);cv2.height=Math.round(h*d)}
   const c=cv2.getContext('2d');c.setTransform(d,0,0,d,0,0);c.clearRect(0,0,w,h);const gy=h*.86,u=Math.min(h*.58,w*.5);
   c.save();c.strokeStyle='#f5f5f5';c.shadowColor='rgba(255,255,255,.7)';c.shadowBlur=8;c.lineWidth=1.5;c.beginPath();c.moveTo(w*.1,gy);c.lineTo(w*.9,gy);c.stroke();c.restore();
-  const f=charFig[key]||(charFig[key]={kind:'hero',cls:k,skin:false,x:0,h:0,size:1,face:1,state:'idle',st:0,dur:0,w:.3,phase:0,seed:CLSK.indexOf(k)});if(f.cls!==k){f.cls=k;f._p=null}f.cvar=(SHOP.vars||{})[k];f.skin=!!(SHOP.skinOn[k]&&SHOP.skins.includes(k))||(demo&&charPv===k);
+  const f=charFig[key]||(charFig[key]={kind:'hero',cls:k,skin:false,x:0,h:0,size:1,face:1,state:'idle',st:0,dur:0,w:.3,phase:0,seed:CLSK.indexOf(k)});if(f.cls!==k){f.cls=k;f._p=null}f.cvar=(SHOP.vars||{})[k];f.skin=!!(SHOP.skinOn[k]&&ownS(k))||(demo&&charPv===k);
   if(demo){const [stt,du]=SDEMO[k],cyc=du+1.1,tt=T%cyc,n=Math.floor(T/cyc);if(tt<du){f.state=stt;f.st=tt;f.dur=du;f.w=stt==='punch'?.2:.3;f.wcfg=k==='sword'?{swk:n%4}:null}else{f.state=k==='sword'||tt>du+.6?'idle':'walk';f.phase=T*7.5}}else f.state='idle';
-  if(!SHOP.owned.includes(k)){f.state=k==='baseball'?'w_batc':'idle';f.batG=.75;f.st=0;f.dur=9;f.skin=false;drawSilhouette(c,cv2,f,smooth(f,pose(f,T),dt),w/2,gy,u,d);return}drawFig(c,f,smooth(f,pose(f,T),dt),w/2,gy,u)}
+  if(!ownC(k)){f.state=k==='baseball'?'w_batc':'idle';f.batG=.75;f.st=0;f.dur=9;f.skin=false;drawSilhouette(c,cv2,f,smooth(f,pose(f,T),dt),w/2,gy,u,d);return}drawFig(c,f,smooth(f,pose(f,T),dt),w/2,gy,u)}
 function renderChar(dt,T){drawCharFig($('#charCv'),charSel,true,dt,T,'big');$('#charGrid').querySelectorAll('canvas').forEach(cv2=>drawCharFig(cv2,cv2.dataset.k,false,dt,T,'t_'+cv2.dataset.k))}
 $('#charBtn').onclick=()=>{closeTut();openChar()};$('#charClose').onclick=closeChar;
-addEventListener('keydown',e=>{if($('#charBack').hidden)return;const i=CLSK.indexOf(charSel);if(e.key==='Escape')closeChar();else if(e.key==='ArrowRight'||e.key==='ArrowLeft'){charSel=CLSK[clamp(i+(e.key==='ArrowRight'?1:-1),0,CLSK.length-1)];buildChar()}else if(e.key==='Enter'&&SHOP.owned.includes(charSel)){SHOP.cls=charSel;G.cls=charSel;saveShop();buildChar()}});
+addEventListener('keydown',e=>{if($('#charBack').hidden)return;const i=CLSK.indexOf(charSel);if(e.key==='Escape')closeChar();else if(e.key==='ArrowRight'||e.key==='ArrowLeft'){charSel=CLSK[clamp(i+(e.key==='ArrowRight'?1:-1),0,CLSK.length-1)];buildChar()}else if(e.key==='Enter'&&ownC(charSel)){SHOP.cls=charSel;G.cls=charSel;saveShop();buildChar()}});
 showBest();
 function renderShop(dt,T){const d=Math.min(2,devicePixelRatio||1);
   $('#sTrack').querySelectorAll('canvas').forEach((cv2,idx)=>{const k=cv2.dataset.k,i=CLSK.indexOf(k);if(Math.abs(i-shopI)>2)return;const r2=cv2.getBoundingClientRect(),w=cv2.clientWidth,h=cv2.clientHeight;if(!w)return;
     if(cv2.width!==Math.round(w*d)){cv2.width=w*d;cv2.height=h*d}const c=cv2.getContext('2d');c.setTransform(d,0,0,d,0,0);c.clearRect(0,0,w,h);const gy=h*.88,u=h*.5;
     c.save();c.strokeStyle='#f5f5f5';c.shadowColor='rgba(255,255,255,.7)';c.shadowBlur=8;c.lineWidth=1.5;c.beginPath();c.moveTo(w*.12,gy);c.lineTo(w*.88,gy);c.stroke();c.restore();
-    const f=shopFig[k]||(shopFig[k]={kind:'hero',cls:k,skin:false,x:0,h:0,size:1,face:1,state:'idle',st:0,dur:0,w:.3,phase:0,seed:i});f.cls=k;f.skin=!!(SHOP.skinOn[k]&&SHOP.skins.includes(k))||shopPv===k;
+    const f=shopFig[k]||(shopFig[k]={kind:'hero',cls:k,skin:false,x:0,h:0,size:1,face:1,state:'idle',st:0,dur:0,w:.3,phase:0,seed:i});f.cls=k;f.skin=!!(SHOP.skinOn[k]&&ownS(k))||shopPv===k;
     if(i===shopI){const [stt,du]=SDEMO[k],cyc=du+.9,tt=(T*1)%cyc;if(tt<du){f.state=stt;f.st=tt;f.dur=du;f.w=stt==='punch'?.2:.3}else f.state='idle'}else f.state='idle';
-    if(!SHOP.owned.includes(k)){f.state=k==='baseball'?'w_batc':'idle';f.batG=.75;f.st=0;f.dur=9;f.skin=false;drawSilhouette(c,cv2,f,smooth(f,pose(f,T),dt),w/2,gy,u,d);return}drawFig(c,f,smooth(f,pose(f,T),dt),w/2,gy,u)})}
+    if(!ownC(k)){f.state=k==='baseball'?'w_batc':'idle';f.batG=.75;f.st=0;f.dur=9;f.skin=false;drawSilhouette(c,cv2,f,smooth(f,pose(f,T),dt),w/2,gy,u,d);return}drawFig(c,f,smooth(f,pose(f,T),dt),w/2,gy,u)})}
 
 const ULT={boss:'ROYAL QUAKE',shadow:'ECLIPSE',golem:'AVALANCHE',bomblord:'MEGATON',storm:'TEMPEST',titan:'CEILING COLLAPSE',phantom:'GLITCH PRISON',warlord:'SPEAR RAIN',archmage:'ARCANE BEAM',emperor:'WORLD BREAK'};
 function zoneB(){return G.zone||{x0:p.x-6,x1:p.x+6}}
@@ -3495,7 +3497,7 @@ let hintCache={};
 function updHud(){
   if(!document.body.classList.contains('desk'))for(const a of['punch','kick','jump']){const h=comboHint(a);if(hintCache[a]!==h){hintCache[a]=h;const b=document.querySelector(`.act [data-c="${a}"]`);if(b){b.classList.toggle('hint',!!h);b.dataset.hint=h}}}
   {const sn=G.cls==='necro'&&kitMode()&&p.state!=='dead'&&!!soulNear();if(hud.soulN!==sn){hud.soulN=sn;const b=document.querySelector('.act [data-c="kick"]');if(b)b.classList.toggle('soulg',sn);const k=document.querySelector('#keys [data-a="kick"]');if(k)k.classList.toggle('soulg',sn)}}
-  setTxt('rtag','R'+G.round);setTxt('wv',String(G.wave+1));setTxt('ko','KO '+G.ko);setTxt('expv','EXP '+EXP.toLocaleString());setTxt('coinb',COIN.toLocaleString());{const ch=$('#coinv');if(ch)ch.classList.toggle('fl',(G.coinFlash||0)>0)}{const ug=(p.ultG||0);$('#ultb').style.width=ug+'%';$('#ultbar').classList.toggle('full',ug>=100);const ub=document.querySelector('.act [data-c="ult"]');if(ub){ub.style.setProperty('--ug',(ug/100).toFixed(3));ub.classList.toggle('ready',ug>=100)}const kl=document.querySelector('#keys [data-a="ult"]');if(kl)kl.classList.toggle('cool',ug<100)}setTxt('dm',Math.floor(G.maxX*2.4)+'m');{const tt=$('#taTimer');if(tt){tt.hidden=!G.ta;if(G.ta){const s2=fmtT(G.ta.t),tb=$('#taT');if(tb.textContent!==s2)tb.textContent=s2}}}
+  setTxt('rtag','R'+G.round);setTxt('wv',String(G.wave+1));setTxt('ko','KO '+G.ko);setTxt('expv','EXP '+EXP.toLocaleString());setTxt('coinb',coinTxt());{const ch=$('#coinv');if(ch)ch.classList.toggle('fl',(G.coinFlash||0)>0)}{const ug=(p.ultG||0);$('#ultb').style.width=ug+'%';$('#ultbar').classList.toggle('full',ug>=100);const ub=document.querySelector('.act [data-c="ult"]');if(ub){ub.style.setProperty('--ug',(ug/100).toFixed(3));ub.classList.toggle('ready',ug>=100)}const kl=document.querySelector('#keys [data-a="ult"]');if(kl)kl.classList.toggle('cool',ug<100)}setTxt('dm',Math.floor(G.maxX*2.4)+'m');{const tt=$('#taTimer');if(tt){tt.hidden=!G.ta;if(G.ta){const s2=fmtT(G.ta.t),tb=$('#taT');if(tb.textContent!==s2)tb.textContent=s2}}}
   $('#hpb').style.width=(p.hp/p.maxHp*100)+'%';$('#hpbar').classList.toggle('low',p.hp<p.maxHp*.25);$('#stb').style.width=p.sta+'%';
   document.querySelector('.act [data-c="roll"]').style.setProperty('--st',clamp(p.sta/100,0,1));
   for(const a in SKILL){const r=1-p.cd[a]/SKILL[a].cd;document.querySelector(`.act [data-c="${a}"]`).style.setProperty('--cd',r.toFixed(3));
@@ -3581,7 +3583,8 @@ function onlineEnd(win,msg){const O=G.online;if(!O||O.over)return;O.over=true;if
   card.innerHTML=`<h1>${win?'WIN':'LOSE'}</h1><div class="big">${O.me} <i>vs</i> ${O.opp}</div><p>${msg||(win?'상대를 쓰러뜨렸어요!':'상대에게 졌어요')}</p><div class="runstats">${CLS[O.cls].name} 미러전 · 최고 콤보 ${G.bestCombo||0}</div><div class="row"><button class="btn" id="bLob">로비로</button></div>`;
   $('#bLob').onclick=toLobby;$('#bLob').focus();try{window.ZMNET&&ZMNET.end()}catch(_){}}
 function onlineMenu(){if(!G.online||G.online.over)return;ov.hidden=false;card.innerHTML=`<h1>ONLINE</h1><p>온라인 대전 중에는 게임이 멈추지 않아요.</p><div class="row"><button class="btn" id="bRes">계속하기</button><button class="btn ghost" id="bGG">항복하고 나가기</button></div>`;$('#bRes').onclick=()=>{ov.hidden=true};$('#bGG').onclick=()=>{onlineEnd(false,'항복했어요')}}
-window.ZMG={startOnline,netState,netEvent,inLobby:()=>G.mode==='lobby',playing:()=>!!G.online,owned:()=>CLSK.filter(k=>k==='base'||SHOP.owned.includes(k)),clsName:k=>CLS[k]?CLS[k].name:k,curCls:()=>SHOP.cls||'base',skinOn:k=>!!(SHOP.skinOn[k]&&SHOP.skins.includes(k))};
+function setDev(on){DEV.on=!!on;G.adminOK=DEV.on;const ab=$('#adminBtn');if(ab)ab.hidden=!DEV.on;if(!DEV.on){$('#admPanel').hidden=true;$('#admCode').hidden=true}try{showBest()}catch(_){}try{if(!$('#shopBack').hidden)buildShop()}catch(_){}}
+window.ZMG={setDev,startOnline,netState,netEvent,inLobby:()=>G.mode==='lobby',playing:()=>!!G.online,owned:()=>CLSK.filter(k=>k==='base'||ownC(k)),clsName:k=>CLS[k]?CLS[k].name:k,curCls:()=>SHOP.cls||'base',skinOn:k=>!!(SHOP.skinOn[k]&&ownS(k))};
 /* ---------- time attack ---------- */
 function fmtT(t){t=Math.max(0,t||0);const m=Math.floor(t/60),s2=t-m*60;return m+':'+(s2<10?'0':'')+s2.toFixed(2)}
 let TAREC={};try{TAREC=JSON.parse(localStorage.getItem('zm-fight-ta')||'{}')||{}}catch(_){TAREC={}}
@@ -3592,7 +3595,7 @@ function taOver(){G.mode='over';ov.hidden=false;const r=G.ta.saved?{nb:false,sc:
   <div class="runstats">KO ${G.ko} · 최고 콤보 ${G.bestCombo}</div>${r.nb?`<div class="unl">${CLS[c].name} 최고 기록 갱신!</div>`:b?`<div class="runstats">최고 기록 · ${b.wl} · ${fmtT(b.t)}</div>`:''}
   <div class="row"><button class="btn" id="bRe">다시 도전</button><button class="btn ghost" id="bTa">캐릭터 변경</button><button class="btn ghost" id="bLob">로비</button></div>`;
   $('#bRe').onclick=()=>startGame(0,false,{ta:c});$('#bTa').onclick=()=>{toLobby();openTA()};$('#bLob').onclick=toLobby;$('#bRe').focus()}
-let openTA=function(){const own=CLSK.filter(k=>k==='base'||SHOP.owned.includes(k));$('#taGrid').innerHTML=own.map(k=>{const b=TAREC[k];return`<button data-k="${k}"><b>${CLS[k].name}</b><small>${b?`최고 ${b.wl} · ${fmtT(b.t)}`:'기록 없음'}</small></button>`}).join('');
+let openTA=function(){const own=CLSK.filter(k=>k==='base'||ownC(k));$('#taGrid').innerHTML=own.map(k=>{const b=TAREC[k];return`<button data-k="${k}"><b>${CLS[k].name}</b><small>${b?`최고 ${b.wl} · ${fmtT(b.t)}`:'기록 없음'}</small></button>`}).join('');
   $('#taGrid').querySelectorAll('button').forEach(bt=>bt.onclick=()=>{$('#taOv').hidden=true;closeTut&&closeTut();startGame(0,false,{ta:bt.dataset.k})});$('#taOv').hidden=false};
 $('#taBtn').onclick=openTA;
 $('#onBtn').onclick=()=>{if(window.ZMONLINE&&ZMONLINE.open){ZMONLINE.open();return}$('#taGrid').innerHTML='';$('#taOv').querySelector('h3').textContent='ONLINE';$('#taOv').querySelector('p').innerHTML='온라인 대전은 <b>Google·이메일 로그인이 되는 웹 버전</b>(Netlify 등)에서만 할 수 있어요.';$('#taOv').hidden=false};
@@ -3871,9 +3874,10 @@ requestAnimationFrame(frame);
 
 <!-- ===================== Google 로그인 + 클라우드 저장 (Firebase) ===================== -->
 <style>
-.acctbtn{position:fixed;z-index:32;top:calc(10px + env(safe-area-inset-top,0px));right:calc(78px + env(safe-area-inset-right,0px));font-family:var(--f-mono,monospace);font-size:10px;letter-spacing:.08em;background:transparent;color:#bdbdbd;border:1px solid #3a3a3a;padding:5px 9px;cursor:pointer;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.acctbtn{position:fixed;z-index:32;top:calc(10px + env(safe-area-inset-top,0px));right:calc(10px + env(safe-area-inset-right,0px));font-family:var(--f-mono,monospace);font-size:10px;letter-spacing:.08em;background:transparent;color:#bdbdbd;border:1px solid #3a3a3a;padding:5px 9px;cursor:pointer;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;gap:5px}
 .acctbtn img{width:14px;height:14px;border-radius:50%;flex:none}
 .acctbtn.on{color:#f5f5f5;border-color:#555}
+.admbtn{top:calc(42px + env(safe-area-inset-top,0px))!important}
 .acctpop{position:fixed;z-index:33;top:calc(40px + env(safe-area-inset-top,0px));right:calc(10px + env(safe-area-inset-right,0px));width:230px;background:#0b0b0b;border:1px solid #3a3a3a;padding:12px;font-family:var(--f-body,system-ui);color:#f5f5f5;font-size:12px;line-height:1.5;box-shadow:0 8px 24px rgba(0,0,0,.6)}
 .acctpop[hidden]{display:none}
 .acctpop .nm{font-weight:700;font-size:13px;word-break:break-all}
@@ -4021,7 +4025,8 @@ const FIREBASE_CONFIG={
   async function upload(){if(!user)return;const t=Date.now();try{await db.collection('users').doc(user.uid).set({data:keys(),updatedAt:t,name:user.displayName||''});setSync({uid:user.uid,t});upd('저장됨 · '+new Date(t).toLocaleTimeString())}catch(e){upd('저장 실패 · 잠시 후 다시 시도해요')}}
   Storage.prototype.setItem=function(k,v){origSet.call(this,k,v);if(this===localStorage&&user&&typeof k==='string'&&k.startsWith(PREFIX)&&k!==SYNC){clearTimeout(timer);timer=setTimeout(upload,1500)}};
   function applyCloud(data,t,uid){const apply=()=>{for(const k of Object.keys(keys()))localStorage.removeItem(k);for(const k in data)origSet.call(localStorage,k,data[k]);setSync({uid,t});location.reload()};if(inLobby())apply();else{const iv=setInterval(()=>{if(inLobby()){clearInterval(iv);apply()}},800)}}
-  auth.onAuthStateChanged(async u=>{user=u;status='';err='';renderBtn();if(!pop.hidden)renderPop();if(!u)return;
+  const DEV_EMAILS=['songhoonseo@gmail.com'];
+  auth.onAuthStateChanged(async u=>{user=u;status='';err='';renderBtn();if(!pop.hidden)renderPop();try{window.ZMG&&ZMG.setDev(!!(u&&u.email&&DEV_EMAILS.includes(u.email.toLowerCase())&&(u.emailVerified||(u.providerData||[]).some(p2=>p2.providerId==='google.com'))))}catch(_){}if(!u)return;
     try{const snap=await db.collection('users').doc(u.uid).get(),sync=getSync();
       if(snap.exists){const d=snap.data();if(!sync||sync.uid!==u.uid||(d.updatedAt||0)>(sync.t||0)){upd('계정에서 불러오는 중…');applyCloud(d.data||{},d.updatedAt||Date.now(),u.uid)}else upd('계정과 동기화됨')}
       else{if(sync&&sync.uid&&sync.uid!==u.uid){for(const k of Object.keys(keys()))localStorage.removeItem(k);await upload();location.reload()}else await upload()}
