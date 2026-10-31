@@ -1339,8 +1339,7 @@ function kill(e,dir){
 }
 function hurtPlayer(dmg,dir,kb,src,nd){
   if(p.state==='dead')return false;
-  if(nd&&p.state==='roll'){p.inv=0}
-  if(p.state==='roll'&&!nd){if(src&&!src.dodged){src.dodged=true;ftext(p.x,p.h+1.05,'DODGE');sfx('dodge')}return false}
+  if(p.state==='roll'){if(src&&!src.dodged){src.dodged=true;ftext(p.x,p.h+1.05,'DODGE');sfx('dodge')}return false}
   if(p.inv>0)return false;
   if(p.state==='guard'&&p.face===-dir){
     if(G.T-p.gStart<.18){p.inv=.25;G.stop=.08;shake(.14);sfx('parry');sparks(p.x+p.face*.15,p.h+.55,p.face,10,1.2);ftext(p.x,p.h+1.15,'PARRY',true);if(G.tutorial)tutEv('parry');
