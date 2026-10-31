@@ -1268,6 +1268,7 @@ function tryAct(a,mv,chain){
     if(!p.gnd)return false;
     if(p.sta<ROLL_COST){ftext(p.x,p.h+1.05,'NO STAMINA');IN.buf=null;return false}
     p.sta-=ROLL_COST;if(mv)p.face=mv;p.rollChain=(p.state==='roll')||(p.prevAct==='roll'&&G.T-p.prevT<.16)||ceilBlocked(p.x,p.h,.97*p.size);p.rollOff=0;p.rollBlk=false;setState(p,'roll',ROLL_T);p.inv=DODGE_T;IN.buf=null;sfx('roll');dust(p.x,4,1,p.h);return true}
+  if(XTRIG[G.cls]){const sc=anyCombo(a);if(sc){if(mv)p.face=mv;return doSwCombo(sc)}}
   if(archerMode()&&archerAct(a,mv))return true;
   if(gunMode()&&(a==='aim'||a==='punch')){if(p.state==='dead')return false;IN.buf=null;if(p.rjump&&!p.gnd){gunSlam();return true}setState(p,'aim',9);G.kAng=0;p.firedOnce=0;p.recoil=0;if(a==='punch')IN.aimHold=false;return true}
   if(G.cls==='necro'&&kitMode()&&a==='punch'){IN.buf=null;if(p.state==='dead'||(p.cd.ghost||0)>0)return false;if(ghostLaunch(true)){p.cd.ghost=.3;if(G.tutorial)tutEv('atk')}return true}
@@ -1284,7 +1285,7 @@ function tryAct(a,mv,chain){
     if(p.cd[a]>0){ftext(p.x,p.h+1.05,'COOLDOWN');IN.buf=null;return false}
     if(a!=='spin'&&a!=='dive'&&!p.gnd)return false;
     if(p.sta<k.st){ftext(p.x,p.h+1.05,'NO STAMINA');IN.buf=null;return false}
-    p.sta-=k.st;p.cd[a]=k.cd;if(mv)p.face=mv;if(archerMode()){archerSkill(a);IN.buf=null;if(G.tutorial)tutEv('act:'+a);return true}if(kitMode()){KIT[G.cls][a]();if(G.cls==='druid'&&p.cd[a]>.5)p.cd[a]*=1.25;p.kact=a;if(!(G.cls==='magician'&&a==='flurry'))p.lastKit=a;IN.buf=null;if(G.tutorial)tutEv('act:'+a);return true}setState(p,a,k.t,.3);p.hitSet=new Set();p.hopped=false;p.kd=false;p.fired=false;p.ftick=-1;IN.buf=null;sfx(a==='dash'?'roll':'swing');return true}
+    p.sta-=k.st;p.cd[a]=k.cd;if(mv)p.face=mv;if(archerMode()){archerSkill(a);p.kact=a;IN.buf=null;if(G.tutorial)tutEv('act:'+a);return true}if(kitMode()){KIT[G.cls][a]();if(G.cls==='druid'&&p.cd[a]>.5)p.cd[a]*=1.25;p.kact=a;if(!(G.cls==='magician'&&a==='flurry'))p.lastKit=a;IN.buf=null;if(G.tutorial)tutEv('act:'+a);return true}setState(p,a,k.t,.3);p.hitSet=new Set();p.hopped=false;p.kd=false;p.fired=false;p.ftick=-1;IN.buf=null;sfx(a==='dash'?'roll':'swing');return true}
   if(mv)p.face=mv;const air=!p.gnd;
   let nx=chain&&!kitMode()?CHAIN[p.state+'>'+a]:null;if(nx==='hammer'){if(G.T<(p.hamCd||0)){ftext(p.x,p.h+1.05,'COOLDOWN');nx=null}else p.hamCd=G.T+3}
   if(!nx&&!kitMode()&&(a==='punch'||a==='kick')){
@@ -2142,7 +2143,7 @@ function bmCombo(a){if(G.cls!=='bomber'||!kitMode()||a!=='punch'||p.state==='dea
   if(p.state==='roll'||(p.prevAct==='roll'&&G.T-p.prevT<.42))return 'rollbomb';return null}
 const CLIST={ninja:[['그림자 걸음','1','barrage'],['하늘 표창(공중)','1','meteor'],['마름쇠','1','volley'],['벽에 매달린 채','2','pounce'],['구르기','1','rollstar']],
   bomber:[['로켓 점프(공중)','1','drop'],['지뢰를 깐 뒤 다시','2','detonate'],['폭풍 돌진','1','dynamite'],['구르기','1','rollbomb']]};
-function anyCombo(a){if(G.cls==='sword')return swCombo(a);if(G.cls==='ninja')return njCombo(a);if(G.cls==='bomber')return bmCombo(a);return null}
+function anyCombo(a){if(XTRIG[G.cls])return xCombo(a);if(G.cls==='sword')return swCombo(a);if(G.cls==='ninja')return njCombo(a);if(G.cls==='bomber')return bmCombo(a);return null}
 function swCombo(a){if(G.cls!=='sword'||!kitMode()||a!=='punch'||p.state==='dead')return null;
   const inW=p.state.slice(0,2)==='w_'&&p.dur&&p.st/p.dur>.55,rec=inW?p.kact:(G.T-(p.kEnd||-9)<.5?p.kact:null);
   if(rec==='thrust')return 'cross';if(rec==='kick'&&(p.state==='w_rush'?inW:true))return(p.cd.c_iai||0)>0?null:'iai';if(rec==='upper'&&!p.gnd)return(p.cd.c_heaven||0)>0?null:'heaven';if(rec==='spin')return 'cyclone';
@@ -2910,6 +2911,68 @@ function vaultBtns(){const V=G.mode==='lobby'?VAULT:vaultSrc(),ks=Object.keys(V)
   if(!ks.length)return '<span style="font-size:12px;color:var(--dim)">아직 모은 영혼이 없어요. 네크로맨서로 적을 쓰러뜨리고, 떨어진 영혼에 다가가 소환 버튼을 누르면 모여요.</span>';
   return ks.map(k=>{const t=TY[k],bs=!!t.boss,on=bs?VBSEL===k:VSEL===k;return`<button data-vk="${k}" class="${on?'on':''} ${bs?'bs':t.mid?'md':''}">${bs?'BOSS · ':t.mid?'ELITE · ':''}${t.name||k} ×${V[k]}</button>`}).join('')}
 function bindVault(el){if(!el)return;el.querySelectorAll('button[data-vk]').forEach(b=>b.onclick=()=>{const k=b.dataset.vk;if(TY[k].boss)VBSEL=VBSEL===k?null:k;else VSEL=VSEL===k?null:k;saveVault();el.innerHTML=vaultBtns();bindVault(el)})}
+/* ---------- skill combos for remaining classes ---------- */
+function xSh(t,times,fire){setState(p,'w_xbow',t,.3);p.wfi=0;p.wcfg={times,fire}}
+function ballFx(x,h,n){for(let i=0;i<(n||8);i++)fx.push({t:'e',x,y:h,vx:rnd(-2.5,2.5),vy:rnd(-1,2.5),life:.4,max:.4,r:.025})}
+const XC={
+archer:{
+  starshower:{en:'STAR SHOWER',ko:'별똥 화살비',cd:5,run(){const A=aimNow(),cx=p.x+A.dir*3;xSh(.5,[.3],()=>{for(let k=0;k<8;k++){const x=cx+rnd(-1.1,1.1);pshots.push({x,px:x,h:p.h+5+k*.4,vx:A.dir*.6,vh:-13,grav:0,dmg:11,kind:'arrow',life:1.5,hitSet:new Set(),kb:.8,rot:0,glow:1})}marks.push({x:cx,h:Math.max(0,floorAt(cx,.05,9)),life:.6,max:.6,r:1.2});sfx('bow');sfx('whistle')})}},
+  blazefan:{en:'BLAZE FAN',ko:'불꽃 부채',run(){xSh(.42,[.3],()=>{const B=aimNow();for(const da of[-.22,0,.22])arrowAt({dir:B.dir,ang:B.ang+da},{spd:14,dmg:12,grav:.12,kb:1.6,fire:1});sfx('xbow');sfx('fire')})}},
+  tumble:{en:'TUMBLE SHOT',ko:'공중제비 사격',run(){p.vx=-p.face*4.5;p.vh=Math.max(p.vh,4.2);p.gnd=false;xSh(.5,[.12,.26,.4],()=>{const B=aimNow();arrowAt(B,{spd:19,dmg:11,grav:.04,kb:1.4,glow:1});sfx('xbow')})}}},
+gunner:{
+  leadrain:{en:'LEAD RAIN',ko:'탄환 세례',run(){kst('w_gun',.45,{times:[.08,.16,.24,.32,.4],fire(){kshot('bullet',-.95+rnd(-.12,.12),16,9,{h:p.h+.35});sfx('shot')}});if(!p.gnd)p.vh=Math.max(p.vh,1.2)}},
+  pointblank:{en:'POINT BLANK',ko:'근접 산탄',cd:3,run(){kst('w_gun',.4,{times:[.22],fire(){aoe(p.x+p.face*.75,p.h,.85,1,26,3.6,'wpnH',p.face);for(let k=0;k<6;k++)kshot('pellet',(k-2.5)*.09,15,5,{life:.35});fx.push({t:'mz',x:p.x+p.face*.6,y:p.h+.6,vx:0,vy:0,life:.08,max:.08,d:p.face});shake(.25);sfx('shot');sfx('boom');p.vx=-p.face*3}})}},
+  rollshot:{en:'ROLL SHOT',ko:'구르기 저격',run(){kst('w_gun',.36,{times:[.12,.28],fire(){kshot('snipe',0,22,16,{pierce:1,kb:2});sfx('shot')}})}}},
+necro:{
+  wraith:{en:'WRAITH BURST',ko:'망령 폭발',cd:3,run(){kst('w_burst',.4,{times:[.15],fire(){aoe(p.x,p.h,1.35,1.1,22,2.8,'wpnH');ringFx(p.x,p.h+.5,1.3,4);ringFx(p.x,p.h+.5,.7,3);wisps(p.x,p.h+.4,18);shake(.25);sfx('glitch');sfx('boom')}})}},
+  bonelance:{en:'BONE LANCE',ko:'뼈 창',run(){const f=p.face,x0=p.x;kst('w_summon',.55,{times:[.12,.22,.32,.42],fire(){const i=p.wfi-1,x=x0+f*(.8+i*.7),h=Math.max(0,floorAt(x,.1,p.h+.5));spikeAt(x,h,1+i*.12);bones(x,h+.3,4);aoe(x,h,.42,1.3,13,2,'wpnH',f,e=>launch(e,3.2));if(i%2===0)sfx('slam')}})}},
+  soulbolts:{en:'SOUL BOLTS',ko:'영혼탄',run(){kst('w_cast',.45,{times:[.12,.26,.4],fire(){cshot({dr:DRW.dbolt,up:trail(0,'shade',30),spd:11,dmg:10,ang:rnd(-.08,.08),life:1.2});sfx('glitch')}})}}},
+magician:{
+  cardfan:{en:'CARD FAN',ko:'카드 부채',run(){kst('w_throw',.4,{times:[.28],fire(){for(let i=-2;i<=2;i++)kshot('card',i*.17,10,8,{pierce:1});sfx('swing')}})}},
+  surprise:{en:'SURPRISE!',ko:'깜짝 등장',cd:3,run(){kst('w_burst',.4,{times:[.12],fire(){aoe(p.x,p.h,1.2,1.1,22,3,'wpnH',null,e=>launch(e,3.5));ringFx(p.x,p.h+.5,1.2,4);for(let i=0;i<22;i++)fx.push({t:'e',x:p.x+rnd(-.3,.3),y:p.h+.6,vx:rnd(-3.5,3.5),vy:rnd(-1,4),life:.6,max:.6,r:.03});shake(.25);sfx('pop');sfx('boom')}})}},
+  trickshot:{en:'TRICK SHOT',ko:'트릭 샷',run(){kst('w_throw',.38,{times:[.25],fire(){kshot('card',0,16,22,{pierce:1,heavy:1,kb:2.6,sc:1.6,life:1.4});sparks(p.x+p.face*.4,p.h+.7,p.face,6,1);sfx('swing')}})}}},
+porter:{
+  returnstrike:{en:'RETURN STRIKE',ko:'귀환 일격',cd:3,run(){const t=nearest(6.5);if(t){const sd=Math.sign(t.x-p.x)||p.face;if(tele(t.x-sd*(.16*t.size+.4),Math.max(p.h,t.h)))p.face=sd}kst('w_kick',.38,{melee:{a0:.15,a1:.6,reach:.85,dmg:24,kb:3,kind:'wpnH'}});p.inv=Math.max(p.inv,.25)}},
+  afterimage:{en:'AFTERIMAGE',ko:'잔상 베기',run(){kst('w_spin',.45,{times:[.15,.35],fire(){const x=p.x;kfx.push({t:'slash',x:x-.9,h:p.h+.2,x2:x+.9,h2:p.h+1.1,life:.3,max:.3});kfx.push({t:'slash',x:x-.9,h:p.h+1.1,x2:x+.9,h2:p.h+.2,life:.3,max:.3});aoe(x,p.h,1.05,1,12,1.6,'wpnH');blinkFx(x,p.h);sfx('swing')}})}},
+  warpkick:{en:'WARP KICK',ko:'워프 킥',run(){const t=nearest(5);if(t){const sd=Math.sign(t.x-p.x)||p.face;if(tele(t.x+sd*(.16*t.size+.36),Math.max(p.h,t.h)))p.face=-sd}kst('w_kick',.4,{melee:{a0:.15,a1:.6,reach:.8,dmg:18,kb:2.5,kind:'wpnH',on(e){launch(e,4.5)}}})}}},
+baseball:{
+  homerun:{en:'HOME RUN',ko:'홈런',cd:4,run(){kst('w_sword',.55,{swk:1,melee:{a0:.3,a1:.6,reach:1.05,dmg:30,kb:4,kind:'wpnH',on(e){launch(e,6.5);ftext(e.x,e.h+e.size+.4,'HOME RUN!',true);shake(.3);G.stop=.05}},times:[.32],fire(){sfx('swing')}})}},
+  fastball:{en:'FASTBALL',ko:'강속구',run(){kst('w_throw',.4,{times:[.32],fire(){kshot('ball',0,19,24,{pierce:1,heavy:1,kb:3,h:p.h+.7});sfx('swing')}})}},
+  tripleplay:{en:'TRIPLE PLAY',ko:'삼중 투구',run(){kst('w_throw',.6,{times:[.2,.4,.58],fire(){kshot('ball',rnd(-.06,.08),14,11,{h:p.h+.7});sfx('swing')}})}}},
+volt:{
+  overload:{en:'OVERLOAD',ko:'과부하',cd:4,run(){const t=nearest(5.5);kst('w_cast',.45,{times:[.2],fire(){if(t&&alive(t)){const fh=Math.max(0,floorAt(t.x,.1,t.h+.5));kfx.push({t:'strike',x:t.x,h:fh,life:.5,max:.5,big:1,seed:Math.floor(Math.random()*9999),dr:DRW.strike});hitEnemy(t,22,'wpnH',Math.sign(t.x-p.x)||1,1.5);chainZap(t.x,t.h+t.size*.55,5,12,3.2,new Set([t]),.4);shake(.3);sfx('boom')}else ftext(p.x,p.h+1.4,'NO TARGET');sfx('zap')}})}},
+  shockwave:{en:'SHOCKWAVE',ko:'전기 파동',run(){kst('w_burst',.4,{times:[.18],fire(){cshot({dr:DRW.zorb,sc:1.9,up:trail(0,'zap',20),spd:8,dmg:16,life:1,pierce:1,kb:1.8,onHit(s,e){if(s.hitSet.has(e))return;s.hitSet.add(e);hitEnemy(e,s.dmg,'wpn',Math.sign(s.vx)||p.face,s.kb);slowE(e,1.5)}});sfx('zap')}})}},
+  sparkdash:{en:'SPARK DASH',ko:'스파크 돌진',run(){kst('w_dash',.38,{melee:{a0:.05,a1:.85,reach:.6,dmg:16,kb:2,both:1,on(e){if(!TY[e.kind].boss&&e.state!=='dead')setState(e,'hurt',.7);slowE(e,1)}},upd(u){if(u<.7)p.vx=p.face*9;if(Math.random()<.6)fx.push({t:'e',x:p.x,y:p.h+rnd(.2,1),vx:-p.face*2,vy:rnd(-1,1),life:.25,max:.25,r:.02})}});p.inv=Math.max(p.inv,.3);sfx('zap')}}},
+wolf:{
+  pounce:{en:'POUNCE',ko:'덮치기',cd:3,run(){p.vh=Math.max(p.vh,4.5);p.gnd=false;kst('w_kick',.55,{upd(u){if(u<.55)p.vx=p.face*6.5},times:[.48],fire(){aoe(p.x+p.face*.45,p.h,.8,1.1,24,2.6,'wpnH',p.face,e=>launch(e,4));kfx.push({t:'claw',x:p.x+p.face*.6,h:p.h+.5,f:p.face,s:1.7,life:.25,max:.25,dr:DRW.claw});dust(p.x,8,1,p.h);shake(.3);sfx('slam')}})}},
+  frenzy:{en:'FRENZY',ko:'광란의 발톱',run(){kst('w_sword',.75,{claw:1,rehit:.13,melee:{a0:.08,a1:.9,reach:.85,dmg:6,kb:.4},times:[.12,.3,.48,.66],fire(){kfx.push({t:'claw',x:p.x+p.face*.5,h:p.h+rnd(.45,.85),f:p.face,s:1.2,life:.2,max:.2,dr:DRW.claw});sfx('swing')}})}},
+  lunge:{en:'LUNGE BITE',ko:'물어뜯기',run(){kst('w_dash',.4,{melee:{a0:.1,a1:.8,reach:.6,dmg:20,kb:2,kind:'wpnH',on(e){p.hp=Math.min(p.maxHp,p.hp+6);ftext(p.x,p.h+1.3,'+6');sparks(e.x,e.h+e.size*.6,p.face,8,1)}},upd(u){if(u<.6)p.vx=p.face*8}})}}},
+bard:{
+  feedback:{en:'FEEDBACK',ko:'피드백',cd:3,run(){kst('w_play',.42,{times:[.2],fire(){for(const d of[-1,1])cshot({dir:d,dr:DRW.gwave,spd:9,dmg:15,life:.6,pierce:1,kb:2,h:p.h+.3});notes(p.x,p.h+.9,4);shake(.2);sfx('note')}})}},
+  crescendo:{en:'CRESCENDO',ko:'크레센도',run(){kst('w_play',.45,{times:[.25],fire(){for(const a of[-.18,0,.18])cshot({dr:drNoteShot,sc:1.6,dbl:1,up:trail(0,'note',8),spd:10,dmg:14,ang:a,life:1.1,pierce:1,kb:2});notes(p.x+p.face*.4,p.h+.9,3);sfx('note')}})}},
+  slidesolo:{en:'SLIDE SOLO',ko:'슬라이드 솔로',run(){kst('w_play',.55,{times:[.1,.22,.34,.46],upd(u){if(p.gnd&&u<.8)p.vx=p.face*4},fire(){cshot({dr:drNoteShot,up:trail(0,'note',4),spd:10,dmg:8,ang:rnd(-.1,.12),life:.9,pierce:1,kb:1.2});sfx('note')}})}}},
+frost:{
+  skate:{en:'ICE SKATE',ko:'빙판 질주',run(){kst('w_dash',.45,{melee:{a0:.05,a1:.85,reach:.65,dmg:16,kb:1.6,both:1,on(e){slowE(e,2);shards(e.x,e.h+.5,4)}},upd(u){if(u<.75)p.vx=p.face*8.5;if(Math.random()<.5)iceBits(p.x,p.h+.1,1)}});p.inv=Math.max(p.inv,.3);sfx('ice')}},
+  shatter:{en:'SHATTER',ko:'산산조각',cd:4,run(){kst('w_burst',.45,{times:[.2],fire(){let n=0;for(const e of enemies){if(!alive(e)||Math.abs(e.x-p.x)>2.2||Math.abs(e.h-p.h)>1.6)continue;const sl=(e.slowT||0)>0||e.holdK==='ice';hitEnemy(e,sl?30:14,'wpnH',Math.sign(e.x-p.x)||1,2.2);shards(e.x,e.h+.5,sl?12:5);if(sl){ftext(e.x,e.h+e.size+.35,'SHATTER',true);n++}}ringFx(p.x,p.h+.4,2.2,4);shake(n?.4:.2);sfx('shatter')}})}},
+  icicles:{en:'ICICLE VOLLEY',ko:'고드름 연사',run(){kst('w_cast',.42,{times:[.1,.22,.34],fire(){cshot({dr:DRW.icespear,up:trail(0,'ice',30),spd:13,dmg:10,ang:rnd(-.06,.1),life:1,kb:1.2,onHit(s,e){hitEnemy(e,s.dmg,'wpn',Math.sign(s.vx)||p.face,s.kb);slowE(e,1);shards(e.x,e.h+.5,3)}});sfx('ice')}})}}},
+druid:{
+  thornlash:{en:'THORN LASH',ko:'가시 채찍',run(){kst('w_dwhip',.5,{times:[.18],fire(){const hp=handPos(),L=3.2;kfx.push({t:'whip',x:hp.x,h:hp.h,f:p.face,L,hit:1,crack:1,life:.45,max:.45,dr:PDR.whip});for(const e of enemies){if(!alive(e))continue;const rel=(e.x-p.x)*p.face;if(rel<-.1||rel>L+.16*e.size||e.h-p.h<-.3||e.h-p.h>.8)continue;const hd=e.hold>0;hitEnemy(e,hd?28:15,'wpnH',p.face,hd?2.8:1.8);if(hd)ftext(e.x,e.h+e.size+.35,'THORN!',true);leaves(e.x,e.h+.5,4)}sfx('swing');sfx('kick')}})}},
+  seeds:{en:'SEED BARRAGE',ko:'씨앗 난사',run(){kst('w_cast',.5,{times:[.12,.22,.32,.42],fire(){cshot({dr:DRW.seed,up:trail(0,'leaf',8),spd:12,dmg:7,ang:rnd(-.1,.14),life:1});sfx('pop')}})}},
+  leafdance:{en:'LEAF DANCE',ko:'나뭇잎 춤',cd:3,run(){kst('w_spin',.6,{rehit:.15,melee:{a0:.05,a1:.95,reach:1.1,dmg:6,kb:.8,both:1},upd(){if(Math.random()<.5)leaves(p.x+rnd(-.8,.8),p.h+rnd(.2,1.1),1)}});sfx('swing')}}},
+shade:{
+  execute:{en:'EXECUTE',ko:'처형',cd:4,run(){kst('w_sword',.5,{swk:3,times:[.5],fire(){const x=p.x+p.face*.7;for(const e of enemies){if(!alive(e)||Math.abs(e.x-x)>.9+.16*e.size||e.h-p.h<-.4||e.h-p.h>1.4)continue;const low=e.hp<e.max*.3;hitEnemy(e,low?45:22,'wpnH',p.face,2.6);if(low){ftext(e.x,e.h+e.size+.4,'EXECUTE',true);G.stop=.06}wisps(e.x,e.h+.5,6)}shake(.3);sfx('combohit')}})}},
+  reap:{en:'REAP',ko:'수확',run(){kst('w_sword',.45,{swk:1,melee:{a0:.28,a1:.56,reach:1.05,dmg:18,kb:1,kind:'wpnH',on(e){launch(e,5.5);wisps(e.x,e.h+.4,5)}},times:[.3],fire(){sfx('swing')}})}},
+  crescent:{en:'CRESCENT',ko:'초승달 참격',run(){kst('w_sword',.45,{swk:2,times:[.42],fire(){kshot('swave',0,11,18,{big:1,pierce:1,life:.8,kb:2});wisps(p.x+p.face*.6,p.h+.6,6);sfx('wave')}})}}}
+};
+const XTRIG={archer:[['dash','starshower'],['spin','blazefan'],['roll','tumble']],gunner:[['kick','leadrain'],['dash','pointblank'],['roll','rollshot']],necro:[['dash','wraith'],['quake','bonelance'],['roll','soulbolts']],
+  magician:[['kick','cardfan'],['dash','surprise'],['roll','trickshot']],porter:[['kick','returnstrike'],['dash','afterimage'],['roll','warpkick']],baseball:[['dash','homerun'],['upper','fastball'],['roll','tripleplay']],
+  volt:[['kick','overload'],['dash','shockwave'],['roll','sparkdash']],wolf:[['kick','pounce'],['upper','frenzy'],['roll','lunge']],bard:[['kick','feedback'],['upper','crescendo'],['roll','slidesolo']],
+  frost:[['kick','skate'],['dash','shatter'],['roll','icicles']],druid:[['kick','thornlash'],['upper','seeds'],['roll','leafdance']],shade:[['dash','execute'],['upper','reap'],['roll','crescent']]};
+for(const k in XC)COMBOS[k]=XC[k];
+for(const k in XTRIG)CLIST[k]=XTRIG[k].map(([a,c])=>[a==='roll'?'구르기':(KITN[k]&&KITN[k][a]?KITN[k][a][2]:ARCHB[a]?ARCHB[a][1]:a),'1',c]);
+function xCombo(a){if(!XTRIG[G.cls]||a!=='punch'||p.state==='dead'||!(kitMode()||archerMode()))return null;const rec=recentAct(.5),rl=p.state==='roll'||(p.prevAct==='roll'&&G.T-p.prevT<.42);
+  for(const [t,c] of XTRIG[G.cls]){if((p.cd['c_'+c]||0)>0)continue;if(t==='roll'?rl:rec===t)return c}return null}
+
 /* admin */
 const ADMIN_CODE='1004';let admSel='base';
 function openAdmin(){$('#admPanel').hidden=false;$('#admChars').innerHTML=CLSK.map(k=>`<button data-k="${k}" class="${k===admSel?'on':''}">${CLS[k].name}</button>`).join('');$('#admChars').querySelectorAll('button').forEach(b=>b.onclick=()=>{admSel=b.dataset.k;openAdmin()})}
@@ -3491,7 +3554,7 @@ function setTxt(id,v){if(hud[id]!==v){hud[id]=v;$('#'+id).textContent=v}}
 const HINTN={kick2:'HIGH KICK',haymaker:'HAYMAKER',roundk:'ROUNDHOUSE',knee:'KNEE',elbow:'ELBOW',hammer:'HAMMER'};
 function aerialTarget(){const e=p.lastLaunch;return e&&!e.ulting&&G.T-p.lastLaunchT<1.3&&(!e.gnd||TY[e.kind].boss)&&e.state!=='dead'&&!e.gone&&Math.abs(e.x-p.x)<2.6?e:null}
 function comboHint(a){
-  if((G.cls==='sword'||G.cls==='ninja'||G.cls==='bomber')&&kitMode()){const c=anyCombo(a);return c?(G.cls==='sword'?SWC[c]:COMBOS[G.cls][c]).en:''}
+  if((G.cls==='sword'||G.cls==='ninja'||G.cls==='bomber'||XTRIG[G.cls])&&(kitMode()||archerMode())){const c=anyCombo(a);return c?(G.cls==='sword'?SWC[c]:COMBOS[G.cls][c]).en:''}
   if(p.state==='dead'||kitMode()||archerMode())return '';
   const recent=p.prevAct&&G.T-p.prevT<.42?p.prevAct:null;
   if(a==='jump')return p.gnd&&(p.state==='upper'||recent==='upper')?'CHASE':'';
