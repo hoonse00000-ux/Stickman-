@@ -1217,6 +1217,7 @@ function tryAct(a,mv,chain){
   if(gunMode()&&(a==='aim'||a==='punch')){if(p.state==='dead')return false;IN.buf=null;if(p.rjump&&!p.gnd){gunSlam();return true}setState(p,'aim',9);G.kAng=0;p.firedOnce=0;p.recoil=0;if(a==='punch')IN.aimHold=false;return true}
   if(G.cls==='necro'&&kitMode()&&a==='punch'){IN.buf=null;if(p.state==='dead'||(p.cd.ghost||0)>0)return false;if(ghostLaunch(true)){p.cd.ghost=.55;if(G.tutorial)tutEv('atk')}return true}
   if(G.cls==='ninja'&&kitMode()&&a==='punch'&&(p.state==='wallclimb'||p.state==='wallslide')){IN.buf=null;if((p.cd.nst||0)>0)return false;p.cd.nst=.3;const d2=-(p.wall||p.face);for(const an of[-.3,0,.3])kshot('star',an,11,8,{dir:d2});sfx('swing');if(G.tutorial)tutEv('wallstar');return true}
+  if(G.cls==='necro'&&kitMode()&&a==='kick'&&p.state!=='dead'&&soulNear()){collectSouls();IN.buf=null;return true}
   {const sc=anyCombo(a);if(sc){if(mv)p.face=mv;return doSwCombo(sc)}}
   if(a==='kick'&&kitMode()){IN.buf=null;if(p.state==='dead')return false;if(G.cls==='bomber'&&pshots.some(s2=>s2.mine&&s2.life>0&&s2.life<7.7)){if(mv)p.face=mv;p.cd.kick=.4;return doSwCombo('detonate')}if((p.cd.kick||0)>0)return false;p.cd.kick=.65;if(mv)p.face=mv;KIT[G.cls].kick();p.kact='kick';p.lastKit='kick';if(G.tutorial)tutEv('act:kick');return true}
   if(a==='ult'){IN.buf=null;if(bt()||!p.gnd||p.state==='dead')return false;if((p.ultG||0)<100){ftext(p.x,p.h+1.05,'ULT NOT READY');return false}if(G.cls==='necro'&&kitMode()&&openSummon('ult'))return true;startPUlt();return true}
@@ -1682,7 +1683,7 @@ const CLS={
   ninja:{name:'닌자',job:'NINJA',wpn:'표창',price:900,desc:'1번 공격으로 표창을 2번 던져요. 이동 속도가 15% 빨라요. 벽을 향해 달리면 손을 쓰지 않고 벽을 타고 올라가고, 벽에 매달린 채 1번으로 표창을 던지거나 점프로 반대편으로 높이 차고 나가요. 2번은 뒤로 물러나며 밟으면 기절하는 마름쇠를 뿌려요.'},
   bomber:{name:'폭탄광',job:'BOMB MANIAC',wpn:'폭탄',price:1300,desc:'1번 공격으로 폭탄을 포물선으로 던져요. 떨어진 자리에서 터져 주변 적을 모두 쳐요.'},
   gunner:{name:'총잡이',job:'GUNNER',wpn:'총',price:1800,desc:'1번을 누르고 있으면 조준 사격을 해요. 조이스틱이나 마우스로 방향을 정해요. 총마다 탄창이 있어서 다 쓰면 재장전하고, 4번으로 권총·AK·샷건·저격총을 바꿔 들어요. 3번 반동 점프로 높이 뛰어오른 뒤 1번을 누르면 총으로 땅을 내려찍어요.',vars:[['pistol','권총'],['ak','AK · 3연사'],['shotgun','샷건 · 산탄'],['sniper','저격총 · 관통']]},
-  necro:{name:'네크로맨서',job:'NECROMANCER',wpn:'지팡이',price:2400,desc:'1번을 누르면 지팡이 끝의 유령이 달려나가 적을 물고 돌아와요. 쓰러뜨린 적의 영혼은 보관함에 영원히 저장돼요. 소환 슬롯 3칸에 넣어둔 영혼이 2번을 누를 때마다 번갈아 나와요. 영혼을 소모해 피해를 막고, 소환수를 폭발시키고, 소환수와 연결해 체력을 회복하고, 표식을 남긴 적이 죽으면 영혼을 하나 더 얻어요. 필살기로는 쓰러뜨린 보스를 불러내요.'},
+  necro:{name:'네크로맨서',job:'NECROMANCER',wpn:'지팡이',price:2400,desc:'1번을 누르면 지팡이 끝의 유령이 달려나가 적을 물고 돌아와요. 쓰러뜨린 적이 남긴 영혼에 다가가 2번(소환)을 누르면 보관함에 영원히 저장돼요. 소환 슬롯 3칸에 넣어둔 영혼이 2번을 누를 때마다 번갈아 나와요. 영혼을 소모해 피해를 막고, 소환수를 폭발시키고, 소환수와 연결해 체력을 회복하고, 표식을 남긴 적이 죽으면 영혼이 2배로 나와요. 필살기로는 쓰러뜨린 보스를 불러내요.'},
   magician:{name:'마술사',job:'MAGICIAN',wpn:'카드',price:3100,desc:'1번 공격으로 카드 3장을 던져요. 상자를 깔아두고 다른 곳에서 상자를 통해 튀어나오거나, 잠시 사라져 공격을 피하고, 모자로 적과 투사체를 빨아들여요. 앙코르로 직전에 쓴 스킬을 약하게 한 번 더 써요.'},
   porter:{name:'텔레포터',job:'TELEPORTER',wpn:'포탈건',price:3900,desc:'1번 공격으로 포탈을 쏘고, 포탈이 닿은 자리로 순간이동하며 적을 쳐요.'},
   baseball:{name:'야구선수',job:'SLUGGER',wpn:'야구공 · 배트',price:4800,desc:'1번 공격으로 공을 던져요. 공이 날아가 있는 동안 1번을 누르고 있으면 스윙 게이지가 차고, 손을 떼면 그만큼 세게 휘둘러요. 적에게 맞고 빠르게 돌아오는 공을 게이지 가득(MAX)으로 치면 홈런!'},
@@ -1876,8 +1877,28 @@ function soulCount(boss){const V=vaultSrc();let n=0;for(const k in V)if(TY[k]&&(
 function pickSoul(boss){const V=vaultSrc(),ks=Object.keys(V).filter(k=>V[k]>0&&TY[k]&&!!TY[k].boss===boss);if(!ks.length)return null;const sel=boss?VBSEL:VSEL;if(sel&&ks.includes(sel))return sel;return ks.sort((a,b)=>TY[b].hp-TY[a].hp)[0]}
 function useSoul(k){const V=vaultSrc();V[k]--;if(V[k]<=0)delete V[k];saveVault()}
 function soulName(k){return TY[k]?(TY[k].name||k):k}
-function takeSoul(e){if(G.cls!=='necro'||bt()||!e.byP||e.clone!=null||e.undead||e.kind==='dummy'||!TY[e.kind])return;const V=vaultSrc();V[e.kind]=(V[e.kind]||0)+1;if(e.mark>G.T){V[e.kind]++;texts.push({x:e.x,y:e.h+e.size+.7,txt:'MARK · SOUL +1',big:true,life:1.1,max:1.1})}saveVault();
-  texts.push({x:e.x,y:e.h+e.size+.3,txt:TY[e.kind].boss?'BOSS SOUL':TY[e.kind].mid?'ELITE SOUL':'SOUL',big:!!(TY[e.kind].boss||TY[e.kind].mid),life:.9,max:.9});for(let i=0;i<10;i++)fx.push({t:'e',x:e.x+rnd(-.2,.2),y:e.h+e.size*.6,vx:(p.x-e.x)*rnd(1.2,2),vy:rnd(.5,1.5),life:.6,max:.6,r:.025})}
+function takeSoul(e){if(G.cls!=='necro'||bt()||!e.byP||e.clone!=null||e.undead||e.kind==='dummy'||!TY[e.kind])return;const t=TY[e.kind],mk=e.mark>G.T;
+  if(!G.souls)G.souls=[];if(G.souls.length>40)G.souls.shift();
+  G.souls.push({k:e.kind,n:mk?2:1,x:e.x,h:e.h+Math.max(.55,e.size*.6),t:0,life:t.boss?90:25,boss:!!t.boss,mid:!!t.mid,ph:rnd(0,6)});
+  if(mk)texts.push({x:e.x,y:e.h+e.size+.7,txt:'MARK · SOUL ×2',big:true,life:1.1,max:1.1});
+  for(let i=0;i<8;i++)fx.push({t:'e',x:e.x+rnd(-.2,.2),y:e.h+e.size*.5,vx:rnd(-.6,.6),vy:rnd(.4,1.2),life:.6,max:.6,r:.025})}
+const SOUL_R=1.35;
+function soulNear(){if(!G.souls||!G.souls.length)return null;let best=null,bd=1e9;for(const o of G.souls){const dx=Math.abs(o.x-p.x),dh=Math.abs(o.h-(p.h+.7));if(dx<SOUL_R&&dh<1.7&&dx<bd){bd=dx;best=o}}return best}
+function collectSouls(){const V=vaultSrc(),got=G.souls.filter(o=>Math.abs(o.x-p.x)<SOUL_R+.15&&Math.abs(o.h-(p.h+.7))<1.9);if(!got.length)return false;let n=0,boss=false,mid=false;
+  for(const o of got){V[o.k]=(V[o.k]||0)+o.n;n+=o.n;boss=boss||o.boss;mid=mid||o.mid;for(let i=0;i<10;i++)fx.push({t:'e',x:o.x+rnd(-.15,.15),y:o.h+rnd(-.15,.15),vx:(p.x-o.x)*rnd(2,3.2),vy:(p.h+.8-o.h)*rnd(2,3)+rnd(-.3,.3),life:.4,max:.4,r:.03});ringFx(o.x,o.h,.35,3)}
+  G.souls=G.souls.filter(o=>!got.includes(o));saveVault();ringFx(p.x,p.h+.6,.6,3);sfx('dodge');p.soulGlow=.5;
+  texts.push({x:p.x,y:p.h+1.5,txt:(boss?'BOSS SOUL':mid?'ELITE SOUL':'SOUL')+' +'+n,big:true,life:1,max:1});if(G.tutorial)tutEv('collect');return true}
+function updSouls(dt){if(!G.souls||!G.souls.length)return;for(const o of G.souls){o.t+=dt;o.life-=dt}G.souls=G.souls.filter(o=>o.life>0)}
+function drawSouls(c,X,Yh){if(G.cls!=='necro'||!G.souls||!G.souls.length)return;const near=soulNear(),T=G.T;
+  for(const o of G.souls){const blink=o.life<4?(.45+.55*Math.abs(Math.sin(T*8))):1,sp=Math.min(1,o.t*3),r=(o.boss?.17:o.mid?.125:.095)*(o.n>1?1.15:1)*sp,bob=Math.sin(T*2.4+o.ph)*.09,x=X(o.x+Math.sin(T*1.3+o.ph)*.05),y=Yh(o.h+bob),R=r*U;
+    c.save();c.globalAlpha=blink;
+    const gr=c.createRadialGradient(x,y,0,x,y,R*2.6);gr.addColorStop(0,'rgba(170,255,230,.55)');gr.addColorStop(1,'rgba(80,255,210,0)');c.fillStyle=gr;c.beginPath();c.arc(x,y,R*2.6,0,Math.PI*2);c.fill();
+    c.fillStyle='rgba(223,255,245,.95)';c.shadowColor='rgba(80,255,210,.95)';c.shadowBlur=14;c.beginPath();
+    const sw=Math.sin(T*5+o.ph)*R*.45;c.arc(x,y,R,0,Math.PI);c.quadraticCurveTo(x-R*1.05,y-R*1.1,x+sw,y-R*2.5);c.quadraticCurveTo(x+R*1.05,y-R*1.1,x+R,y);c.closePath();c.fill();
+    c.shadowBlur=0;c.fillStyle='rgba(10,40,34,.85)';c.beginPath();c.arc(x-R*.32,y-R*.1,R*.14,0,Math.PI*2);c.arc(x+R*.32,y-R*.1,R*.14,0,Math.PI*2);c.fill();
+    if(o.n>1){c.fillStyle='#dffff5';c.font=`700 ${Math.round(U*.1+6)}px ${FONT.mono}`;c.textAlign='center';c.fillText('×2',x+R*1.6,y-R*1.2)}
+    if(o===near){const lb=('ontouchstart' in window)?'소환 버튼':km('2');c.globalAlpha=.75+.25*Math.sin(T*6);c.fillStyle='#dffff5';c.shadowColor='rgba(80,255,210,.9)';c.shadowBlur=8;c.font=`700 ${Math.round(U*.11+6)}px ${FONT.mono}`;c.textAlign='center';c.textBaseline='middle';c.fillText(`[${lb}] 수집`,x,y-R*2.6-U*.42)}
+    c.restore()}}
 function raiseSoul(kind,o){o=o||{};if(G.tutorial)tutEv('raise');const t=TY[kind],x=p.x+p.face*(o.dx!=null?o.dx:.7+.25*t.size),d=t.dmg||{},base=d.punch||d.kick||d.spin||d.stomp||d.throw||8,gh=Math.max(0,floorAt(x,.1,p.h+.5));
   allies.push({kind,undead:true,boss:!!t.boss,x,h:gh>-50?gh:p.h,vh:0,vx:0,gnd:true,face:p.face,size:t.size,state:'ultcast',st:0,dur:1,w:.3,phase:0,life:o.life||25,cd:.4,seed:rnd(0,9),hitDone:false,dmg:Math.round(base*(t.boss?.75:.9)),spd:Math.max(1.3,t.spd||1.4),rise:t.boss?1.3:.9,riseMax:t.boss?1.3:.9});crack(x,gh>-50?gh:p.h,.5+.35*t.size);sfx('rumble');
   fx.push({t:'r',x,y:p.h+.1,vx:0,vy:0,life:.45,max:.45,r:.7,w:3});dust(x,8,.9,p.h);for(let q=0;q<10;q++)fx.push({t:'e',x:x+rnd(-.25,.25),y:p.h,vx:0,vy:rnd(1,2.6),life:.7,max:.7,r:.022});sfx('dodge');texts.push({x,y:p.h+t.size+.2,txt:'RISE',big:true,life:.8,max:.8})}
@@ -2677,7 +2698,7 @@ function closeSummon(go){const P=VPLAN;$('#sumOv').hidden=true;VPLAN=null;G.mode
 addEventListener('keydown',e=>{if(G.mode!=='vault')return;if(e.key==='Escape'){e.preventDefault();closeSummon(false)}else if(e.key==='Enter'&&VPLAN&&(planN(false)+planN(true))){e.preventDefault();closeSummon(true)}});
 /* necro vault UI */
 function vaultBtns(){const V=G.mode==='lobby'?VAULT:vaultSrc(),ks=Object.keys(V).filter(k=>V[k]>0&&TY[k]).sort((a,b)=>(TY[a].boss?2:TY[a].mid?1:0)-(TY[b].boss?2:TY[b].mid?1:0)||TY[a].hp-TY[b].hp);
-  if(!ks.length)return '<span style="font-size:12px;color:var(--dim)">아직 모은 영혼이 없어요. 네크로맨서로 적을 쓰러뜨리면 영혼이 쌓여요.</span>';
+  if(!ks.length)return '<span style="font-size:12px;color:var(--dim)">아직 모은 영혼이 없어요. 네크로맨서로 적을 쓰러뜨리고, 떨어진 영혼에 다가가 소환 버튼을 누르면 모여요.</span>';
   return ks.map(k=>{const t=TY[k],bs=!!t.boss,on=bs?VBSEL===k:VSEL===k;return`<button data-vk="${k}" class="${on?'on':''} ${bs?'bs':t.mid?'md':''}">${bs?'BOSS · ':t.mid?'ELITE · ':''}${t.name||k} ×${V[k]}</button>`}).join('')}
 function bindVault(el){if(!el)return;el.querySelectorAll('button[data-vk]').forEach(b=>b.onclick=()=>{const k=b.dataset.vk;if(TY[k].boss)VBSEL=VBSEL===k?null:k;else VSEL=VSEL===k?null:k;saveVault();el.innerHTML=vaultBtns();bindVault(el)})}
 /* admin */
@@ -2977,7 +2998,7 @@ function update(dt){
   spikes=spikes.filter(k=>k.t<k.delay+k.warn+.45);
   for(const f of fx){if(f.t==='pil'||f.t==='hl'||f.t==='mz'||f.t==='ln'||f.t==='sl'||f.t==='spr'||f.t==='x'||f.t==='a'||f.t==='k'||f.t==='c'||f.t==='b'||f.t==='g'||f.t==='f'||f.t==='r'){f.life-=dt;continue}f.x+=f.vx*dt;f.y+=f.vy*dt;f.vy-=(f.t==='s'?9:f.t==='e'?-.3:f.t==='sh'?7:f.t==='fl'?-1.4:f.t==='fs'?3.5:f.t==='ic'?7:f.t==='lf'?.9:f.t==='nt'?-.4:f.t==='wp'?-.6:f.t==='cm'?-.12:f.t==='cd'?4:f.t==='sp'?0:1.5)*dt;if(f.t==='sh'||f.t==='ic'||f.t==='lf'||f.t==='cd'||f.t==='nt')f.rot+=(f.vr||0)*dt;if(f.t==='lf'){f.vx+=Math.sin(G.T*4+f.ph)*dt*3;f.vy=Math.max(f.vy,-1.2)}if(f.t==='sp'||f.t==='wp'||f.t==='cm'){f.vx*=Math.exp(-4*dt);f.vy*=Math.exp(-3*dt)}if(f.t==='e')f.vx*=Math.exp(-2*dt);f.life-=dt}
   fx=fx.filter(f=>f.life>0);
-  for(const t of texts){t.y+=.7*dt;t.life-=dt}
+  updSouls(dt);for(const t of texts){t.y+=.7*dt;t.life-=dt}
   texts=texts.filter(t=>t.life>0);
   // waves
   if(G.banner){G.banner.t+=dt;if(G.banner.t>G.banner.dur)G.banner=null}
@@ -3235,7 +3256,7 @@ function render(rdt){
     else if(f.t==='r'){c.strokeStyle=`rgba(255,255,255,${a})`;c.lineWidth=(f.w||3)*a+1;c.shadowColor='rgba(255,255,255,.9)';c.shadowBlur=14;c.beginPath();c.arc(X(f.x),Yh(f.y),f.r*U*(1.15-a*.8),0,Math.PI*2);c.stroke()}
     else if(f.t==='s'){c.strokeStyle=`rgba(255,255,255,${a})`;c.lineWidth=2;c.shadowColor='rgba(255,255,255,.9)';c.shadowBlur=6;c.beginPath();c.moveTo(X(f.x),Yh(f.y));c.lineTo(X(f.x-f.vx*(f.big?.06:.035)),Yh(f.y-f.vy*(f.big?.06:.035)));c.stroke()}
     else{c.shadowBlur=0;c.fillStyle=`rgba(200,200,200,${a*.35})`;c.beginPath();c.arc(X(f.x),Yh(f.y),f.r*U*(1.4-a*.4),0,Math.PI*2);c.fill()}}
-  renderUlts(c,X,Yh,true);renderPUlt(c,X,Yh);drawBuffs(c,X,Yh);renderAim(c,X,Yh);
+  drawSouls(c,X,Yh);renderUlts(c,X,Yh,true);renderPUlt(c,X,Yh);drawBuffs(c,X,Yh);renderAim(c,X,Yh);
   c.restore();
   for(const t of texts){const a=clamp(t.life/t.max*1.5,0,1);c.save();c.globalAlpha=a;c.fillStyle='#f5f5f5';c.shadowColor='rgba(255,255,255,.8)';c.shadowBlur=t.big?10:4;
     c.font=t.big?`700 ${Math.round(U*.2+6)}px ${FONT.disp}`:`600 ${Math.round(U*.12+6)}px ${FONT.mono}`;c.textAlign='center';c.textBaseline='middle';c.fillText(t.txt,X(t.x),Yh(t.y));c.restore()}
@@ -3487,7 +3508,7 @@ function classSteps(c){const K=KITN[c]||{},nm=a=>(c==='archer'?ARCHN[a]:(K[a]||[
   else if(c==='baseball'){S.push({t:'투구',x:`${KK('1')} 공을 던져 훈련용 졸라맨을 맞혀보세요. 공은 맞고 튕겨 돌아와요.`,ev:['atk'],n:1});
     S.push({t:'스윙 게이지',x:`공이 날아가 있는 동안 ${KK('1')}을 <strong>누르고 있으면</strong> 게이지가 차고, 떼면 그만큼 세게 휘둘러요. 2번 휘둘러보세요.`,ev:['bat'],n:2});
     S.push({t:'홈런',x:`졸라맨에게 맞고 돌아오는 공을 게이지 <strong>MAX</strong>로 치면 홈런! 한 번 성공해보세요.`,ev:['homerun'],n:1});}
-  else if(c==='necro'){S.push({t:'유령 공격',x:`${KK('1')}을 누르면 지팡이 끝의 유령이 달려나가 적을 물고 돌아와요. 3번 해보세요.`,ev:['atk'],n:3});S.push({t:'소환 슬롯',x:`쓰러뜨린 적의 영혼은 보관함에 저장돼요. 연습용 영혼을 넣어뒀어요. ${KK('T','슬롯 변경하기')}로 슬롯 3칸에 영혼을 넣은 뒤 ${KK('2','소환')}을 누르면 슬롯의 영혼이 번갈아 땅을 파고 올라와요. 2번 불러내보세요.`,ev:['raise'],n:2,init(){G.tmpVault={grunt:2,brute:1,m_titan:1,golem:1}}});}
+  else if(c==='necro'){S.push({t:'유령 공격',x:`${KK('1')}을 누르면 지팡이 끝의 유령이 달려나가 적을 물고 돌아와요. 3번 해보세요.`,ev:['atk'],n:3});S.push({t:'소환 슬롯',x:`쓰러뜨린 적이 남긴 영혼에 다가가 소환 버튼을 누르면 보관함에 모여요. 연습용 영혼을 넣어뒀어요. ${KK('T','슬롯 변경하기')}로 슬롯 3칸에 영혼을 넣은 뒤 ${KK('2','소환')}을 누르면 슬롯의 영혼이 번갈아 땅을 파고 올라와요. 2번 불러내보세요.`,ev:['raise'],n:2,init(){G.tmpVault={grunt:2,brute:1,m_titan:1,golem:1}}});}
   else S.push({t:atkName,x:`${KK('1')} ${atkName}! 훈련용 졸라맨을 3번 맞혀보세요.`,ev:['atk'],n:3});
   if(c==='sword'){S.push({t:'4방향 베기',x:`${KK('1 1 1 1')} 연달아 누르면 방향을 바꿔가며 이어서 베요. 네 방향을 모두 써보세요.`,ev:['sw:0','sw:1','sw:2','sw:3'],n:4,uniq:1});}
   if(c==='ninja'){S.push({t:'벽타기',x:`벽 쪽으로 달리면 손을 쓰지 않고 <strong>벽을 타고 올라가요</strong>. 앞의 벽을 올라가보세요.`,ev:['state:wallclimb'],n:1});
@@ -3531,7 +3552,7 @@ sword:{blast:['SWORD WAVE','초승달 모양 검기를 날려 적들을 관통�
 ninja:{blast:['GIANT STAR','적을 뚫고 갔다가 되돌아오는 거대 표창을 던져요'],flurry:['STAR STORM','표창 8개를 연달아 던져요'],quake:['STAR RAIN','가까운 적 위로 표창 비를 내려요'],dive:['ASSASSIN DROP','내리꽂으며 주변으로 표창을 흩뿌려요']},
 bomber:{blast:['BIG BOMB','엄청난 폭발을 일으키는 대형 폭탄을 던져요'],flurry:['BARRAGE','폭탄 5개를 연달아 흩뿌려요'],quake:['AIRSTRIKE','앞쪽에 폭탄이 줄지어 떨어져요'],dive:['BOMB DIVE','내리꽂으며 큰 폭발을 일으켜요']},
 gunner:{blast:['PIERCING SHOT','조준한 방향으로 적을 모두 꿰뚫는 관통탄을 쏴요'],flurry:['FAN FIRE','공이치기를 연달아 쳐서 6발을 부채꼴로 쏴요'],quake:['GRENADE','포물선으로 날아가 터지는 수류탄을 던져요'],dive:['AIR STRAFE','뛰어올라 아래로 연사해요']},
-necro:{blast:['SOUL LINK','10초 동안 소환수가 입힌 피해의 20%만큼 체력을 회복해요'],flurry:['DEATH MARK','주변 적에게 표식을 남겨요. 표식이 남은 적이 죽으면 영혼을 하나 더 얻어요'],quake:['GRAVE HANDS','주변 적들을 땅에서 솟은 뼈로 묶어요'],dive:['REAPER DROP','내리꽂으며 뼈 가시를 솟게 해요']},
+necro:{blast:['SOUL LINK','10초 동안 소환수가 입힌 피해의 20%만큼 체력을 회복해요'],flurry:['DEATH MARK','주변 적에게 표식을 남겨요. 표식이 남은 적이 죽으면 영혼이 2배로 나와요'],quake:['GRAVE HANDS','주변 적들을 땅에서 솟은 뼈로 묶어요'],dive:['REAPER DROP','내리꽂으며 뼈 가시를 솟게 해요']},
 magician:{blast:['MAGIC HAT','모자를 설치해 주변 적과 투사체를 빨아들이고, 빨아들인 만큼 강하게 터뜨려요'],flurry:['ENCORE','직전에 쓴 스킬을 약해진 형태로 한 번 더 써요'],quake:['STARFALL','가까운 적 위로 카드가 쏟아져요'],dive:['TRICK DROP','내리꽂으며 카드를 사방으로 날려요']},
 porter:{blast:['VOID ORB','닿는 적을 계속 때리는 느린 공허 구체를 쏴요'],flurry:['BLINK CHAIN','가까운 적 4명에게 순간이동하며 차례로 때려요'],quake:['DROP GATE','주변 적들을 공중으로 순간이동시켜 떨어뜨려요'],dive:['GATE DIVE','내리꽂으며 차원 충격파를 일으켜요']},
 baseball:{blast:['FASTBALL','적을 뚫고 가는 강속구를 던져요'],flurry:['RAPID PITCH','공 5개를 연달아 던져요'],quake:['METEOR BALL','가까운 적 위로 거대한 공을 떨어뜨려 폭발시켜요'],dive:['DIVING SLAM','내리꽂으며 땅을 울려요']},
