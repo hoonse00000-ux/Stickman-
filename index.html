@@ -4429,13 +4429,15 @@ const FIREBASE_CONFIG={
   function doLogin(){
     err='';const pv=new firebase.auth.GoogleAuthProvider();pv.setCustomParameters({prompt:'select_account'});
     auth.signInWithPopup(pv).catch(e=>{
-      if(e.code==='auth/popup-blocked'||e.code==='auth/operation-not-supported-in-this-environment'){auth.signInWithRedirect(pv).catch(x=>showErr(ERR[x.code]||('로그인 실패: '+x.code)));return}
+      if(e.code==='auth/popup-blocked'){showErr('로그인 창(팝업)이 막혔어요. 로그인 버튼을 한 번 더 눌러 보거나, 브라우저 설정에서 팝업을 허용해 주세요. 안 되면 이메일로 로그인할 수 있어요.');return}
+      if(e.code==='auth/operation-not-supported-in-this-environment'){showErr('이 브라우저에서는 Google 로그인이 안 돼요. Safari나 Chrome에서 열거나 이메일로 로그인해 주세요.');return}
+      if(e.code==='auth/cancelled-popup-request')return;
       showErr(ERR[e.code]||('로그인 실패 ('+(e.code||e.message)+')'))});
   }
   renderBtn();
   if(!configured||!window.firebase)return;
   firebase.initializeApp(FIREBASE_CONFIG);auth=firebase.auth();db=firebase.firestore();ready=true;
-  auth.getRedirectResult().catch(e=>showErr(ERR[e.code]||('로그인 실패 ('+e.code+')')));
+  auth.getRedirectResult().catch(e=>{if(e.code==='auth/missing-initial-state'||e.code==='auth/no-auth-event')return;showErr(ERR[e.code]||('로그인 실패 ('+e.code+')'))});
   const keys=()=>{const o={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith(PREFIX)&&k!==SYNC)o[k]=localStorage.getItem(k)}return o};
   const getSync=()=>{try{return JSON.parse(localStorage.getItem(SYNC)||'null')}catch(_){return null}};
   const origSet=Storage.prototype.setItem;
