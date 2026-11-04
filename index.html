@@ -339,6 +339,25 @@ body:not(.desk) .keys{display:none}
 .tips li.on b{border-color:var(--ink);box-shadow:0 0 10px var(--glow)}
 .lob .foot{font-family:var(--f-mono);font-size:10.5px;color:#5c5c5c;text-align:center;letter-spacing:.06em}
 @media (prefers-reduced-motion:reduce){.bar.low b{animation:none}}
+
+/* phone layout: smaller controls, no overlap with the joystick */
+@media (max-width:600px) and (orientation:portrait){
+ .act{flex-direction:column;align-items:flex-end;gap:8px}
+ .act .g-move{grid-template-areas:"run s3 ul";grid-template-columns:auto auto auto;align-items:center}
+ .act button{--s:42px}
+ .act [data-c="punch"]{--s:60px}.act [data-c="kick"],.act [data-c="jump"],.act [data-c="guard"]{--s:56px}.act [data-c="roll"]{--s:48px}.act [data-c="ult"]{--s:46px}
+ .act .sk{--s:34px;font-size:13px}.act .skrow{max-width:170px;gap:6px}.act .rcol{gap:8px}
+ .act button small{font-size:7.5px;margin-top:1px}
+ .joy{width:108px}
+}
+@media (max-height:500px) and (orientation:landscape){
+ .act{gap:10px;bottom:6px}
+ .act button{--s:40px}
+ .act [data-c="punch"]{--s:52px}.act [data-c="kick"],.act [data-c="jump"],.act [data-c="guard"]{--s:48px}.act [data-c="roll"]{--s:44px}.act [data-c="ult"]{--s:42px}
+ .act .sk{--s:30px;font-size:12px}.act .skrow{max-width:150px;gap:5px}.act .grp{gap:6px}.act .rcol{gap:6px}
+ .act button small{font-size:7px;margin-top:1px}
+ .joy{width:100px;bottom:6px}
+}
 </style>
 
 <div class="app">
