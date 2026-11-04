@@ -3746,7 +3746,7 @@ function gameOver(){
 function toLobby(){collectCoins(true);if(G.online){if(!G.online.over)netSend('bye',{});try{window.ZMNET&&ZMNET.end()}catch(_){}G.online=null}if(G.ta&&G.mode!=='over'&&G.mode!=='lobby')taSave();G.ta=null;G.admin=false;G.adminSkin=false;G.cls=SHOP.cls;G.tutorial=false;G.ctut=false;G.tutSpar=false;$('#tutPanel').hidden=true;G.mode='lobby';ov.hidden=true;showBest();$('#lobby').hidden=false}
 $('#goBtn').onclick=()=>{closeTut();startGame(0)};
 /* ---------- online 1v1 (game side; network lives in the login script) ---------- */
-const ONL={DMG:.5,HP:300,W:12};
+const ONL={DMG:.75,HP:240,W:12};
 function netSend(t,d){try{if(window.ZMNET&&ZMNET.send)ZMNET.send(t,d)}catch(_){}}
 function startOnline(o){if(G.mode==='play')return false;closeTut&&closeTut();$('#taOv').hidden=true;startGame(0,false);G.online={cls:o.cls,side:o.side|0,me:o.myNick||'나',opp:o.oppNick||'상대',oppSkin:!!o.oppSkin,rs:null,last:performance.now(),sendT:0,over:false,ns:[],shotN:0,shotT:0};
   G.cls=o.cls;blocks.length=0;gaps.length=0;zones.length=0;segs.length=0;enemies.length=0;pshots.length=0;genX=1e9;G.zone={x0:0,x1:ONL.W,net:1};G.phase='online';G.gateOpen=true;G.queue=[];G.banner={big:'VS',small:G.online.me+'  vs  '+G.online.opp,t:0,dur:1.6};
@@ -4466,10 +4466,10 @@ const FIREBASE_CONFIG={
   const stopKeys=el=>el.querySelectorAll('input').forEach(i=>{i.addEventListener('keydown',e=>e.stopPropagation());i.addEventListener('keyup',e=>e.stopPropagation())});
   const esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const ready=!!(window.firebase&&firebase.apps&&firebase.apps.length&&firebase.database&&typeof FIREBASE_CONFIG!=='undefined'&&!/YOUR_/.test(FIREBASE_CONFIG.databaseURL||'YOUR_'));
-  let db=null,auth=null,me=null,myNick='',offs=[],friends={},fst={},fnick={},reqs={},chIn={},out=null,match=null,note='',noteEr=false,pick=null,toastFor=null;
+  let fown={},lastOwned='',db=null,auth=null,me=null,myNick='',offs=[],friends={},fst={},fnick={},reqs={},chIn={},out=null,match=null,note='',noteEr=false,pick=null,toastFor=null;
   const TS=()=>firebase.database.ServerValue.TIMESTAMP;
   function on(ref,ev,fn){ref.on(ev,fn,err=>{note=dbErr(err);noteEr=true;render()});offs.push(()=>ref.off(ev,fn))}
-  function cleanup(){offs.forEach(f=>{try{f()}catch(_){}});offs=[];friends={};fst={};fnick={};reqs={};chIn={};out=null;myNick='';toast.hidden=true}
+  function cleanup(){offs.forEach(f=>{try{f()}catch(_){}});offs=[];friends={};fst={};fnick={};fown={};lastOwned='';reqs={};chIn={};out=null;myNick='';toast.hidden=true}
   function open(){ov.hidden=false;render();if(db&&me&&!myNick){withTO(db.ref('users/'+me.uid+'/nick').get(),8000).then(s2=>{if(s2.val()){myNick=s2.val();render()}}).catch(e=>say(dbErr(e),1))}}
   function close(){ov.hidden=true}
   window.ZMONLINE={open,close};
@@ -4485,10 +4485,10 @@ const FIREBASE_CONFIG={
       h+=`<div class="sec"><span class="lbl">친구 추가</span><div class="rowi"><input id="onAdd" maxlength="12" placeholder="친구 닉네임"><button class="pri" id="onAddGo">요청 보내기</button></div></div>`;
       const rq=Object.keys(reqs);if(rq.length)h+=`<div class="sec"><span class="lbl">받은 친구 요청</span>${rq.map(u=>`<div class="item"><span class="nk">${esc(reqs[u].nick)}</span><button class="pri" data-acc="${u}">수락</button><button data-dec="${u}">거절</button></div>`).join('')}</div>`;
       const own=owned();if(!pick||!own.includes(pick))pick=own.includes(ZMG.curCls())?ZMG.curCls():own[0];
-      h+=`<div class="sec"><span class="lbl">대결 캐릭터 · 두 사람 모두 이 캐릭터로 싸워요</span><div class="clsgrid">${own.map(k=>`<button class="clsbtn${k===pick?' on':''}" data-cls="${k}">${esc(cname(k))}</button>`).join('')}</div></div>`;
+      h+=`<div class="sec"><span class="lbl">대결 캐릭터 · 두 사람 모두 이 캐릭터로 싸워요 · 친구도 가진 캐릭터만 신청할 수 있어요</span><div class="clsgrid">${own.map(k=>`<button class="clsbtn${k===pick?' on':''}" data-cls="${k}">${esc(cname(k))}</button>`).join('')}</div></div>`;
       if(out)h+=`<div class="sec"><span class="lbl">보낸 대결 신청</span><div class="item"><span class="nk">${esc(out.nick)} · ${esc(cname(out.cls))} · 기다리는 중…</span><button id="onCancel">취소</button></div></div>`;
       const fl=Object.keys(friends).sort((a,b)=>(fst[b]?1:0)-(fst[a]?1:0));
-      h+=`<div class="sec"><span class="lbl">친구 ${fl.length}명</span>${fl.length?fl.map(u=>{const o=!!fst[u];return`<div class="item"><span class="dot ${o?'on':''}"></span><span class="nk">${esc(fnick[u]||friends[u].nick||'?')} <span class="st">${o?'온라인':'오프라인'}</span></span><button class="pri" data-ch="${u}" ${o&&!out?'':'disabled'}>대결 신청</button><button data-del="${u}">삭제</button></div>`}).join(''):'<div class="st">아직 친구가 없어요. 닉네임으로 친구 요청을 보내 보세요.</div>'}</div>`}
+      h+=`<div class="sec"><span class="lbl">친구 ${fl.length}명</span>${fl.length?fl.map(u=>{const o=!!fst[u];return`<div class="item"><span class="dot ${o?'on':''}"></span><span class="nk">${esc(fnick[u]||friends[u].nick||'?')} <span class="st">${o?'온라인':'오프라인'}</span></span>${(fown[u]||['base']).includes(pick)?'':'<span class="st">이 캐릭터 없음</span>'}<button class="pri" data-ch="${u}" ${o&&!out&&(fown[u]||['base']).includes(pick)?'':'disabled'}>대결 신청</button><button data-del="${u}">삭제</button></div>`}).join(''):'<div class="st">아직 친구가 없어요. 닉네임으로 친구 요청을 보내 보세요.</div>'}</div>`}
     box.innerHTML=h;stopKeys(box);const q=s2=>box.querySelector(s2);
     q('#onX').onclick=close;
     if(q('#onNickEd'))q('#onNickEd').onclick=()=>{q('#onNickRow').hidden=false;q('#onNick').focus()};
@@ -4511,11 +4511,11 @@ const FIREBASE_CONFIG={
       await db.ref(`friendReq/${u}/${me.uid}`).set({nick:myNick,t:TS()});say(n+'님에게 친구 요청을 보냈어요. 수락하면 친구가 돼요.')}catch(e){say(dbErr(e),1)}}
   async function acceptReq(u){const r=reqs[u];if(!r)return;try{await db.ref(`friends/${me.uid}/${u}`).set({nick:r.nick,t:TS()});await db.ref(`friends/${u}/${me.uid}`).set({nick:myNick,t:TS()});await db.ref(`friendReq/${me.uid}/${u}`).remove();say(r.nick+'님과 친구가 됐어요!')}catch(e){say(dbErr(e),1)}}
   /* ---- challenges ---- */
-  async function challenge(u){if(out)return;const cls=pick||'base',nick=fnick[u]||friends[u].nick;const ref=db.ref(`challenges/${u}/${me.uid}`);
+  async function challenge(u){if(out)return;const cls=pick||'base',nick=fnick[u]||friends[u].nick;if(!(fown[u]||['base']).includes(cls))return say(nick+'님은 '+cname(cls)+' 캐릭터가 없어요. 두 사람 모두 가진 캐릭터를 골라 주세요.',1);const ref=db.ref(`challenges/${u}/${me.uid}`);
     try{await ref.set({nick:myNick,cls,sk:ZMG.skinOn(cls)?1:0,t:TS(),st:'wait'})}catch(e){return say(dbErr(e),1)}
     out={u,nick,cls,ref,tm:setTimeout(()=>{if(out&&out.u===u){cancelOut();say(nick+'님이 응답하지 않았어요.',1)}},40000)};
     const fn=snap=>{const v=snap.val();if(!out||out.u!==u)return;if(!v){ref.off('value',fn);clearTimeout(out.tm);out=null;render();return}
-      if(v.st==='declined'){ref.off('value',fn);clearTimeout(out.tm);out=null;ref.remove();say(nick+'님이 대결을 거절했어요.',1)}
+      if(v.st==='declined'){ref.off('value',fn);clearTimeout(out.tm);out=null;ref.remove();say(v.why==='own'?nick+'님은 그 캐릭터가 없어서 대결할 수 없어요.':nick+'님이 대결을 거절했어요.',1)}
       else if(v.st==='accepted'&&v.room){ref.off('value',fn);clearTimeout(out.tm);const o=out;out=null;startMatch(v.room,u,o.nick,o.cls,0,!!v.ask)}};
     ref.on('value',fn);offs.push(()=>ref.off('value',fn));render()}
   function cancelOut(){if(!out)return;clearTimeout(out.tm);out.ref.remove().catch(()=>{});out=null;render()}
@@ -4523,6 +4523,7 @@ const FIREBASE_CONFIG={
     const u=ks[0],v=chIn[u];toastFor=u;toast.innerHTML=`<div><b>${esc(v.nick)}</b>님이 <b>${esc(cname(v.cls))}</b> 미러전 대결을 신청했어요!</div><div class="rowi"><button class="pri" id="tAcc">수락</button><button id="tDec">거절</button></div>`;toast.hidden=false;
     toast.querySelector('#tAcc').onclick=()=>acceptCh(u);toast.querySelector('#tDec').onclick=()=>{db.ref(`challenges/${me.uid}/${u}`).update({st:'declined'});delete chIn[u];showToast()}}
   async function acceptCh(u){const v=chIn[u];if(!v)return;toast.hidden=true;if(window.ZMG&&!ZMG.inLobby()){say('로비에서만 대결을 시작할 수 있어요.',1);return}
+    if(window.ZMG&&!ZMG.owned().includes(v.cls)){db.ref(`challenges/${me.uid}/${u}`).update({st:'declined',why:'own'}).catch(()=>{});delete chIn[u];say(cname(v.cls)+' 캐릭터가 없어서 이 대결은 할 수 없어요.',1);showToast();return}
     const rid=db.ref('rooms').push().key;try{await db.ref('rooms/'+rid).set({a:u,b:me.uid,cls:v.cls,t:TS()});await db.ref(`challenges/${me.uid}/${u}`).update({st:'accepted',room:rid,ask:ZMG.skinOn(v.cls)?1:0})}catch(e){return say(dbErr(e),1)}
     delete chIn[u];startMatch(rid,u,v.nick,v.cls,1,!!v.sk)}
   /* ---- match ---- */
@@ -4537,15 +4538,16 @@ const FIREBASE_CONFIG={
   db=firebase.database();auth=firebase.auth();
   auth.onAuthStateChanged(u=>{cleanup();endMatch();me=u;render();if(!u)return;const uid=u.uid;
     on(db.ref('.info/connected'),'value',s=>{if(s.val()){const r=db.ref('status/'+uid);r.onDisconnect().set({on:false,t:TS()});r.set({on:true,t:TS()})}});
-    db.ref('users/'+uid+'/nick').get().then(s=>{myNick=s.val()||'';render()}).catch(()=>{});
+    db.ref('users/'+uid+'/nick').get().then(s=>{myNick=s.val()||'';render()}).catch(()=>{});pubOwned();
     on(db.ref('friendReq/'+uid),'value',s=>{reqs=s.val()||{};render()});
-    on(db.ref('friends/'+uid),'value',s=>{const nv=s.val()||{};for(const f in nv)if(!friends[f]){on(db.ref('status/'+f),'value',q=>{const v=q.val();fst[f]=!!(v&&v.on);render()});on(db.ref('users/'+f+'/nick'),'value',q=>{if(q.val())fnick[f]=q.val();render()})}friends=nv;render()});
+    on(db.ref('friends/'+uid),'value',s=>{const nv=s.val()||{};for(const f in nv)if(!friends[f]){on(db.ref('status/'+f),'value',q=>{const v=q.val();fst[f]=!!(v&&v.on);render()});on(db.ref('users/'+f+'/nick'),'value',q=>{if(q.val())fnick[f]=q.val();render()});on(db.ref('users/'+f+'/owned'),'value',q=>{fown[f]=String(q.val()||'base').split(',');render()})}friends=nv;render()});
     on(db.ref('challenges/'+uid),'value',s=>{chIn=s.val()||{};showToast();render()})});
   window.ZMTA={me:()=>!!me,nick:()=>myNick,
     submit(cls,sc,t){if(!me)return Promise.resolve('login');const go=()=>{if(!myNick)return 'nonick';const score=sc*1e6+(999999-Math.min(999999,Math.round(t*100)));const r=db.ref('ta/'+cls+'/'+me.uid);return withTO(r.get(),8000).then(s2=>{const o=s2.val();if(o&&o.score>=score)return 'kept';return r.set({n:myNick,s:sc,t:Math.round(t*100)/100,score,at:TS()}).then(()=>'saved')})};
       if(myNick)return go();return withTO(db.ref('users/'+me.uid+'/nick').get(),8000).then(s2=>{myNick=s2.val()||'';return go()})},
     top(cls){return withTO(db.ref('ta/'+cls).orderByChild('score').limitToLast(100).get(),8000).then(s2=>{const L=[];s2.forEach(c=>{L.push(Object.assign({uid:c.key,mine:me&&c.key===me.uid},c.val()))});L.sort((a,b)=>b.score-a.score);return L})}};
-  setInterval(()=>{if(me)showToast()},5000);
+  function pubOwned(){try{if(!me||!window.ZMG)return;const o=ZMG.owned().join(',');if(o===lastOwned)return;lastOwned=o;db.ref('users/'+me.uid+'/owned').set(o).catch(()=>{lastOwned=''})}catch(_){}}
+  setInterval(()=>{if(me){showToast();pubOwned()}},5000);
 })();
 </script>
 
