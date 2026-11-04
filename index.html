@@ -1874,7 +1874,7 @@ const CLS={
   frost:{name:'빙결술사',job:'CRYOMANCER',wpn:'얼음 창',price:8300,desc:'1번 공격으로 맞은 적을 느리게 만드는 얼음 창을 던져요. 빙판, 얼음 벽, 눈보라로 전장을 얼리고 얼음 감옥으로 적을 가둬요.'},
   druid:{name:'드루이드',job:'DRUID',wpn:'덩굴',price:9200,desc:'1번 공격으로 덩굴 채찍을 휘둘러 앞의 적 둘까지 때려요. 채찍 끝부분으로 맞히면 TIP! 강타가 들어가요. 뿌리와 가시 덤불, 꽃의 감옥으로 적을 묶고, 식충 식물과 거대 나무로 공격하는 식물의 힘을 다뤄요.'},
   shade:{name:'사신',job:'REAPER',wpn:'낫',price:10200,desc:'1번 공격으로 낫을 휘둘러 검은 구체를 날려요. 그림자 속으로 숨어 무적 상태로 움직이다 튀어나와 공격하고, 적 뒤로 순간이동하거나 분신을 불러내요.'},
-  kid:{name:'어린이',job:'KID',wpn:'우산',price:0,sz:.8,desc:'노란 모자를 쓴 키 작은 어린이. 1번 공격으로 우산을 휘둘러요. 우산을 펼쳐 빗물을 튀기고 충격파를 날려요.'},
+  kid:{name:'잼민이',job:'JAMMINI',wpn:'우산',price:0,sz:.8,desc:'노란 프로펠러 모자를 쓴 키 작은 잼민이. 1번 공격으로 우산을 휘둘러요. 우산을 펼쳐 빗물을 튀기고 충격파를 날려요.'},
   seonbi:{name:'선비',job:'SEONBI',wpn:'부채',price:0,desc:'갓을 쓰고 부채질하며 다니는 선비. 1번 공격으로 부채질해 바람칼을 날려요. 붓글씨와 시조로 적을 다스려요.'},
   grad:{name:'대학원생',job:'GRAD STUDENT',wpn:'연필',price:0,desc:'책가방을 메고 연필을 든 대학원생. 1번 공격으로 허공에 글씨를 쓰면 그 글씨가 날아가 공격해요. 지우개와 전공책, 논문으로 싸워요.'},
 };
@@ -1921,7 +1921,7 @@ const SKINS={
   frost:{name:'설녀',price:5000,ink:'#eaf9ff',glow:'rgba(140,220,255,.95)',desc:'얼음 왕관을 쓰고 몸 주위로 얼음 창 3개가 맴돌아요. 일반 공격을 하면 맴돌던 얼음 창이 날아가고, 잠시 뒤 다시 생겨요.'},
   druid:{name:'꽃의 정령',price:5500,ink:'#ffeef5',glow:'rgba(255,140,190,.9)',desc:'머리에 꽃 화관을 쓴 꽃의 정령. 덤불과 나무 대신 꽃이 피어나고, 잎 대신 꽃잎이 흩날려요.'},
   shade:{name:'심연',price:6000,ink:'#e0e0e0',glow:'rgba(255,70,70,.8)',desc:'붉은 눈이 빛나는 심연의 그림자. 너덜너덜한 망토가 휘날려요.'},
-  kid:{name:'비옷 어린이',price:900,ink:'#fff6c8',glow:'rgba(255,210,60,.95)',desc:'노란 비옷을 입은 어린이. 몸이 노랗게 빛나요.'},
+  kid:{name:'비옷 잼민이',price:900,ink:'#fff6c8',glow:'rgba(255,210,60,.95)',desc:'노란 비옷을 입은 잼민이. 몸이 노랗게 빛나요.'},
   seonbi:{name:'암행어사',price:1400,ink:'#ffe6d6',glow:'rgba(255,120,80,.95)',desc:'마패를 품은 암행어사. 붉은빛으로 빛나요.'},
   grad:{name:'박사 졸업',price:1600,ink:'#e6eeff',glow:'rgba(120,170,255,.95)',desc:'드디어 졸업한 박사. 푸른빛으로 빛나요.'},
 };
@@ -4121,7 +4121,7 @@ function drawUmb(c,T,S,hand,u,open,d){const L=open?.4:.56;c.save();c.lineCap='ro
   c.restore()}
 function drawKidAcc(c,o,d,T,S,st,e){const h=o.hc,r=SK.head,fl=e.flash>0;c.save();c.lineJoin='round';
   const cap=[];for(let i=0;i<=12;i++){const a=Math.PI+Math.PI*i/12;cap.push(T([h[0]+Math.cos(a)*r*1.06,h[1]+Math.sin(a)*r*1.06-r*.05]))}c.fillStyle=fl?'#fff':KCOL.cap;c.strokeStyle='#fff6c8';c.lineWidth=Math.max(1.2,S*.016);c.shadowColor='rgba(255,210,60,.8)';c.shadowBlur=S*.08;c.beginPath();c.moveTo(cap[0][0],cap[0][1]);for(const q of cap)c.lineTo(q[0],q[1]);c.closePath();c.fill();c.stroke();
-  const b0=T([h[0]+d*r*.6,h[1]-r*.12]),b1=T([h[0]+d*r*1.75,h[1]-r*.02]);c.lineWidth=Math.max(2,S*.03);c.strokeStyle=fl?'#fff':KCOL.cap;c.beginPath();c.moveTo(b0[0],b0[1]);c.lineTo(b1[0],b1[1]);c.stroke();const bt=T([h[0],h[1]-r*1.12]);c.fillStyle='#fff6c8';c.beginPath();c.arc(bt[0],bt[1],S*.012,0,Math.PI*2);c.fill();c.restore();
+  const b0=T([h[0]+d*r*.6,h[1]-r*.12]),b1=T([h[0]+d*r*1.75,h[1]-r*.02]);c.lineWidth=Math.max(2,S*.03);c.strokeStyle=fl?'#fff':KCOL.cap;c.beginPath();c.moveTo(b0[0],b0[1]);c.lineTo(b1[0],b1[1]);c.stroke();const bt=T([h[0],h[1]-r*1.12]),tp=T([h[0],h[1]-r*1.5]);c.strokeStyle='#e9e9e9';c.lineWidth=Math.max(1.2,S*.014);c.shadowBlur=0;c.beginPath();c.moveTo(bt[0],bt[1]);c.lineTo(tp[0],tp[1]);c.stroke();{const spd=(Math.abs(e.vx||0)>.5||(e.state||'').slice(0,2)==='w_'||!e.gnd)?26:9,a=(G.T*spd+(e.seed||0))%(Math.PI*2),L=S*r*1.15;c.save();c.translate(tp[0],tp[1]);for(let i=0;i<2;i++){const ca=Math.cos(a+i*Math.PI),bx=ca*L,by=Math.sin(a+i*Math.PI)*L*.18;c.fillStyle=i?'#ff5a5a':'#5ab0ff';c.globalAlpha=.65+.35*Math.abs(ca);c.beginPath();c.ellipse(bx/2,by/2,Math.abs(bx/2)+S*.004,S*.012+Math.abs(by/2),0,0,Math.PI*2);c.fill()}c.globalAlpha=1;c.fillStyle='#ffd23a';c.beginPath();c.arc(0,0,S*.014,0,Math.PI*2);c.fill();c.restore()}c.fillStyle='#fff6c8';c.beginPath();c.arc(bt[0],bt[1],S*.012,0,Math.PI*2);c.fill();c.restore();
   const hand=o.fa[2],el=o.fa[1],stt=e.state||'',L=Math.hypot(hand[0]-el[0],hand[1]-el[1])||1;let u=o.wv&&stt==='w_sword'?[o.wv[0],o.wv[1]]:[(hand[0]-el[0])/L,(hand[1]-el[1])/L];const ul=Math.hypot(u[0],u[1])||1;u=[u[0]/ul,u[1]/ul];
   const open=stt==='w_burst'||stt==='w_spin'||stt==='w_fall'||(e===p&&p.pult&&p.pult.k==='kid')||(e.wcfg&&e.wcfg.umb&&stt.slice(0,2)==='w_');if(open&&stt!=='w_sword')u=stt==='w_spin'?[Math.sin(G.T*14),-Math.abs(Math.cos(G.T*14))*.6-.4]:[d*.35,-.94];drawUmb(c,T,S,hand,u,open,d)}
 function drawGradAcc(c,o,d,T,S,st,e){const fl=e.flash>0;c.save();c.lineJoin='round';const sh=o.sh,hp=o.hip,bk=[-d*.13,0];
