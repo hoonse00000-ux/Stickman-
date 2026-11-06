@@ -143,6 +143,7 @@ body:not(.desk) .keys{display:none}
 .tabox h3{margin:0;font-family:var(--f-display);letter-spacing:.12em}.tabox p{margin:0;color:var(--dim);font-size:13px}
 .tatabs{display:flex;gap:6px;margin:4px 0 10px}.tatabs button{flex:1;background:transparent;border:1px solid #333;color:#9a9a9a;padding:8px;font:inherit;font-size:13px;cursor:pointer}.tatabs button.on{border-color:#f5f5f5;color:#fff}
 .tarank{max-height:52vh;overflow:auto}.tarsel{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}.tarsel button{background:transparent;border:1px solid #2a2a2a;color:#8a8a8a;padding:4px 8px;font:inherit;font-size:11.5px;cursor:pointer}.tarsel button.on{border-color:#fff;color:#fff}
+.tarnd{gap:3px}.tarnd button{min-width:38px;padding:4px 5px}#taGrid button[disabled]{opacity:.35;cursor:not-allowed}
 .tarmsg{color:#8a8a8a;font-size:12.5px;margin:8px 0}.tarlist{list-style:none;margin:0;padding:0;font-family:var(--f-mono);font-size:12.5px}.tarlist li{display:grid;grid-template-columns:2.4em 1fr auto auto;gap:10px;padding:6px 4px;border-bottom:1px solid #1d1d1d;align-items:center}.tarlist li b{font-weight:600;color:#eee;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tarlist li.mine{background:rgba(255,255,255,.07)}.tarlist .rk{color:#777}.tarlist li:nth-child(-n+3) .rk{color:#fff;font-weight:700}
 .tagrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
 .tagrid button{background:transparent;border:1px solid var(--line);color:var(--ink);padding:10px;text-align:left;cursor:pointer;font-family:var(--f-body)}
@@ -1210,6 +1211,7 @@ for(const k in TY)if(TY[k].boss){const t=TY[k];t.udmg={};for(const d in t.dmg){t
 for(const k in TY)if(!TY[k].boss&&!TY[k].mid&&k!=='dummy')TY[k].cd=TY[k].cd.map(v=>v*.72);
 for(const k in TY)if(TY[k].mid){const t=TY[k];t.hp=Math.round(t.hp*1.7);for(const d in t.dmg)t.dmg[d]=Math.round(t.dmg[d]*1.3);t.cd=t.cd.map(v=>v*.85);t.spd*=1.1}
 const MIDS=['m_brawler','m_spear','m_hammer','m_archer','m_twin','m_bombard','m_monk','m_titan'];
+const MAXR=20;const lvR=r=>1+(clamp(r||1,1,MAXR)-1)*9/(MAXR-1);const bossOfR=r=>BOSSES[Math.min(BOSSES.length-1,Math.floor(((r||1)-1)/2))];const bossTagR=r=>((r||1)%2===0?' II':'');const bossHpT=r=>420*Math.pow(6308/420,(clamp(r||1,1,MAXR)-1)/(MAXR-1));
 const BOSSES=['boss','shadow','golem','bomblord','storm','titan','phantom','warlord','archmage','emperor'];
 const WAVES=[
   {n:'꼬마 부대',list:['small','small','small'],max:3},
@@ -1238,14 +1240,14 @@ let p=null,enemies=[],fx=[],texts=[],waves=[],shots=[],pwaves=[],eshots=[],bolts
 let best={w:0,wl:'—',k:0,c:0,d:0};
 try{best=Object.assign(best,JSON.parse(localStorage.getItem('zm-fight-best')||'{}'))}catch(_){}
 function showBest(){{const sb=$('#shopBtn');if(sb)sb.innerHTML=`<small>SHOP</small><b class="coinhud"><svg class="dico coini" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/></svg>${coinTxt()}</b>`;const prb=$('#practiceBtn');if(prb)prb.textContent=(SHOP.cls||'base')==='base'?'튜토리얼':'튜토리얼 · '+CLS[SHOP.cls].name;const chb=$('#charBtn');if(chb)chb.innerHTML=`<small>CHARACTER</small><b>${CLS[SHOP.cls||'base'].name}</b>`}const cc=SHOP.cls||'base',cn=CLS[cc].name,sv=getProg(cc);
-  {const mx=DEV.on?49:Math.max(sv.max||0,sv.idx||0),wb=$('#waveBtn');wb.hidden=!(mx>0);wb.textContent='웨이브 선택';wb.onclick=()=>openWaves(mx,sv.idx,DEV.on?{dev:1}:{})}const cb=$('#contBtn');if(sv.idx>0){cb.hidden=false;cb.textContent=`이어하기 · ${cn} · R${Math.floor(sv.idx/5)+1} WAVE ${sv.idx%5+1}${sv.idx%5===4?' (BOSS)':''}`;cb.onclick=()=>{closeTut();startGame(sv.idx)}}else cb.hidden=true;$('#bW').textContent=best.wl||'—';$('#bD').textContent=Math.floor(best.d)+'m';$('#bC').textContent=best.c}
+  {const mx=DEV.on?MAXR*5-1:Math.max(sv.max||0,sv.idx||0),wb=$('#waveBtn');wb.hidden=!(mx>0);wb.textContent='웨이브 선택';wb.onclick=()=>openWaves(mx,sv.idx,DEV.on?{dev:1}:{})}const cb=$('#contBtn');if(sv.idx>0){cb.hidden=false;cb.textContent=`이어하기 · ${cn} · R${Math.floor(sv.idx/5)+1} WAVE ${sv.idx%5+1}${sv.idx%5===4?' (BOSS)':''}`;cb.onclick=()=>{closeTut();startGame(sv.idx)}}else cb.hidden=true;$('#bW').textContent=best.wl||'—';$('#bD').textContent=Math.floor(best.d)+'m';$('#bC').textContent=best.c}
 
-function applyStats(full){const rr=Math.max(1,G.round|0);p.lvl=rr;p.maxHp=100+15*(rr-1);p.atk=1+.12*(rr-1);p.regen=24*(1+.06*(rr-1));if(full)p.hp=p.maxHp}
+function applyStats(full){const rr=lvR(G.round);p.lvl=Math.max(1,G.round|0);p.maxHp=Math.round(100+15*(rr-1));p.atk=1+.12*(rr-1);p.regen=24*(1+.06*(rr-1));if(full)p.hp=p.maxHp}
 function newPlayer(){return{kind:'hero',size:HERO,x:1.6,h:0,gnd:true,wall:0,wallB:null,wallT:0,wallDir:0,noSteer:0,safe:{x:1.6,h:0},pk:null,vx:0,face:1,state:'idle',st:0,dur:0,w:.2,phase:0,vh:0,ultG:0,cd:{upper:0,spin:0,dash:0},hp:100,maxHp:100,atk:1,regen:24,lvl:1,sta:100,inv:0,combo:0,lastHit:-9,hitSet:new Set(),seed:0,flash:0}}
 const setState=(o,s,dur,w)=>{o.state=s;o.st=0;o.dur=dur||0;o.w=w||.2};
 
 let kfx=[];
-function startGame(from,adm,opt){kfx=[];collectCoins(true);G.coins=[];G.runCoin=0;from=(typeof from==='number'&&from>0)?from:0;G.startIdx=from;if(adm)G.admin=true;else{G.admin=false;G.adminSkin=false;G.cls=SHOP.cls}G.ta=opt&&opt.ta?{cls:opt.ta,t:0}:null;if(G.ta)G.cls=G.ta.cls;
+function startGame(from,adm,opt){kfx=[];collectCoins(true);G.coins=[];G.runCoin=0;from=(typeof from==='number'&&from>0)?from:0;G.startIdx=from;if(adm)G.admin=true;else{G.admin=false;G.adminSkin=false;G.cls=SHOP.cls}G.ta=opt&&opt.ta?{cls:opt.ta,t:0,r:opt.r||0}:null;G.allClear=0;if(G.ta)G.cls=G.ta.cls;
   initAudio();resize();G.tutorial=false;G.ctut=false;G.tutSpar=false;$('#tutPanel').hidden=true;
   G.round=1;G.wave=0;G.ko=0;G.bestCombo=0;G.stop=0;G.slow=0;G.shake=0;G.overT=-1;
   blocks=[];gaps=[];zones=[];segs=[];genX=0;genN=from;lastPiece='';G.segI=-1;G.round=Math.floor(from/5)+1;G.wave=from%5;
@@ -1254,12 +1256,12 @@ function startGame(from,adm,opt){kfx=[];collectCoins(true);G.coins=[];G.runCoin=
   G.banner={big:'GO ›',small:'CROSS THE LINE TO START',t:0,dur:1.8};
   $('#lobby').hidden=true;$('#ov').hidden=true;G.mode='play';
 }
-const mult=()=>1+.3*(G.round-1);
+const mult=()=>1+.3*(lvR(G.round)-1);
 function startWave(){G.wUsed={};
   const wv=WAVES[G.wave];G.queue=wv.list.slice();G.phase='banner';G.pt=0;G.spawnT=0;let nm=wv.n;G.waveMax=wv.max;
-  if(!wv.boss){const R=G.round||1,EX=['small','grunt','brute','ninja','thrower','shield','bomber','charger','spinner','jumper','healer'].filter(k=>TY[k]),pool=EX.slice(0,Math.min(EX.length,2+(R-1)*2)),extra=Math.min(24,Math.floor((R-1)*3+G.wave*1.2));
+  if(!wv.boss){const R=lvR(G.round),EX=['small','grunt','brute','ninja','thrower','shield','bomber','charger','spinner','jumper','healer'].filter(k=>TY[k]),pool=EX.slice(0,Math.min(EX.length,2+(R-1)*2)),extra=Math.min(24,Math.floor((R-1)*3+G.wave*1.2));
     for(let i=0;i<extra;i++)G.queue.splice(Math.floor(Math.random()*(G.queue.length+1)),0,pool[Math.floor(Math.random()*pool.length)]);G.waveMax=Math.min(10,wv.max+Math.floor((R-1)*.8)+(G.wave>=2?1:0));if(extra>0)nm+=` · ${G.queue.length}명`}
-  if(wv.boss){const bk=BOSSES[(G.round-1)%BOSSES.length];G.queue=[bk];nm=TY[bk].en+(G.round>BOSSES.length?' II':'')}
+  if(wv.boss){const bk=bossOfR(G.round);G.queue=[bk];nm=TY[bk].en+bossTagR(G.round)}
   G.banner={big:wv.boss?'BOSS':'WAVE '+(G.wave+1),small:(G.round>1?'ROUND '+G.round+' · ':'')+(G.wave===0&&!wv.boss?bioOf(G.round).n+' · ':'')+nm,t:0,dur:1.6};
   sfx('wave');
 }
@@ -1268,7 +1270,7 @@ function spawn(kind){
   const z=G.zone||{x0:p.x-3,x1:p.x+3};do{x=rnd(z.x0+.6,z.x1-.6);tries++}while(Math.abs(x-p.x)<1.8&&tries<30);
   const bm=t.boss&&!G.tutorial?1+.06*btier():1;const e={kind,x,h:TY[kind].boss?5:3.5,vh:0,vx:0,face:x<p.x?1:-1,size:t.size,hp:t.hp*m*bm,max:t.hp*m*bm,state:'drop',st:0,dur:0,w:.5,phase:rnd(0,6),
     cd:rnd(.6,1.2),flash:0,seed:rnd(0,9),hitDone:false,poise:0,p2:false,summons:0,slammed:false,gnd:false,active:true,inZone:true,zref:G.zone};
-  if(t.boss&&!G.tutorial&&(G.round||1)>=4){e.ph=1;e.ph2Max=e.max*.8;e.hp*=.82;e.max*=.82}
+  if(t.boss&&!G.tutorial&&!G.online){const lv=lvR(G.round),s2=clamp((lv-1.6)/5.4,0,1),T2=bossHpT(G.round),k2=.25+.55*s2,m0=s2>0?T2/((1-.18*s2)+k2):T2;e.hp=e.max=m0;if(s2>0){e.ph=1;e.ph2Max=m0*k2;e.hp*=1-.18*s2;e.max*=1-.18*s2}}
   enemies.push(e);
 }
 
@@ -1330,7 +1332,7 @@ function piece(t,cx,force){
 }
 function genSegment(){
   const idx=genN,round=Math.floor(idx/5)+1,wv=idx%5;let cx=genX;const x0=cx;
-  GG.m=1+.3*(round-1);GG.d=Math.min(1,idx/8);GG.n=0;GG.idx=idx;GG.th=bioOf(round).blk;
+  GG.m=1+.3*(lvR(round)-1);GG.d=Math.min(1,idx/8);GG.n=0;GG.idx=idx;GG.th=bioOf(round).blk;
   if(idx===(G.startIdx||0)){addB('wall',-1.4,0,0,3.4);cx=idx===0?3:GATE+1.4}
   if(wv===4){cx+=.8;const len=Math.max(6.5,VIEWU+.6);zones.push({x0:cx,x1:cx+len,used:false,boss:true});cx+=len+.8}
   else{
@@ -1882,7 +1884,7 @@ function updEnemy(e,dt){
       if(!e.p2&&e.ph!==1&&e.hp<e.max*.5){e.p2=true;ftext(e.x,e.h+e.size*1.2,'RAGE',true);shake(.5);e.ultCd=Math.min(e.ultCd??0,.4);e.chainQ=[];if(btier()>=1)waves.push({x:e.x,dir:1,life:1.2,max:1.2,hit:false,dmg:TY[e.kind].dmg.wave||12},{x:e.x,dir:-1,life:1.2,max:1.2,hit:false,dmg:TY[e.kind].dmg.wave||12});G.flash=Math.max(G.flash||0,.25);sfx('pound')}
       if(bossAI(e,dist))break;
     }else if(t.atk.length&&dist<=want+.06&&p.h-e.h<.95&&p.h-e.h>-.3&&((e.cd<=0&&busy<3)||(e.idleT||0)>1.2)){eAttack(e,t.atk[Math.floor(Math.random()*t.atk.length)]);break}
-    if(dist>want+.05){const sp=t.spd*(1+.05*(G.round-1))*(e.p2?1.25:1)*(t.boss?1+.02*btier():1),nx=e.x+dir*sp*dt;if(e.gnd&&canWalk(e,nx)){e.x=nx;e.state='walk';e.phase+=dt*7*sp}else e.state='idle'}
+    if(dist>want+.05){const sp=t.spd*(1+.05*(lvR(G.round)-1))*(e.p2?1.25:1)*(t.boss?1+.02*btier():1),nx=e.x+dir*sp*dt;if(e.gnd&&canWalk(e,nx)){e.x=nx;e.state='walk';e.phase+=dt*7*sp}else e.state='idle'}
     else if(dist<want-.25&&!TY[e.kind].boss){const nx=e.x-dir*t.spd*.5*dt;if(e.gnd&&canWalk(e,nx)){e.x=nx;e.state='back';e.phase-=dt*5}else e.state='idle'}
     else e.state='idle';
   }}
@@ -1916,7 +1918,7 @@ function bossHazard(e){const t=TY[e.kind],ty=BHZ[e.kind]||'rock',R=Math.random()
   ftext(e.x,e.h+e.size*1.25,'!!',true);sfx('rumble')}
 function updHazards(dt){if(!G.hzs||!G.hzs.length)return;for(const z of G.hzs){z.t+=dt;if(!z.done&&z.t>=z.warn){z.done=1;shake(.22);
     if(z.kind==='bomb'){boom(z.x,z.h,.75,z.dmg)}else{crack(z.x,z.h,.7);dust(z.x,8,.9,z.h);if(z.kind==='shade')kfx.push({t:'vspk',x:z.x,h:z.h,s:.9,life:.5,max:.5,dr:DRW.vspk,col:'#ffffff',glow:'rgba(255,255,255,.6)'});else if(z.kind==='rune')mspells.push({k:'pil',x:z.x,h:z.h,life:.5,max:.5});else kfx.push({t:'spike',x:z.x,h:z.h,s:1.1,life:.55,max:.55});sfx('slam');if(Math.abs(p.x-z.x)<.5&&p.h-z.h<1.1&&p.h-z.h>-.3)hurtPlayer(z.dmg,Math.sign(p.x-z.x)||1,2.6,null,1)}}}G.hzs=G.hzs.filter(z=>!z.done)}
-function btier(){return G.tutorial?0:clamp((G.round||1)-1,0,12)}
+function btier(){return G.tutorial?0:clamp(lvR(G.round)-1,0,12)}
 function bossAI(e,dist){const k=e.kind,R=Math.random();
   const tr=btier();if(e.ultCd==null)e.ultCd=tr<2?8:5;if(!G.tutorial&&e.ultCd<=0&&!ults.some(u=>u.e===e)){startUlt(e);const base=Math.max(11,20-tr*.9);e.ultCd=e.p2?rnd(base*.7,base*.85):rnd(base,base+3);return true}
   if(!G.tutorial&&tr>=2){if(e.hzAt==null)e.hzAt=G.T+rnd(4,6);if(G.T>=e.hzAt){e.chainQ=[];bossHazard(e);const gap=Math.max(5,12-tr*.6);e.hzAt=G.T+(e.p2?rnd(gap*.6,gap*.8):rnd(gap,gap+2));e.cd=.5;return false}}
@@ -3470,7 +3472,7 @@ function update(dt){
   spikes=spikes.filter(k=>k.t<k.delay+k.warn+.45);
   for(const f of fx){if(f.t==='pil'||f.t==='hl'||f.t==='mz'||f.t==='ln'||f.t==='sl'||f.t==='spr'||f.t==='x'||f.t==='a'||f.t==='k'||f.t==='c'||f.t==='b'||f.t==='g'||f.t==='f'||f.t==='r'){f.life-=dt;continue}f.x+=f.vx*dt;f.y+=f.vy*dt;f.vy-=(f.t==='s'?9:f.t==='e'?-.3:f.t==='sh'?7:f.t==='fl'?-1.4:f.t==='fs'?3.5:f.t==='ic'?7:f.t==='lf'?.9:f.t==='nt'?-.4:f.t==='wp'?-.6:f.t==='cm'?-.12:f.t==='cd'?4:f.t==='sp'?0:1.5)*dt;if(f.t==='sh'||f.t==='ic'||f.t==='lf'||f.t==='cd'||f.t==='nt')f.rot+=(f.vr||0)*dt;if(f.t==='lf'){f.vx+=Math.sin(G.T*4+f.ph)*dt*3;f.vy=Math.max(f.vy,-1.2)}if(f.t==='sp'||f.t==='wp'||f.t==='cm'){f.vx*=Math.exp(-4*dt);f.vy*=Math.exp(-3*dt)}if(f.t==='e')f.vx*=Math.exp(-2*dt);f.life-=dt}
   fx=fx.filter(f=>f.life>0);
-  updSouls(dt);updGroove(dt);updCoins(dt);if(G.coinFlash>0)G.coinFlash-=dt;if(G.online)updOnline(dt);if(G.ta&&G.mode==='play'&&p.state!=='dead')G.ta.t+=Math.min(.1,dt);for(const t of texts){t.y+=.7*dt;t.life-=dt}
+  updSouls(dt);updGroove(dt);updCoins(dt);if(G.coinFlash>0)G.coinFlash-=dt;if(G.online)updOnline(dt);if(G.ta&&!G.ta.done&&G.mode==='play'&&p.state!=='dead')G.ta.t+=Math.min(.1,dt);for(const t of texts){t.y+=.7*dt;t.life-=dt}
   texts=texts.filter(t=>t.life>0);
   // waves
   if(G.banner){G.banner.t+=dt;if(G.banner.t>G.banner.dur)G.banner=null}
@@ -3490,7 +3492,7 @@ function update(dt){
         else G.banner={big:'ROUND CLEAR',small:'BOSS DOWN · HP +40',t:0,dur:2.4};sfx('wave');
         recordBest(true);}
       }
-    }else if(G.phase==='clear'){G.pt+=dt;if(G.pt>2.9){const wasMid=G.zone&&G.zone.mid;G.phase='travel';G.zone=null;G.banner={big:'GO ›',small:wasMid?'KEEP GOING':'NEXT ROUND · ENEMIES GET STRONGER',t:0,dur:1.2}}}
+    }else if(G.phase==='clear'){G.pt+=dt;if(G.zone&&G.zone.boss&&G.pt>1.4&&!G.tutorial&&!G.online&&!G.admin){if(G.ta&&G.ta.r&&G.round>=G.ta.r&&!G.ta.done){G.ta.done=1;G.ta.win=1;collectCoins(true);taOver();return}if(!G.ta&&G.round>=MAXR&&!G.allClear){G.allClear=1;allClear();return}}if(G.pt>2.9){const wasMid=G.zone&&G.zone.mid;G.phase='travel';G.zone=null;G.banner={big:'GO ›',small:wasMid?'KEEP GOING':'NEXT ROUND · ENEMIES GET STRONGER',t:0,dur:1.2}}}
   }else if(G.overT>=0){G.overT+=dt;if(G.overT>1.3){G.overT=-1;gameOver()}}
 }
 
@@ -3807,6 +3809,11 @@ function recordBest(cleared){if(G.admin||G.ta||G.online)return[];
   try{localStorage.setItem('zm-fight-best',JSON.stringify(best))}catch(_){}
   return nb;
 }
+function allClear(){collectCoins(true);G.mode='over';try{saveProg(MAXR*5-1)}catch(_){}const nb=recordBest(true);ov.hidden=false;
+  card.innerHTML=`<h1>ALL CLEAR!</h1><div class="big"><i>R</i>${MAXR}</div><p>${TY[bossOfR(MAXR)].name}까지 모든 라운드를 이겼어요!</p>
+  <div class="runstats">KO ${G.ko} · 최고 콤보 ${G.bestCombo} · +${(G.runExp||0).toLocaleString()} EXP · +${(G.runCoin||0).toLocaleString()} 코인</div>${nb.length?`<div class="unl">최고 기록 갱신 · ${nb.join(' · ')}</div>`:''}
+  <div class="row"><button class="btn" id="bRe">처음부터</button><button class="btn ghost" id="bLob">로비</button></div>`;
+  $('#bRe').onclick=()=>startGame(0);$('#bLob').onclick=toLobby;$('#bRe').focus();sfx('combohit')}
 function gameOver(){
   collectCoins(true);let soulBk=0;if(G.cls==='necro')soulBk=refundSouls();
   if(G.online){onlineEnd(false);return}
@@ -3880,28 +3887,36 @@ window.ZMG={setDev,startOnline,netState,netEvent,inLobby:()=>G.mode==='lobby',pl
 /* ---------- time attack ---------- */
 function fmtT(t){t=Math.max(0,t||0);const m=Math.floor(t/60),s2=t-m*60;return m+':'+(s2<10?'0':'')+s2.toFixed(2)}
 let TAREC={};try{TAREC=JSON.parse(localStorage.getItem('zm-fight-ta')||'{}')||{}}catch(_){TAREC={}}
-function taScore(){return Math.max(0,G.segI|0)}
-function taSave(){if(!G.ta)return{nb:false};const c=G.ta.cls,sc=taScore(),t=G.ta.t,o=TAREC[c],nb=!o||sc>o.s||(sc===o.s&&t<o.t);if(nb){TAREC[c]={s:sc,t,wl:`R${Math.floor(sc/5)+1}-${sc%5+1}`,d:Date.now()};try{localStorage.setItem('zm-fight-ta',JSON.stringify(TAREC))}catch(_){}}G.ta.saved=1;try{if(window.ZMTA){const P=ZMTA.submit(c,sc,t);if(P&&P.then)P.then(r=>{G.taSub=r}).catch(()=>{})}}catch(_){}return{nb,sc,t}}
-function taOver(){G.mode='over';ov.hidden=false;const r=G.ta.saved?{nb:false,sc:taScore(),t:G.ta.t}:taSave(),c=G.ta.cls,b=TAREC[c];
-  card.innerHTML=`<h1>TIME ATTACK</h1><div class="big"><i>R</i>${Math.floor(r.sc/5)+1}-${r.sc%5+1}</div><p>${CLS[c].name} · ${fmtT(r.t)}</p>
-  <div class="runstats">KO ${G.ko} · 최고 콤보 ${G.bestCombo}</div>${r.nb?`<div class="unl">${CLS[c].name} 최고 기록 갱신!</div>`:b?`<div class="runstats">최고 기록 · ${b.wl} · ${fmtT(b.t)}</div>`:''}
-  <div class="row"><button class="btn" id="bRe">다시 도전</button><button class="btn ghost" id="bTa">캐릭터 변경</button><button class="btn ghost" id="bLob">로비</button></div>`;
-  $('#bRe').onclick=()=>startGame(0,false,{ta:c});$('#bTa').onclick=()=>{toLobby();openTA()};$('#bLob').onclick=toLobby;$('#bRe').focus()}
-function taTab(t){$('#taTabs').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));$('#taGrid').hidden=t!=='me';$('#taRank').hidden=t!=='rank';if(t==='rank')taRankShow(G.taRankCls||G.cls||SHOP.cls||'base')}
+const taKey=(c,r)=>r?c+'_r'+r:c;
+function taScore(){if(G.ta&&G.ta.r)return G.ta.win?5:clamp((G.segI|0)-(G.ta.r-1)*5,0,4);return Math.max(0,G.segI|0)}
+const taWl=(s,r)=>r?(s>=5?'CLEAR':'W'+(s+1)+' 실패'):`R${Math.floor(s/5)+1}-${s%5+1}`;
+function taSave(){if(!G.ta)return{nb:false};const c=G.ta.cls,r=G.ta.r,key=taKey(c,r),sc=taScore(),t=G.ta.t,o=TAREC[key],nb=!o||sc>o.s||(sc===o.s&&t<o.t);if(nb){TAREC[key]={s:sc,t,wl:taWl(sc,r),d:Date.now()};try{localStorage.setItem('zm-fight-ta',JSON.stringify(TAREC))}catch(_){}}G.ta.saved=1;try{if(window.ZMTA){const P=ZMTA.submit(key,sc,t);if(P&&P.then)P.then(q=>{G.taSub=q}).catch(()=>{})}}catch(_){}return{nb,sc,t}}
+function taOver(){G.mode='over';ov.hidden=false;const r=G.ta.saved?{nb:false,sc:taScore(),t:G.ta.t}:taSave(),c=G.ta.cls,R0=G.ta.r,b=TAREC[taKey(c,R0)],win=R0&&r.sc>=5;
+  card.innerHTML=`<h1>${win?'ROUND CLEAR!':'TIME ATTACK'}</h1><div class="big">${R0?(win?fmtT(r.t):`<i>R</i>${R0} · W${r.sc+1}`):`<i>R</i>${Math.floor(r.sc/5)+1}-${r.sc%5+1}`}</div><p>${CLS[c].name}${R0?` · 라운드 ${R0}`:''}${win?'':' · '+fmtT(r.t)}</p>
+  <div class="runstats">KO ${G.ko} · 최고 콤보 ${G.bestCombo}</div>${r.nb&&win?`<div class="unl">라운드 ${R0} 최고 기록 갱신!</div>`:b&&b.s>=5?`<div class="runstats">최고 기록 · ${fmtT(b.t)}</div>`:''}
+  <div class="row"><button class="btn" id="bRe">다시 도전</button><button class="btn ghost" id="bTa">라운드·캐릭터 변경</button><button class="btn ghost" id="bLob">로비</button></div>`;
+  $('#bRe').onclick=()=>taStart(c,R0||1);$('#bTa').onclick=()=>{toLobby();openTA()};$('#bLob').onclick=toLobby;$('#bRe').focus()}
+function taStart(c,r){$('#taOv').hidden=true;closeTut&&closeTut();G.taR=r;startGame((r-1)*5,false,{ta:c,r});G.banner={big:'TIME ATTACK',small:`ROUND ${r} · ${TY[bossOfR(r)].en+bossTagR(r)}까지`,t:0,dur:1.8}}
+const taMaxR=c=>DEV.on?MAXR:Math.min(MAXR,Math.floor((getProg(c).max||0)/5)+1);
+function taRoundChips(cur,onPick){return `<div class="tarsel tarnd">${Array.from({length:MAXR},(_,i)=>i+1).map(r=>`<button data-r="${r}" class="${r===cur?'on':''}">R${r}</button>`).join('')}</div>`}
+function taTab(t){$('#taTabs').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));$('#taGrid').hidden=t!=='me';$('#taRank').hidden=t!=='rank';{const rw=$('#taRndMe');if(rw)rw.hidden=t!=='me'}if(t==='rank')taRankShow(G.taRankCls||G.cls||SHOP.cls||'base')}
 function taRankShow(c){G.taRankCls=c;const el=$('#taRank');const esc=t=>String(t==null?'':t).replace(/[&<>"]/g,q=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[q]));
- const sel=`<div class="tarsel">${CLSK.map(k=>`<button data-k="${k}" class="${k===c?'on':''}">${CLS[k].name}</button>`).join('')}</div>`;
- const bind=()=>el.querySelectorAll('.tarsel button').forEach(b=>b.onclick=()=>taRankShow(b.dataset.k));
+ const RR=G.taR||1,sel=taRoundChips(RR)+`<div class="tarsel">${CLSK.map(k=>`<button data-k="${k}" class="${k===c?'on':''}">${CLS[k].name}</button>`).join('')}</div>`;
+ const bind=()=>{el.querySelectorAll('.tarsel button[data-k]').forEach(b=>b.onclick=()=>taRankShow(b.dataset.k));el.querySelectorAll('.tarnd button').forEach(b=>b.onclick=()=>{G.taR=+b.dataset.r;taRankShow(c)})};
  if(!window.ZMTA){el.innerHTML=sel+'<p class="tarmsg">온라인 랭킹은 로그인이 되는 게임 링크(github.io)에서 볼 수 있어요.</p>';bind();return}
  el.innerHTML=sel+'<p class="tarmsg">불러오는 중…</p>';bind();
- ZMTA.top(c).then(L=>{if(G.taRankCls!==c)return;const me=ZMTA.me()?'':'<p class="tarmsg">로그인하고 닉네임(온라인 메뉴)을 정하면 내 기록도 랭킹에 올라가요.</p>';
-  el.innerHTML=sel+me+(L.length?`<ol class="tarlist">${L.map((r,i)=>`<li class="${r.mine?'mine':''}"><span class="rk">${i+1}</span><b>${esc(r.n)}</b><span>R${Math.floor(r.s/5)+1}-${r.s%5+1}</span><span>${fmtT(r.t)}</span></li>`).join('')}</ol>`:'<p class="tarmsg">아직 기록이 없어요. 첫 번째 기록을 세워 보세요!</p>');bind()})
+ ZMTA.top(taKey(c,RR)).then(L=>{if(G.taRankCls!==c||(G.taR||1)!==RR)return;const me=ZMTA.me()?'':'<p class="tarmsg">로그인하고 닉네임(온라인 메뉴)을 정하면 내 기록도 랭킹에 올라가요.</p>';
+  el.innerHTML=sel+me+(L.length?`<ol class="tarlist">${L.map((r,i)=>`<li class="${r.mine?'mine':''}"><span class="rk">${i+1}</span><b>${esc(r.n)}</b><span>${taWl(r.s,RR)}</span><span>${fmtT(r.t)}</span></li>`).join('')}</ol>`:'<p class="tarmsg">아직 기록이 없어요. 첫 번째 기록을 세워 보세요!</p>');bind()})
   .catch(e=>{el.innerHTML=sel+`<p class="tarmsg">랭킹을 불러오지 못했어요. ${/permission/i.test(String(e&&e.message||e))?'(데이터베이스 규칙에 ta 항목이 필요해요)':''}</p>`;bind()})}
-let openTA=function(){$('#taOv').querySelector('h3').textContent='TIME ATTACK';$('#taOv').querySelector('p').textContent='보유한 캐릭터를 골라 처음부터 끝까지 달려요. 쓰러진 지점과 걸린 시간이 캐릭터별 기록으로 남아요. 경험치·진행 상황·영혼은 저장되지 않아요.';$('#taTabs').hidden=false;taTab('me');const own=CLSK.filter(k=>k==='base'||ownC(k));$('#taGrid').innerHTML=own.map(k=>{const b=TAREC[k];return`<button data-k="${k}"><b>${CLS[k].name}</b><small>${b?`최고 ${b.wl} · ${fmtT(b.t)}`:'기록 없음'}</small></button>`}).join('');
-  $('#taGrid').querySelectorAll('button').forEach(bt=>bt.onclick=()=>{$('#taOv').hidden=true;closeTut&&closeTut();startGame(0,false,{ta:bt.dataset.k})});$('#taOv').hidden=false};
+let openTA=function(){const box=$('#taOv');box.querySelector('h3').textContent='TIME ATTACK';box.querySelector('p').textContent='라운드와 캐릭터를 골라 그 라운드의 웨이브 4개와 보스를 잡기까지 걸린 시간을 재요. 라운드마다 기록과 랭킹이 따로 남아요. 진행 상황·경험치·영혼은 저장되지 않아요.';$('#taTabs').hidden=false;
+  if(!$('#taRndMe')){const d=document.createElement('div');d.id='taRndMe';$('#taGrid').before(d)}const RR=G.taR||1;
+  $('#taRndMe').innerHTML=taRoundChips(RR);$('#taRndMe').querySelectorAll('button').forEach(b=>b.onclick=()=>{G.taR=+b.dataset.r;openTA()});
+  taTab('me');const own=CLSK.filter(k=>k==='base'||ownC(k));$('#taGrid').innerHTML=own.map(k=>{const b=TAREC[taKey(k,RR)],ok=RR<=taMaxR(k);return`<button data-k="${k}"${ok?'':' disabled'}><b>${CLS[k].name}</b><small>${!ok?`라운드 ${RR} 미도달`:b?(b.s>=5?`최고 ${fmtT(b.t)}`:`최고 ${b.wl}`):'기록 없음'}</small></button>`}).join('');
+  $('#taGrid').querySelectorAll('button:not([disabled])').forEach(bt=>bt.onclick=()=>taStart(bt.dataset.k,RR));box.hidden=false};
 $('#taBtn').onclick=openTA;
 $('#taTabs').querySelectorAll('button').forEach(b=>b.onclick=()=>taTab(b.dataset.t));
 $('#onBtn').onclick=()=>{if(window.ZMONLINE&&ZMONLINE.open){ZMONLINE.open();return}$('#taGrid').innerHTML='';$('#taTabs').hidden=true;$('#taRank').hidden=true;$('#taGrid').hidden=false;$('#taOv').querySelector('h3').textContent='ONLINE';$('#taOv').querySelector('p').innerHTML='온라인 대전은 <b>Google·이메일 로그인이 되는 웹 버전</b>(Netlify 등)에서만 할 수 있어요.';$('#taOv').hidden=false};
-{const _oTA=openTA;openTA=function(){$('#taOv').querySelector('h3').textContent='TIME ATTACK';$('#taOv').querySelector('p').textContent='보유한 캐릭터를 골라 처음부터 끝까지 달려요. 쓰러진 지점과 걸린 시간이 캐릭터별 기록으로 남아요. 경험치·진행 상황·영혼은 저장되지 않아요.';_oTA()};$('#taBtn').onclick=openTA}$('#taClose').onclick=()=>{$('#taOv').hidden=true};
+$('#taClose').onclick=()=>{$('#taOv').hidden=true};
 
 
 /* ---------- lobby preview ---------- */
@@ -4176,11 +4191,11 @@ let ufTimer=0;function showUnlock(a){const d=UDESC[a]?unlockInfo(a):null;if(!d)r
   $('#ufDesc').textContent=`'${d[0]}' 스킬이 잠금 해제되었어요 · ${km(d[1]+'')} 키 · 모바일 ${d[2]} 버튼 — ${d[3]}`;el.hidden=true;void el.offsetWidth;el.hidden=false;
   clearTimeout(ufTimer);ufTimer=setTimeout(()=>{el.hidden=true},3300);sfx('pound')}
 /* ---------- wave select ---------- */
-function openWaves(mx,last,opt){opt=opt||{};const rounds=opt.admin||opt.dev?10:Math.max(10,Math.floor(mx/5)+2),b=$('#waveBody');let h='<p class="whelp">지금 장착한 캐릭터로 한 번이라도 도달한 웨이브만 다시 들어갈 수 있어요. 캐릭터마다 진행 상황이 따로 저장돼요. 그 라운드까지 이긴 보스만큼 해금 스킬도 열린 채로 시작해요.</p>';
+function openWaves(mx,last,opt){opt=opt||{};const rounds=MAXR,b=$('#waveBody');let h='<p class="whelp">지금 장착한 캐릭터로 한 번이라도 도달한 웨이브만 다시 들어갈 수 있어요. 캐릭터마다 진행 상황이 따로 저장돼요. 그 라운드까지 이긴 보스만큼 해금 스킬도 열린 채로 시작해요.</p>';
   h+='<div class="wrounds">';
-  for(let r2=1;r2<=rounds;r2++){const rl=(r2-1)*5>mx;h+=`<section class="wcard${rl?' rlock':''}"><div class="wround">ROUND ${r2}<span>${rl?'LOCKED':TY[BOSSES[(r2-1)%BOSSES.length]].name}</span></div><div class="wgrid">`;
+  for(let r2=1;r2<=rounds;r2++){const rl=(r2-1)*5>mx;h+=`<section class="wcard${rl?' rlock':''}"><div class="wround">ROUND ${r2}<span>${rl?'LOCKED':TY[bossOfR(r2)].name+bossTagR(r2)}</span></div><div class="wgrid">`;
     for(let w=0;w<5;w++){const idx=(r2-1)*5+w,boss=w===4,j=idx-Math.floor(idx/5),mid=!boss&&j%3===2,lock=idx>mx;
-      const sub=boss?TY[BOSSES[(r2-1)%BOSSES.length]].en:mid?'MID BOSS':'WAVE';
+      const sub=boss?TY[bossOfR(r2)].en+bossTagR(r2):mid?'MID BOSS':'WAVE';
       const LK='<svg class="lk" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.2 10.5V7.6a3.8 3.8 0 0 1 7.6 0v2.9" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="15.5" r="1.4" fill="currentColor"/></svg>';
       h+=`<button class="wcell${boss?' boss':''}${mid?' mid':''}${idx===last?' cur':''}${lock?' locked':''}" data-i="${idx}" ${lock?'disabled aria-label="잠김"':''}>${lock?LK:`<b>${boss?'BOSS':w+1}</b>`}<small>${lock?(boss?'BOSS':'WAVE '+(w+1)):sub}</small></button>`}
     h+='</div></section>'}
