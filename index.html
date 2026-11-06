@@ -749,7 +749,7 @@ function isSwordHero(e){return e.kind==='hero'&&(e.cls||G.cls)==='sword'&&!(bt()
 function mgPose(e,T){const mv=e.mgMv||0,P=poseBase(Object.assign({},e,{state:mv?(mv===e.face?'walk':'back'):'idle'}),T),a=e.aimAng||0,rc=e.recoil||0,hy=swHy(P);
   P.lean=.06+(mv===e.face?.06:0);const G2=[.15-rc*.5,hy-.17],dr=[Math.cos(a),-Math.sin(a)],up=[-Math.sin(a),-Math.cos(a)];
   swIK(P,'ba',G2);swIK(P,'fa',[G2[0]+dr[0]*.13+up[0]*.12,G2[1]+dr[1]*.13+up[1]*.12]);P.wv=dr;P.wgb=1;return P}
-const GSST=new Set(['w_s1','w_sgust','w_sbrushw','w_scrane','w_sstep','w_ssijo','w_sink','w_swhirl','w_sfold','w_sleap','w_sfall','w_sland','w_stwin','w_sflick','w_sult',
+const GSST=new Set(['w_s1','w_sgust','w_styph','w_sbrushw','w_scrane','w_sstep','w_ssijo','w_sink','w_swhirl','w_sfold','w_sleap','w_sfall','w_sland','w_stwin','w_sflick','w_sult',
   'w_g1','w_gform','w_geras','w_gbook','w_gcof','w_gtired','w_gpaper','w_ghl','w_gdead','w_gbag','w_gprof','w_gult']);
 const KIDST=new Set(['w_k1','w_k2','w_k3','w_kbonk','w_kspin','w_krain','w_kguard','w_kbounce','w_kpud','w_kpair','w_kcloud','w_kplane','w_kfloat','w_kdive','w_kland','w_kt']);
 function pose(e,T){
@@ -2122,7 +2122,7 @@ function updPshots(dt){
     if(s2.bounce>0&&!wall&&fl>-50&&s2.h<=fl){s2.bounce--;s2.h=fl+.03;s2.vh=Math.abs(s2.vh)*.55+1.6;s2.vx*=.8;dust(s2.x,3,.6,fl);sfx('land')}
     else if(s2.mine&&!wall&&fl>-50&&s2.h<=fl+.03){s2.h=fl+.03;s2.vh=0;s2.vx=0;s2.grav=0}
     else if(s2.kind==='bomb'&&(wall||(fl>-50&&s2.h<=fl))){if(s2.cluster)for(let k=0;k<3;k++)pshots.push({x:s2.x,h:Math.max(0,fl)+.15,vx:(k-1)*2.6,vh:4.2,grav:1,dmg:14,kind:'bomb',life:3,hitSet:new Set(),kb:1.6,rot:0});pBoom(s2.x,Math.max(0,fl),s2.ult,s2.dmg);s2.life=0;continue}
-    const thru=s2.kind==='star';
+    const thru=s2.kind==='star'||!!s2.thru;
     if(wall&&!thru){if(s2.kind==='ball'&&!s2.home){s2.vx=-s2.vx*.5;s2.x+=s2.vx*dt*2}else{if(s2.portal)doPortal(s2);s2.life=0;continue}}
     if(fl>-50&&s2.h<=fl+.02&&(s2.vh<0||!s2.grav)&&!(thru&&s2.h>.03)){if(s2.portal)doPortal(s2);if(s2.ult){sparks(s2.x,fl+.05,1,3,.7);sparks(s2.x,fl+.05,-1,3,.7)}s2.life=0;continue}
     for(const e of enemies){if(e.state==='dead'||e.state==='drop'||!e.active||s2.hitSet.has(e))continue;
@@ -4400,6 +4400,11 @@ function gsPose(e,T){const P=guard(T+(e.seed||0)),u=e.dur?clamp(e.st/e.dur,0,1):
     const a=E(seg(0,.2)),b=E(seg(.2,.36)),c2=E(seg(.42,.52)),d2=E(seg(.52,.7)),r=E(seg(.78,1));let sx=L(1,.45,a);if(b>0)sx=L(.45,1,b);if(c2>0)sx=L(1,-.5,c2);if(d2>0)sx=L(-.5,1,d2);P.sx=Math.abs(sx)<.2?.2*Math.sign(sx||1):sx;
     let fa=[L(.6,-.5,a),.2];if(b>0)fa=[L(-.5,1.9,b),.2];if(c2>0)fa=[L(1.9,1.0,c2),L(.2,2.2,c2)];if(d2>0)fa=[L(1.0,1.75,d2),L(2.2,0,d2)];if(r>0)fa=[L(1.75,.75,r),L(0,2.2,r)];P.fa=fa;P.ba=[L(.4,1.2,b)*(1-r)+.3*r,.6];
     P.lean=d2>0?L(.1,.3,d2)*(1-r)+.06*r:L(.06,-.08,a);P.fl=[.45,.35];P.bl=[-.4,.2];A.fan={a:fa[0]+fa[1],sp:L(2.5,.2,E(seg(.88,1))),h:'fa'};break}
+  case 'w_styph':{// 부채를 머리 위로 크게 돌리며 몸도 회전 → 앞으로 내던지듯 부침
+    const a=E(seg(0,.15)),cr=seg(.15,.5),th=E(seg(.5,.62)),r=E(seg(.75,1));const an=cr*Math.PI*2;let fa=[L(.6,2.7,a),L(1.4,.2,a)];
+    if(cr>0&&cr<1){fa=[2.7+Math.sin(an)*.35,.2];P.sx=Math.cos(an);if(Math.abs(P.sx)<.2)P.sx=.2*Math.sign(P.sx||1)}if(cr>=1)fa=[2.7,.2];if(th>0)fa=[L(2.7,1.45,th),L(.2,0,th)];if(r>0)fa=[L(1.45,.75,r),L(0,2.2,r)];
+    P.fa=fa;P.ba=[L(.4,1.4,a),.4];P.lean=th>0?L(-.08,.3,th)*(1-r)+.06*r:L(.06,-.08,a);P.fl=[L(.3,.55,th),.35];P.bl=[L(-.22,-.5,th),.15];P.sy=cr>0&&cr<1?.94:1;
+    A.fan={a:cr>0&&cr<1?Math.PI+Math.sin(an*2)*.6:fa[0]+fa[1],sp:L(2.6,.2,E(seg(.9,1))),h:'fa'};break}
   case 'w_sbrushw':{// 한 손 앞으로 뻗기 (붓은 허공에)
     const a=E(seg(0,.15)),r=E(seg(.85,1));P.fa=[L(.6,1.55,a)*(1-r)+.6*r,L(1.4,.05,a)*(1-r)+1.4*r];P.ba=[.3,1.3];P.lean=L(.06,.12,a);P.fl=[.38,.3];P.bl=[-.3,.15];
     if(u>.62&&u<.85)P.fa[0]+=Math.sin(G.T*60)*.04;A.fan={a:1.9,sp:.15,h:'ba'};break}
@@ -4536,8 +4541,16 @@ const BRUSHFX={
   '十'(k){cshot({x:k.x,h:k.h+.15,dr:DRW.sslash,len:1.1,spd:8.5,ang:-.32,dmg:16,life:.8,pierce:1,kb:1.8,up(s,dt){s.age=(s.age||0)+dt}});cshot({x:k.x,h:k.h-.15,dr:DRW.sslash,vert:1,len:1.1,spd:8.5,ang:.32,dmg:16,life:.8,pierce:1,kb:1.8,up(s,dt){s.age=(s.age||0)+dt}});sfx('slam')},
   '大'(k){aoe(k.x,p.h,1.4,1.6,28,2.4,'wpnH',null,e=>launch(e,3.4));inkSplat(k.x,k.h,30,2.2);ringFx(k.x,k.h,1.3,6);shake(.3);sfx('boom')},
   '山'(k){const fh=Math.max(0,floorAt(k.x,.1,p.h+.5));[-.5,0,.5].forEach((dx,i)=>{const rx=k.x+dx*1.2;zone({t:'srock',i,x:rx,h:fh,w:.3,dur:3,tick:.15,dr:DRW.srock,f(z){const age=z.max-z.life;for(const e of enemies){if(!alive(e)||Math.abs(e.x-z.x)>.32+.12*e.size||e.h>z.h+.9)continue;if(age<.3&&!(z.hs||(z.hs=new Set())).has(e)){z.hs.add(e);hitEnemy(e,15,'wpnH',Math.sign(e.x-z.x)||1,1);launch(e,4)}else if(!TY[e.kind].boss)e.x=z.x+Math.sign(e.x-z.x||1)*(.34+.12*e.size)}}});dust(rx,6,.6,fh)});shake(.25);sfx('pound')}};
+DRW.styph=function(c,s,x,y){const ag=s.age||0,L0=s.life0||1.3,grow=Math.min(1,ag/.25),fade=Math.min(1,(L0-ag)/.25),sc=(s.sc||1)*grow,Hh=U*1.9*sc,base=y+U*.55;c.globalAlpha=Math.max(0,fade);
+  c.fillStyle='rgba(200,230,215,.10)';c.beginPath();c.moveTo(x-U*.12*sc,base);c.quadraticCurveTo(x-U*.2*sc,base-Hh*.5,x-U*.62*sc,base-Hh);c.lineTo(x+U*.62*sc,base-Hh);c.quadraticCurveTo(x+U*.2*sc,base-Hh*.5,x+U*.12*sc,base);c.closePath();c.fill();
+  c.lineWidth=2;c.shadowColor='rgba(210,255,235,1)';c.shadowBlur=12;const n=11;for(let i=0;i<n;i++){const q=i/(n-1),yy=base-q*Hh,rr=U*(.1+q*q*.55+q*.05)*sc,sw=Math.sin(ag*5+q*3)*U*.12*sc*q,ph=ag*16-q*5;c.strokeStyle=`rgba(${230-q*30},255,${240-q*15},${.35+.55*(1-Math.abs(q-.5))})`;c.beginPath();c.ellipse(x+sw,yy,rr,rr*.26,0,ph%(Math.PI*2),ph%(Math.PI*2)+Math.PI*1.55);c.stroke()}
+  c.strokeStyle='rgba(255,255,255,.75)';c.lineWidth=1.4;for(let k=0;k<3;k++){c.beginPath();for(let i=0;i<=24;i++){const q=i/24,yy=base-q*Hh,rr=U*(.1+q*q*.55)*sc,an=ag*14+k*2.1+q*9;c.lineTo(x+Math.cos(an)*rr+Math.sin(ag*5+q*3)*U*.12*sc*q,yy+Math.sin(an)*rr*.22)}c.stroke()}
+  c.shadowBlur=0;for(let i=0;i<14;i++){const q=((i*.137+ag*.9)%1),yy=base-q*Hh,rr=U*(.15+q*q*.6)*sc,an=ag*(10+i%4*3)+i*1.7;c.fillStyle=i%3?'rgba(160,200,120,.9)':'rgba(255,255,255,.9)';c.save();c.translate(x+Math.cos(an)*rr,yy+Math.sin(an)*rr*.25);c.rotate(an*2);c.fillRect(-U*.03,-U*.012,U*.06,U*.024);c.restore()}
+  c.fillStyle='rgba(220,220,200,.35)';for(let i=0;i<6;i++){const an=ag*12+i;c.beginPath();c.arc(x+Math.cos(an)*U*.35*sc,base-Math.abs(Math.sin(an))*U*.06,U*.05*sc,0,Math.PI*2);c.fill()}c.globalAlpha=1};
+Object.assign(SFX,{typhoon:()=>{nz(.9,{type:'bandpass',f0:260,f1:1300,q:1.4,vol:.32,att:.08});nz(.8,{type:'lowpass',f0:420,f1:160,q:.8,vol:.26,att:.05,delay:.08});osc(.9,{type:'sine',f0:62,f1:118,vol:.14});osc(.7,{type:'triangle',f0:520,f1:980,vol:.035,delay:.12});nz(.5,{type:'highpass',f0:2600,f1:4200,q:.6,vol:.08,delay:.3})}});
 const SEONK={
-  kick(){kst('w_sgust',.95,{times:[.33,.66],fire(){if(p.wfi===1){seonbiWind({sc:1.5,dmg:9,life:.7,kb:2.4,lift:2.6});sfx('wind');return}const s2=seonbiWind({sc:2.3,spd:7,dmg:14,life:.85,kb:5,lift:3.8,onHit(s,e){windHit(s,e);if(!TY[e.kind].boss)e.vx=Math.sign(s.vx)*7;s.sc=Math.max(.5,s.sc*.85)}});sfx('gust');shake(.12)}});sfx('fan');ftext(p.x,p.h+1.2,'GUST',true)},
+  kick(){kst('w_styph',1.0,{times:[.55],fire(){const d=p.face;cshot({dr:DRW.styph,x:p.x+d*.8,h:p.h+.05,spd:4.6,dmg:0,life:1.4,life0:1.4,pierce:1,thru:1,kb:0,sc:1.2,tk:.05,up(s,dt){s.age=(s.age||0)+dt;s.vh=0;{const fh=floorAt(s.x,.05,s.h+.6);if(fh>-50)s.h=lerp(s.h,fh+.05,Math.min(1,dt*10))}s.tk-=dt;if(s.tk<=0){s.tk=.2;for(const e of enemies)if(alive(e)&&Math.abs(e.x-s.x)<.75+.12*e.size&&e.h-s.h>-.4&&e.h-s.h<2.3){hitEnemy(e,5,'wpn',Math.sign(s.vx)||1,.1);if(Math.random()<.5)sfx('swing')}}if(Math.random()<dt*10)dust(s.x,1,.3,s.h);for(const e of enemies){if(!alive(e)||TY[e.kind].boss||Math.abs(e.x-s.x)>.9+.1*e.size||Math.abs(e.h-s.h)>2)continue;e.x+=(s.x-e.x)*Math.min(1,dt*6)+s.vx*dt*.85;if(e.state!=='dead'){e.vh=Math.max(e.vh||0,2.6);e.gnd=false;e.h=Math.max(e.h,s.h+.02)}}},
+      onHit(s,e){},onEnd(s){for(const e of enemies)if(alive(e)&&Math.abs(e.x-s.x)<1.1&&Math.abs(e.h-s.h)<2.2){hitEnemy(e,10,'wpnH',Math.sign(s.vx)||1,2.4);if(!TY[e.kind].boss&&e.state!=='dead')launch(e,4.5)}ringFx(s.x,s.h+.6,1,4);for(let q=0;q<10;q++)fx.push({t:'e',x:s.x,y:s.h+rnd(.3,1.6),vx:rnd(-2.5,2.5),vy:rnd(0,2),life:.5,max:.5,r:.02})}});sfx('typhoon');shake(.12)}});sfx('fan');ftext(p.x,p.h+1.2,'TYPHOON',true)},
   upper(){const ch=Object.keys(BRUSHCH)[Math.floor(Math.random()*4)];kst('w_sbrushw',1.0,{});const x=p.x+p.face*1.4,h=p.h+.95;p.sBrush=1;
     kfx.push({t:'sbrush',ch,x,h,f:p.face,life:1.15,max:1.15,dr:DRW.sbrush2,up(k){const age=k.max-k.life,S=BRUSHCH[k.ch],n=S.length,i2=Math.min(n-1,Math.floor(age/(.62/n)));if(age<.62&&k.si!==i2){k.si=i2;sfx('brush');const st=S[i2][0];inkSplat(k.x+st[0]*1.35,k.h-st[1]*1.35,6,.8)}if(age>=.62&&!k.gat){k.gat=1;sfx('magic')}if(age>=.86&&!k.done){k.done=1;BRUSHFX[k.ch](k);inkSplat(k.x,k.h,10,1)}}});ftext(p.x,p.h+1.2,'CALLIGRAPHY · '+ch,true)},
   spin(){kst('w_scrane',1.1,{rehit:.12,melee:{a0:.22,a1:.82,reach:1.15,dmg:7,kb:1,both:1},upd(u){if(u>.2&&u<.82&&Math.random()<.3)petals(p.x,p.h+.6,2);if(u>=.82&&!p.sFlip){p.sFlip=1;p.face=-p.face}}});p.sFlip=0;sfx('swing');ftext(p.x,p.h+1.2,'CRANE DANCE',true)},
@@ -4650,12 +4663,12 @@ for(const k of['kid','grad','seonbi']){COMBOS[k]=XC[k]}
 Object.assign(KITN,{
   kid:{kick:[IC.umb,'때리기','우산 때리기'],upper:[IC.spin,'돌기','빙글빙글 공격'],spin:[IC.drop,'빗물','빗물 튀기기'],dash:[IC.umb,'반동','우산 반동'],blast:[IC.drop,'웅덩이','물웅덩이 점프'],flurry:[IC.cloud,'비구름','비구름'],quake:[IC.plane,'비행기','종이비행기'],dive:[IC.dive,'낙하','우산 낙하']},
   grad:{kick:[IC.pencil,'수식','수식 쓰기'],upper:[IC.eraser,'지우개','지우개 던지기'],spin:[IC.book,'책','전공책 강타'],dash:[IC.coffee,'커피','밤샘 커피'],blast:[IC.card,'논문','논문 폭풍'],flurry:[IC.beam,'형광펜','형광펜 긋기'],quake:[IC.book,'마감','마감 폭탄'],dive:[IC.dive,'가방','책가방 내려찍기']},
-  seonbi:{kick:[IC.wind,'부채','부채 바람'],upper:[IC.char,'붓글씨','붓글씨'],spin:[IC.fan,'학춤','학춤'],dash:[IC.dash,'걸음','선비 걸음'],blast:[IC.char,'시조','시조 읊기'],flurry:[IC.brush,'먹물','먹물 웅덩이'],quake:[IC.wind,'회오리','회오리바람'],dive:[IC.dive,'낙화','낙화']}});
+  seonbi:{kick:[IC.wind,'태풍','태풍 회오리'],upper:[IC.char,'붓글씨','붓글씨'],spin:[IC.fan,'학춤','학춤'],dash:[IC.dash,'걸음','선비 걸음'],blast:[IC.char,'시조','시조 읊기'],flurry:[IC.brush,'먹물','먹물 웅덩이'],quake:[IC.wind,'회오리','회오리바람'],dive:[IC.dive,'낙화','낙화']}});
 Object.assign(SLOTN,{kid:{punch:[IC.umb,'우산','우산 휘두르기']},grad:{punch:[IC.pencil,'글씨','글씨 쓰기']},seonbi:{punch:[IC.fan,'부채','부채 바람칼']}});
 Object.assign(CTD,{
   kid:{kick:'우산을 양손으로 머리 위까지 들어 웅크렸다가 수직으로 내리쳐요. 맞으면 바닥에 작은 충격파가 퍼지고 일반 적은 0.8초 기절, 보스는 잠깐 경직돼요',upper:'우산을 펼쳐 들고 뛰어올라 프로펠러처럼 돌며 전진해요. 회전 중 방향키로 이동 방향만 바꿀 수 있어요',spin:'펼친 우산을 머리 위로 세 번 흔들어 빗방울을 앞쪽 하늘로 흩뿌려요. 떨어진 빗방울은 작은 물웅덩이를 만들고, 맞은 적은 느려져요',dash:'우산을 방패처럼 정면으로 펼쳐요. 앞에서 공격이 닿으면 우산이 뒤집히며 그 반동으로 뒤로 튕겨 나가 피해를 막아요'},
   grad:{kick:'책가방을 열고 허공에 수식 세 개를 쓴 뒤 하나로 합쳐 적에게 날려요. 닿으면 산산조각 나며 폭발해요',upper:'연필을 입에 물고 지우개를 바닥으로 던져요. 통통 튀다가 맞은 적을 잠깐 멈추게 해요',spin:'무거운 전공책을 꺼내 머리 위로 들었다가 앞으로 세게 내려쳐요',dash:'커피를 급하게 마셔 6초 동안 빨라지고 세지며 다른 스킬 쿨타임이 줄어요. 효과가 끝나면 잠깐 비틀거려요'},
-  seonbi:{kick:'부채를 완전히 펼치고 허리를 돌려 두 번 부쳐요. 두 번째 바람은 더 넓고 강해서 적을 멀리 밀어내요',upper:'허공에 거대한 붓이 나타나 一·十·大·山 중 한 글자를 써요. 一은 가로 참격, 十은 교차 참격, 大는 먹물 폭발, 山은 바위 세 개가 솟아요',spin:'한쪽 다리를 들고 학처럼 한 바퀴, 반대로 반 바퀴 돌며 부채 끝으로 베어요. 도는 동안에는 공격을 막아요',dash:'꽃잎으로 흩어져 미끄러지듯 이동해요. 지나간 자리의 꽃잎을 밟은 적은 느려져요'}});
+  seonbi:{kick:'부채를 머리 위로 크게 돌리며 몸을 한 바퀴 돌린 뒤 앞으로 내던지듯 부쳐, 태풍 같은 회오리를 날려요. 회오리는 앞으로 나아가며 적을 빨아들여 공중에 띄운 채 계속 때리고, 사라질 때 터지며 적을 높이 날려요',upper:'허공에 거대한 붓이 나타나 一·十·大·山 중 한 글자를 써요. 一은 가로 참격, 十은 교차 참격, 大는 먹물 폭발, 山은 바위 세 개가 솟아요',spin:'한쪽 다리를 들고 학처럼 한 바퀴, 반대로 반 바퀴 돌며 부채 끝으로 베어요. 도는 동안에는 공격을 막아요',dash:'꽃잎으로 흩어져 미끄러지듯 이동해요. 지나간 자리의 꽃잎을 밟은 적은 느려져요'}});
 Object.assign(UCLS,{
   kid:{blast:['PUDDLE JUMP','우산 끝으로 바닥을 찔러 물웅덩이를 만들고 높이 튀어 올라요. 공중에서 방향을 바꿀 수 있고, 웅덩이에 다시 착지하면 주변 적이 미끄러져 넘어져요'],flurry:['RAIN CLOUD','우산 끝에서 나온 구름이 적 위로 날아가 비를 뿌리고, 사라질 때 번개 물방울을 떨어뜨려요'],quake:['PAPER PLANES','종이비행기 3개를 연달아 던져요. 벽에 부딪히면 튕겨 나와요'],dive:['UMBRELLA DROP','펼친 우산으로 둥실 떠올라요. 공격을 누르면(또는 잠시 뒤) 우산을 접고 내리꽂아 바닥을 내려찍어요']},
   grad:{blast:['PAPER STORM','논문 묶음에서 일곱 장을 뽑아 부채꼴로 던져요. 종이는 적을 꿰뚫고 벽에 닿으면 조각나요'],flurry:['HIGHLIGHTER','형광펜으로 앞을 길게 그어 줄 위의 적을 차례로 표시한 뒤, 표시된 곳마다 순서대로 피해를 줘요'],quake:['DEADLINE','서류를 머리 위로 던져 적 주변에 떨어뜨려요. 그림자로 낙하 위치가 보이고, 잠시 뒤 한꺼번에 종이 폭풍이 터져요'],dive:['BACKPACK SLAM','책가방을 벗어 바닥에 내려쳐 서류와 책을 흩뿌려요. 내려치기 전에 공격을 한 번 더 누르면 한 번 더 내려찍어 큰 충격파를 일으켜요']},
@@ -4663,7 +4676,7 @@ Object.assign(UCLS,{
 Object.assign(SDEMO,{kid:['w_k1',.42],grad:['w_write',.42],seonbi:['w_s1',.5]});
 Object.assign(KPV,{kid:{punch:['w_k1',.42,0],kick:['w_kbonk',.78,0],upper:['w_kspin',.95,0],spin:['w_krain',.95,0],dash:['w_kguard',.85,0],blast:['w_kpud',.42,0],flurry:['w_kcloud',.6,0],quake:['w_kplane',1,0],dive:['w_kfloat',1.2,0]},
   grad:{punch:['w_write',.42,0],kick:['w_gform',1.15,0],upper:['w_geras',.8,0],spin:['w_gbook',1.15,0],dash:['w_gcof',1,0],blast:['w_gpaper',1,0],flurry:['w_ghl',1,0],quake:['w_gdead',1.1,0],dive:['w_gbag',1.2,0]},
-  seonbi:{punch:['w_s1',.5,0],kick:['w_sgust',.95,0],upper:['w_sbrushw',1,0],spin:['w_scrane',1.1,0],dash:['w_sstep',.55,0],blast:['w_ssijo',1,0],flurry:['w_sink',1,0],quake:['w_swhirl',.9,0],dive:['w_sleap',.75,0]}});
+  seonbi:{punch:['w_s1',.5,0],kick:['w_styph',1,0],upper:['w_sbrushw',1,0],spin:['w_scrane',1.1,0],dash:['w_sstep',.55,0],blast:['w_ssijo',1,0],flurry:['w_sink',1,0],quake:['w_swhirl',.9,0],dive:['w_sleap',.75,0]}});
 for(const k of['kid','grad','seonbi'])CLIST[k]=XTRIG[k].map(([a,c])=>[a==='roll'?'구르기':KITN[k][a][2],'1',c]);
 
 
