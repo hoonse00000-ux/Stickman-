@@ -358,6 +358,47 @@ body:not(.desk) .keys{display:none}
  .act button small{font-size:7px;margin-top:1px}
  .joy{width:100px;bottom:6px}
 }
+
+html,body{margin:0;height:100%;overflow:hidden}
+@media (orientation:portrait) and (max-width:600px){
+ #charBack .cbody{gap:10px;padding:8px 10px}
+ #charBack .cprev{gap:6px}
+ #charBack .cprev canvas{aspect-ratio:2.6/1}
+ #charBack .cinfo{gap:6px}
+ #charBack .cgrid{grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
+ #charBack .ctile{padding:3px 2px 4px;gap:1px}#charBack .ctile canvas{aspect-ratio:1.25/1}#charBack .ctile b{font-size:11px}#charBack .ctile small{display:none}
+ #charBack .ctile.cur::after{font-size:8px;top:2px;left:2px;padding:1px 3px}
+}
+@media (orientation:portrait) and (max-height:700px){#charBack .cprev canvas{aspect-ratio:3.4/1}#charBack .cbody{gap:6px}#charBack .ctile canvas{aspect-ratio:1.5/1}}
+@media (orientation:portrait) and (max-height:760px){
+ .lob{gap:10px;padding-block:calc(12px + env(safe-area-inset-top,0px)) calc(12px + env(safe-area-inset-bottom,0px))}
+ .lob h1{font-size:clamp(34px,10.5vw,52px)}
+ .stagebox{height:clamp(110px,21vh,200px)}
+ .menu .go{padding:13px 0;font-size:21px}.menu .mt{min-height:54px;padding:8px 12px}
+ .lob .foot{display:none}
+}
+@media (max-height:520px) and (orientation:landscape){
+ .lob{max-width:none;height:100%;min-height:0;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);grid-template-rows:auto minmax(0,1fr) auto;grid-template-areas:"ttl menu" "stage menu" "stats menu";column-gap:16px;row-gap:8px;align-content:stretch;padding-block:calc(8px + env(safe-area-inset-top,0px)) calc(8px + env(safe-area-inset-bottom,0px))}
+ .lob .ttl{grid-area:ttl}.lob .eyebrow{font-size:9px;letter-spacing:.24em}.lob h1{font-size:clamp(24px,8vh,34px);margin-top:2px}
+ .stagebox{grid-area:stage;height:auto;min-height:0}.stagebox .chdesc{max-width:40ch}
+ .statrow{grid-area:stats}.statrow div{padding:4px 10px;flex-direction:row;align-items:baseline;gap:6px}.statrow b{font-size:15px}.statrow span{font-size:9px;letter-spacing:.06em}
+ .lob .foot{display:none}
+ .menu{grid-area:menu;align-content:center;gap:6px}
+ .menu .go{padding:9px 0;font-size:19px}.menu .mt{min-height:42px;padding:5px 10px;font-size:13px}
+ .menu .tutbtn{font-size:12.5px}.menu .sm{padding:6px 4px;font-size:11.5px}.menu .modebtn{padding:7px 4px}
+ .shead{padding-top:4px;padding-bottom:4px}.shead h2{font-size:20px}
+ #charBack .cbody{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1fr) minmax(0,1.3fr);gap:10px;padding:8px max(10px,env(safe-area-inset-right,0px)) 8px max(10px,env(safe-area-inset-left,0px));overflow:hidden}
+ #charBack .cprev{display:contents}
+ #charBack .cprev canvas{aspect-ratio:auto;height:100%;min-height:0}
+ #charBack .cinfo{min-height:0;align-self:start;gap:6px;font-size:12px}
+ #charBack .cgrid{min-height:0;align-self:start;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
+ #charBack .ctile{padding:3px 2px 4px;gap:1px}#charBack .ctile canvas{aspect-ratio:1.5/1}#charBack .ctile b{font-size:11px}#charBack .ctile small{display:none}
+ #charBack .ctile.cur::after{font-size:8px;top:2px;left:2px;padding:1px 3px}
+ #shopBack{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}
+ #shopBack .shead{grid-column:1/-1}#shopBack .sstage{height:auto;min-height:0}#shopBack .sinfo{border-top:0;border-left:1px solid var(--line);padding-block:10px}
+ .tut{width:min(880px,100%);display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);grid-template-rows:auto minmax(0,1fr) auto}
+ .tut .thead,.tut .tfoot{grid-column:1/-1}.tut .tdemo{height:auto;border-bottom:0;border-right:1px solid var(--line)}.tut .tbody{padding:10px 14px}.tut .tfoot{padding:6px 12px}
+}
 </style>
 
 <div class="app">
@@ -1369,7 +1410,7 @@ function tryAct(a,mv,chain){
       ftext(p.x,p.h+1.2,C.name,true);G.combos=(G.combos||0)+1;IN.buf=null;sfx('combo');return true}
   }
   if(nx){const C=COMBO[nx];setState(p,nx,C.t,C.w);if(!air)p.vx=p.face*C.vx;if(C.name){ftext(p.x,p.h+1.2,C.name,true);G.combos=(G.combos||0)+1;p.comboSnd=1}}
-  else if(a==='punch'&&!air&&G.cls&&G.cls!=='base'&&!bt()&&(p._cf=wcfg())){const cf=p._cf;p.kact=(cf.swk===3||cf.fin)?'thrust':'w';if(G.tutorial){tutEv('atk');if(G.cls==='sword')tutEv('sw:'+(p.swN||0))}p.wcfg=cf;p.wfi=0;setState(p,cf.st,cf.t,.3);p.vx=p.face*.25}
+  else if(a==='punch'&&G.cls&&G.cls!=='base'&&!bt()&&(p._cf=wcfg())){const cf=p._cf;p.kact=(cf.swk===3||cf.fin)?'thrust':'w';if(G.tutorial){tutEv('atk');if(G.cls==='sword')tutEv('sw:'+(p.swN||0))}p.wcfg=cf;p.wfi=0;setState(p,cf.st,cf.t,.3);p.vx=p.face*.25}
   else if(a==='punch'){setState(p,'punch',PUNCH_T,.2);if(!air)p.vx=p.face*.9}
   else if(air){setState(p,'flykick',.6,.1);p.vx=p.face*Math.max(3.3,Math.abs(p.vx));p.vh=Math.max(p.vh,1.3);ftext(p.x,p.h+1.2,'FLYING KICK',true)}
   else{setState(p,'kick',KICK_T,.18);if(!air)p.vx=p.face*.4}
@@ -1414,7 +1455,7 @@ function explode(e){const r=.95;shake(.4);sfx('boom');
   if(Math.abs(p.x-e.x)<r&&Math.abs(p.h-e.h)<.7)hurtPlayer(TY.bomber.dmg.boom,Math.sign(p.x-e.x)||1,3.6,e,1);
   for(const o of enemies)if(o!==e&&o.state!=='dead'&&o.active&&Math.abs(o.x-e.x)<r&&Math.abs(o.h-e.h)<.7)hitEnemy(o,30,'boomx',Math.sign(o.x-e.x)||1,3);
 }
-const CLSM={sword:[.88,1.12],ninja:[.86,.9],gunner:[.66,.75],wolf:[.8,.85],volt:[.82,.85],shade:[.85,.88],frost:[.9,.9],bard:[1.08,1.05],druid:[.9,.84],magician:[.95,1],porter:[.95,1]};
+const CLSM={archer:[1.15,1.1],sword:[1.05,1.2],ninja:[.86,.9],gunner:[.66,.75],wolf:[.8,.85],volt:[.82,.85],shade:[.85,.88],frost:[.9,.9],bard:[1.08,1.05],druid:[.9,.84],magician:[.95,1],porter:[.95,1]};
 const SHB={shield:1,golem:.25,m_titan:.8,titan:.45};
 function shieldBreak(e,dir){e.noShield=true;e.shHP=0;const sx=e.x+e.face*.14*e.size,sh=e.h+.55*e.size;ftext(e.x,e.h+1.2*e.size,'SHIELD BREAK',true);sfx('shatter');shake(.25);sparks(sx,sh,-dir,14,1.3);
   for(let q=0;q<9;q++)kfx.push({t:'shell',x:sx,h:sh+rnd(-.2,.2)*e.size,vx:-dir*rnd(-1,3),vh:rnd(1.5,4),life:1.2,max:1.2,r:rnd(0,6),big:1});if(!TY[e.kind].boss)setState(e,'hurt',.9);else e.flash=.2}
@@ -3202,7 +3243,7 @@ function buildChar(){const cur=SHOP.cls||'base';$('#charCur').textContent=CLS[cu
   const cs=$('#cShop');if(cs)cs.onclick=()=>{closeChar();openShop();shopI=CLSK.indexOf(k);layoutShop();buildShop()};
   {const pv=$('#cPvSkin');if(pv)pv.onclick=()=>{charPv=charPv===k?null:k;buildChar()}}bindVault($('#cVault'));const sc=$('#cSkin');if(sc)sc.onchange=()=>{SHOP.skinOn[k]=sc.checked;saveShop()};
   $('#charInfo').querySelectorAll('.vars button').forEach(b=>b.onclick=()=>{SHOP.vars=SHOP.vars||{};SHOP.vars[k]=b.dataset.v;G.clsVar=SHOP.vars;saveShop();buildChar()})}
-function drawCharFig(cv2,k,demo,dt,T,key){const d=Math.min(2,devicePixelRatio||1),w=cv2.clientWidth,h=cv2.clientHeight;if(!w)return;if(cv2.width!==Math.round(w*d)){cv2.width=Math.round(w*d);cv2.height=Math.round(h*d)}
+function drawCharFig(cv2,k,demo,dt,T,key){const d=Math.min(2,devicePixelRatio||1),w=cv2.clientWidth,h=cv2.clientHeight;if(!w)return;if(cv2.width!==Math.round(w*d)||cv2.height!==Math.round(h*d)){cv2.width=Math.round(w*d);cv2.height=Math.round(h*d)}
   const c=cv2.getContext('2d');c.setTransform(d,0,0,d,0,0);c.clearRect(0,0,w,h);const gy=h*.86,u=Math.min(h*.58,w*.5);
   c.save();c.strokeStyle='#f5f5f5';c.shadowColor='rgba(255,255,255,.7)';c.shadowBlur=8;c.lineWidth=1.5;c.beginPath();c.moveTo(w*.1,gy);c.lineTo(w*.9,gy);c.stroke();c.restore();
   const f=charFig[key]||(charFig[key]={kind:'hero',cls:k,skin:false,x:0,h:0,size:1,face:1,state:'idle',st:0,dur:0,w:.3,phase:0,seed:CLSK.indexOf(k)});if(f.cls!==k){f.cls=k;f._p=null}f.cvar=(SHOP.vars||{})[k];f.skin=!!(SHOP.skinOn[k]&&ownS(k))||(demo&&charPv===k);
@@ -3892,7 +3933,7 @@ function pvSet(i){pvI=i;pvT=0;const M=MOVES[i];$('#pvName').textContent=M.n;$('#
   document.querySelectorAll('#tips li').forEach(li=>li.classList.toggle('on',li.dataset.m===M.m))}
 document.querySelectorAll('#tips li').forEach(li=>li.addEventListener('click',()=>{const i=MOVES.findIndex(M=>M.m===li.dataset.m);if(i>=0)pvSet(i)}));
 function renderLobby(dt,T){
-  if(!PW)sizePreview();
+  {const r0=pv.getBoundingClientRect();if(!PW||Math.abs(r0.width-PW)>1||Math.abs(r0.height-PH)>1)sizePreview()}
   pvMoves();
   if(pvI<0)pvSet(0);
   pvT+=dt;if(pvT>3.2)pvSet((pvI+1)%MOVES.length);
@@ -3958,23 +3999,40 @@ const TUT=[
   <li>높은 곳에 있는 적은 같은 높이로 올라가야 서로 공격할 수 있어요.</li><li>도움닫기가 필요하면 조금 뒤로 물러날 수 있어요.</li>
   <li>게임 중 <strong>Esc</strong>나 오른쪽 위 <strong>II</strong>를 누르면 일시정지 화면에서 키와 콤보 목록을 볼 수 있어요.</li></ul>`},
 ];
+const TUT0=TUT.slice();let tutC=null,tutTN={};
 const TN={walk:'걷기',back:'뒤로 걷기',run:'달리기',jump:'점프',roll:'구르기',punch:'펀치',punch2:'펀치 2타',kick:'발차기',kick2:'하이킥',guard:'가드',upper:'어퍼컷',spin:'회전 발차기',dash:'돌진 정권',
   haymaker:'강펀치',roundk:'돌려차기',hammer:'해머',sweep:'스윕',superman:'슈퍼맨 펀치',dashkick:'러시 킥',backfist:'백피스트'};
 const tutE={kind:'hero',x:0,size:HERO,face:1,state:'idle',st:0,dur:0,w:.2,phase:0,h:0,seed:0};
 let tutI=-1,tutT=0;const tcv=$('#tutCv'),tcx=tcv.getContext('2d');
-const tDur=s2=>({punch:PUNCH_T,punch2:PUNCH2_T,kick:KICK_T,kick2:KICK2_T,roll:ROLL_T,guard:1.2,walk:1.6,back:1.6,run:1.6,jump:2*JUMP_V/GRAV+.15})[s2]||COMBO[s2]?.t||SPEC[s2]?.t||SKILL[s2]?.t||.6;
+const tDur=s2=>typeof s2==='string'&&s2.startsWith('k:')?Math.max(.35,((tutC&&KPV[tutC]&&KPV[tutC][s2.slice(2)])||[,.6])[1]):({punch:PUNCH_T,punch2:PUNCH2_T,kick:KICK_T,kick2:KICK2_T,roll:ROLL_T,guard:1.2,walk:1.6,back:1.6,run:1.6,jump:2*JUMP_V/GRAV+.15})[s2]||COMBO[s2]?.t||SPEC[s2]?.t||SKILL[s2]?.t||.6;
 const tW=s2=>COMBO[s2]?.w??SPEC[s2]?.w??({punch:.2,kick:.18})[s2]??.3;
-function openTut(i){tutI=clamp(i,0,TUT.length-1);tutT=0;const P=TUT[tutI];$('#tutBack').hidden=false;$('#tutStep').textContent=`${tutI+1} / ${TUT.length}`;
+function openTut(i){if(i===0||tutI<0)buildTut();tutI=clamp(i,0,TUT.length-1);tutT=0;const P=TUT[tutI];$('#tutBack').hidden=false;$('#tutStep').textContent=`${tutI+1} / ${TUT.length}`;
   $('#tutBody').innerHTML=`<h2>${P.t}</h2>${P.b}`;$('#tutBody').scrollTop=0;$('#tutPrev').disabled=tutI===0;$('#tutNext').textContent=tutI===TUT.length-1?'시작하기':'다음';
   $('#tutDots').innerHTML=TUT.map((_,k)=>`<i class="${k===tutI?'on':''}"></i>`).join('');tutE.ghosts=[];tutE.trail=[];tutE._p=null}
 function closeTut(){tutI=-1;$('#tutBack').hidden=true}
+function tutClean(x){return String(x).split(/(?<=[.!?])\s+/).filter(z=>!/보세요|연습|넣어뒀어요|채워뒀어요|훈련용/.test(z)).join(' ')}
+function buildTut(){const c=(typeof SHOP!=='undefined'&&SHOP.cls)||'base';TUT.length=0;tutTN={};tutE.cls=null;tutE.size=HERO;tutC=null;
+  if(c==='base'||!CLS[c]||!KPV[c]){for(const P of TUT0)TUT.push(P);return}
+  tutC=c;tutE.cls=c;tutE.size=HERO*(CLS[c].sz||1);const K=KITN[c]||{},sn=SLOTN[c]&&SLOTN[c].punch;
+  const nm=sl=>sl==='punch'?(sn?sn[2]:c==='archer'?'조준 사격':'기본 공격'):(c==='archer'?(ARCHN[sl]||sl):(K[sl]?K[sl][2]:sl));
+  for(const sl of['punch','kick','upper','spin','dash','blast','flurry','quake','dive'])tutTN['k:'+sl]=nm(sl);
+  let S=[];try{S=classSteps(c)}catch(_){S=[]}const adv=['blast','flurry','quake','dive'],G4={basic:[],skill:[],adv:[],combo:[],ult:[]};
+  for(const st of S){const ev=(st.ev||[])[0]||'';let g='basic';if(ev==='ult')g='ult';else if(ev.startsWith('combo:'))g='combo';else if(ev.startsWith('act:'))g=adv.includes(ev.slice(4))?'adv':'skill';G4[g].push(st)}
+  const dl=L=>`<dl class="ttab">${L.map(st=>`<dt>${st.t.replace(/^(고급 기술|콤보|필살기) · /,'')}</dt><dd>${tutClean(st.x)}</dd>`).join('')}</dl>`;
+  const nm0=CLS[c].name;TUT.push(TUT0[0],TUT0[1],TUT0[2]);
+  TUT.push({t:nm0+' · 기본 공격',demo:['k:punch'],b:`<p>${CLS[c].desc||''}</p>${dl(G4.basic)}${c!=='bomber'?`<dl class="ttab"><dt>${KK('Q','⛉')}</dt><dd><strong>가드</strong> · 누르는 동안 정면 공격을 막아요. 맞기 직전에 누르면 <strong>패리</strong>.</dd><dt>점프 + ${KK('1')}</dt><dd>공중에서도 ${nm('punch')}을 쓸 수 있어요.</dd></dl>`:''}`});
+  TUT.push({t:nm0+' · 스킬',demo:['k:kick','k:upper','k:spin','k:dash'],b:`<p>스킬은 스태미나를 쓰고 쿨타임이 있어요.</p>${dl(G4.skill)}`});
+  TUT.push({t:nm0+' · 고급 기술',demo:adv.map(a=>'k:'+a),b:`<p>보스를 이길 때마다 하나씩 열려요.</p>${dl(G4.adv)}`});
+  if(G4.combo.length)TUT.push({t:nm0+' · 콤보',demo:['k:punch','k:kick'],b:`<p>동작 중이나 끝난 직후에 이어 누르면 콤보 기술이 나가요. 모바일은 이을 수 있을 때 버튼이 빛나요.</p>${dl(G4.combo)}`});
+  TUT.push({t:'필살기 · '+CLS[c].ult.en,demo:['k:dash','k:punch'],b:`<p>${KK('R','★')} 게이지가 가득 차면 쓸 수 있어요.</p><p>${CLS[c].ult.desc}</p>`});
+  TUT.push(TUT0[7],TUT0[8])}
 $('#tutBtn').onclick=()=>openTut(0);$('#tutClose').onclick=closeTut;$('#tutPrev').onclick=()=>openTut(tutI-1);
 $('#tutNext').onclick=()=>{if(tutI===TUT.length-1){closeTut();startGame()}else openTut(tutI+1)};
 $('#tutBack').addEventListener('click',e=>{if(e.target.id==='tutBack')closeTut()});
 addEventListener('keydown',e=>{if(tutI<0)return;if(e.key==='Escape')closeTut();else if(e.key==='ArrowRight')$('#tutNext').click();else if(e.key==='ArrowLeft'&&tutI>0)openTut(tutI-1)});
 function renderTut(dt,T){
   const d=Math.min(2,devicePixelRatio||1),r=tcv.getBoundingClientRect(),w=r.width,h=r.height;if(!w)return;
-  if(tcv.width!==Math.round(w*d)){tcv.width=w*d;tcv.height=h*d}
+  if(tcv.width!==Math.round(w*d)||tcv.height!==Math.round(h*d)){tcv.width=Math.round(w*d);tcv.height=Math.round(h*d)}
   const c=tcx;c.setTransform(d,0,0,d,0,0);c.clearRect(0,0,w,h);const gy=h-30,u=h*.62;
   const P=TUT[tutI];tutT+=dt;
   c.save();c.strokeStyle='#f5f5f5';c.shadowColor='rgba(255,255,255,.7)';c.shadowBlur=8;c.lineWidth=1.5;c.beginPath();c.moveTo(0,gy);c.lineTo(w,gy);c.stroke();c.restore();
@@ -3987,12 +4045,13 @@ function renderTut(dt,T){
   if(st2==='walk'||st2==='back'||st2==='run'){tutE.state=st2;tutE.phase+=dt*(st2==='run'?12:st2==='back'?-6.5:7.5);spd=st2==='run'?RUN:st2==='back'?-WALK*.8:WALK}
   else if(st2==='jump'){const ta=2*JUMP_V/GRAV;if(sst<ta){tutE.state='jump';tutE.vh=JUMP_V-GRAV*sst;tutE.h=JUMP_V*sst-GRAV/2*sst*sst}else tutE.state='idle'}
   else if(st2==='idle'){tutE.state='idle'}
+  else if(st2.startsWith('k:')){const P=(KPV[tutC]||{})[st2.slice(2)];tutE.state=P?P[0]:'idle';tutE.st=sst;tutE.dur=tDur(st2);tutE.w=.3;tutE.wcfg={swk:P?P[2]:0,times:[]}}
   else{tutE.state=st2;tutE.st=sst;tutE.dur=tDur(st2);tutE.w=tW(st2);if(st2==='roll')spd=ROLL;if(st2==='dash'||st2==='superman'||st2==='slide')spd=(sst/tutE.dur>.3&&sst/tutE.dur<.66)?4.4:0}
   tutE.x+=spd*dt;
   c.strokeStyle='rgba(255,255,255,.4)';c.lineWidth=1;c.beginPath();for(let i=-20;i<=20;i++){const x=w/2+(i*.5-(((tutE.x%.5)+.5)%.5))*u;if(x<0||x>w)continue;c.moveTo(x,gy);c.lineTo(x,gy+5)}c.stroke();
   c.fillStyle='rgba(255,255,255,.07)';c.beginPath();c.ellipse(w/2,gy,u*.2,u*.03,0,0,Math.PI*2);c.fill();
   drawWithFx(c,tutE,smooth(tutE,pose(tutE,T),dt),u*HERO,1,dt,x=>w/2+(x-tutE.x)*u,hh=>gy-hh*u);
-  $('#tutLbl').textContent=Array.isArray(cur)?cur.map(q=>TN[q]||q).join(' → '):(TN[cur]||cur);
+  $('#tutLbl').textContent=Array.isArray(cur)?cur.map(q=>tutTN[q]||TN[q]||q).join(' → '):(tutTN[cur]||TN[cur]||cur);
 }
 
 /* ---------- interactive tutorial ---------- */
@@ -4591,6 +4650,14 @@ Object.assign(KPV,{kid:{punch:['w_k1',.42,0],kick:['w_kbonk',.78,0],upper:['w_ks
   seonbi:{punch:['w_s1',.5,0],kick:['w_sgust',.95,0],upper:['w_sbrushw',1,0],spin:['w_scrane',1.1,0],dash:['w_sstep',.55,0],blast:['w_ssijo',1,0],flurry:['w_sink',1,0],quake:['w_swhirl',.9,0],dive:['w_sleap',.75,0]}});
 for(const k of['kid','grad','seonbi'])CLIST[k]=XTRIG[k].map(([a,c])=>[a==='roll'?'구르기':KITN[k][a][2],'1',c]);
 
+
+function fitZoom(box,kids){kids=kids.filter(Boolean);for(const k of kids)k.style.zoom='';if(!box||box.hidden||!box.clientHeight)return;const cs=getComputedStyle(box),H=box.clientHeight-parseFloat(cs.paddingTop||0)-parseFloat(cs.paddingBottom||0)-2;
+  const row=cs.display==='grid'&&kids.length>1&&cs.gridTemplateColumns.split(' ').length>1;
+  if(row){for(const k of kids){let r=1;for(let it=0;it<4;it++){const need=k.getBoundingClientRect().height;if(need<=H+1)break;r=Math.max(.55,r*H/need);k.style.zoom=r.toFixed(3)}}}
+  else{let r=1;for(let it=0;it<6;it++){const need=box.scrollHeight-parseFloat(cs.paddingTop||0)-parseFloat(cs.paddingBottom||0);if(need<=H+3)break;r=Math.max(.55,r*(H+2)/need);for(const k of kids)k.style.zoom=r.toFixed(3)}}}
+function fitScreens(){try{fitZoom($('#lobby'),[$('#lobby .lob')]);const cb=$('#charBack .cbody');if(cb&&!$('#charBack').hidden)fitZoom(cb,getComputedStyle($('#charBack .cprev')).display==='contents'?[$('#charGrid'),$('#charInfo')]:[$('#charBack .cprev'),$('#charGrid')])}catch(_){}}
+{const _b=buildChar;buildChar=function(){const r=_b.apply(this,arguments);setTimeout(fitScreens,30);return r}}
+addEventListener('resize',()=>setTimeout(fitScreens,60));addEventListener('orientationchange',()=>setTimeout(fitScreens,250));setInterval(fitScreens,1200);
 resize();
 (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{sizePreview()});
 requestAnimationFrame(frame);
