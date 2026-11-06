@@ -4590,7 +4590,7 @@ KIT.grad=GRADK;
 KIT.seonbi=SEONK;
 const NEWB={
   kid(){const k=G.T-(p.swT||-9)<.62?((p.swN||0)+1)%3:0;p.swN=k;const t=[.42,.36,.56][k];p.swT=G.T+t;return[{st:'w_k1',t,melee:{a0:.42,a1:.62,reach:.85,dmg:9,kb:1.2,kind:'wpn'},times:[.42],fire(){sfx('swing')}},{st:'w_k2',t,melee:{a0:.37,a1:.58,reach:1.02,dmg:9,kb:1.6,kind:'wpn'},times:[.37],fire(){sfx('kick')}},{st:'w_k3',t,melee:{a0:.12,a1:.8,reach:.95,dmg:10,kb:1.6,both:1,kind:'wpn'},times:[.15,.45],fire(){sfx('swing')}}][k]},
-  grad(){return gradBasic()},
+  grad(){const W2=['A+','∑','π','√2','x²','∫','∞','Δ','E=mc²','Q.E.D.'][Math.floor(Math.random()*10)],t=nearest(3.6);let wx=0,wh=0;return{st:'w_write',t:.44,times:[.08,.38],fire(){if(p.wfi===1){if(t&&alive(t)){const sd=Math.sign(t.x-p.x)||p.face;wx=t.x-sd*(.5+.1*t.size);wh=t.h+.85}else{wx=p.x+p.face*.8;wh=p.h+.85}kfx.push({t:'gwrite',x:wx,h:wh,txt:W2,f:p.face,life:.32,max:.32,dr:DRW.gwrite});sfx('scribble');return}const ok=t&&alive(t);cshot({x:wx,h:wh,dr:DRW.gword,txt:W2,spd:ok?8:10,dir:ok?(Math.sign(t.x-wx)||p.face):p.face,ang:ok?Math.atan2((t.h+t.size*.5)-wh,Math.abs(t.x-wx)||.1):0,homing:ok?1:0,dmg:7,life:ok?.6:.4,kb:1});sfx('pop')}}},
   seonbi(){return{st:'w_s1',t:.5,times:[.28],fire(){const s2=seonbiWind();for(const e of enemies){if(!alive(e))continue;const rel=(e.x-p.x)*p.face;if(rel>-.15&&rel<.75+.16*e.size&&e.h-p.h>-.4&&e.h-p.h<1.1&&!sep(p.h,e.h,e.x,p.x)){s2.hitSet.add(e);windHit(s2,e)}}sfx('wind')}}}};
 /* --- ultimates --- */
 function ultActor(u,x,face,st,stt){return{kind:'hero',cls:'base',x,h:u.h0,size:HERO*1.3,face,state:st,st:stt||0,dur:.6,w:.3,phase:G.T*8,seed:5,flash:0,skin:false}}
@@ -4659,9 +4659,9 @@ Object.assign(UCLS,{
   kid:{blast:['PUDDLE JUMP','우산 끝으로 바닥을 찔러 물웅덩이를 만들고 높이 튀어 올라요. 공중에서 방향을 바꿀 수 있고, 웅덩이에 다시 착지하면 주변 적이 미끄러져 넘어져요'],flurry:['RAIN CLOUD','우산 끝에서 나온 구름이 적 위로 날아가 비를 뿌리고, 사라질 때 번개 물방울을 떨어뜨려요'],quake:['PAPER PLANES','종이비행기 3개를 연달아 던져요. 벽에 부딪히면 튕겨 나와요'],dive:['UMBRELLA DROP','펼친 우산으로 둥실 떠올라요. 공격을 누르면(또는 잠시 뒤) 우산을 접고 내리꽂아 바닥을 내려찍어요']},
   grad:{blast:['PAPER STORM','논문 묶음에서 일곱 장을 뽑아 부채꼴로 던져요. 종이는 적을 꿰뚫고 벽에 닿으면 조각나요'],flurry:['HIGHLIGHTER','형광펜으로 앞을 길게 그어 줄 위의 적을 차례로 표시한 뒤, 표시된 곳마다 순서대로 피해를 줘요'],quake:['DEADLINE','서류를 머리 위로 던져 적 주변에 떨어뜨려요. 그림자로 낙하 위치가 보이고, 잠시 뒤 한꺼번에 종이 폭풍이 터져요'],dive:['BACKPACK SLAM','책가방을 벗어 바닥에 내려쳐 서류와 책을 흩뿌려요. 내려치기 전에 공격을 한 번 더 누르면 한 번 더 내려찍어 큰 충격파를 일으켜요']},
   seonbi:{blast:['SIJO','부채로 허공에 원을 그려 한자 세 글자를 띄운 뒤 차례로 날려요. 風은 소용돌이, 月은 초승달 궤적, 山은 세 갈래, 花는 꽃잎, 雪은 천천히 내려가며 적을 느리게 해요'],flurry:['INK POOL','먹물병을 기울여 바닥에 먹물을 쏟아요. 안의 적은 느려지고 계속 피해를 받고, 점프하면 먹물이 튀어 추가 피해를 받아요'],quake:['WHIRLWIND','천천히 나아가는 회오리가 적과 적의 투사체를 빨아들여요. 많이 흡수할수록 커지고, 끝나면 터지며 사방으로 쏘아내요'],dive:['FALLING PETALS','꽃잎에 감싸여 떠올랐다가 접은 부채를 아래로 내리꽂아요. 착지하면 꽃잎이 사방으로 흩어져 주변을 베어요']}});
-Object.assign(SDEMO,{kid:['w_k1',.42],grad:['w_g1',.5],seonbi:['w_s1',.5]});
+Object.assign(SDEMO,{kid:['w_k1',.42],grad:['w_write',.42],seonbi:['w_s1',.5]});
 Object.assign(KPV,{kid:{punch:['w_k1',.42,0],kick:['w_kbonk',.78,0],upper:['w_kspin',.95,0],spin:['w_krain',.95,0],dash:['w_kguard',.85,0],blast:['w_kpud',.42,0],flurry:['w_kcloud',.6,0],quake:['w_kplane',1,0],dive:['w_kfloat',1.2,0]},
-  grad:{punch:['w_g1',.5,0],kick:['w_gform',1.15,0],upper:['w_geras',.8,0],spin:['w_gbook',1.15,0],dash:['w_gcof',1,0],blast:['w_gpaper',1,0],flurry:['w_ghl',1,0],quake:['w_gdead',1.1,0],dive:['w_gbag',1.2,0]},
+  grad:{punch:['w_write',.42,0],kick:['w_gform',1.15,0],upper:['w_geras',.8,0],spin:['w_gbook',1.15,0],dash:['w_gcof',1,0],blast:['w_gpaper',1,0],flurry:['w_ghl',1,0],quake:['w_gdead',1.1,0],dive:['w_gbag',1.2,0]},
   seonbi:{punch:['w_s1',.5,0],kick:['w_sgust',.95,0],upper:['w_sbrushw',1,0],spin:['w_scrane',1.1,0],dash:['w_sstep',.55,0],blast:['w_ssijo',1,0],flurry:['w_sink',1,0],quake:['w_swhirl',.9,0],dive:['w_sleap',.75,0]}});
 for(const k of['kid','grad','seonbi'])CLIST[k]=XTRIG[k].map(([a,c])=>[a==='roll'?'구르기':KITN[k][a][2],'1',c]);
 
