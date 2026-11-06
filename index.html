@@ -1605,6 +1605,7 @@ function hurtPlayer(dmg,dir,kb,src,nd){dmg=Number.isFinite(+dmg)?+dmg:0;if(dmg>0
   {const bp=bossPh();if(bp)dmg*=bp===1?.85:1.12}dmg=Math.round(dmg*mult());p.hp=Math.max(0,p.hp-dmg);if(!G.tutorial&&!bfOn('wolf')&&!p.pult)p.ultG=Math.min(100,(p.ultG||0)+dmg*.6*(G.cls==='necro'?.4:1));p.inv=.55;p.flash=.1;p.combo=0;
   sparks(p.x,.5+p.h,dir,8,1.1);ftext(p.x,1+p.h,'-'+dmg,true);hitShake(dmg*1.4,dir);sfx('hurt');G.stop=.06;
   if(p.hp<=0){setState(p,'dead');p.vx=dir*2;G.overT=0;return true}
+  if(G.cls==='grad'&&!bt()&&typeof p.state==='string'&&p.state.startsWith('w_')&&p.state!=='w_gtired'){p.vx+=dir*Math.min(.6,kb*.15);return true}
   setState(p,'hurt',.34);p.vx=dir*kb;p.face=-dir;return true;
 }
 
