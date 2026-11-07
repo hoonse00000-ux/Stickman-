@@ -1262,8 +1262,8 @@ function startGame(from,adm,opt){kfx=[];collectCoins(true);G.coins=[];G.runCoin=
 const mult=()=>1+.3*(lvR(G.round)-1);
 function startWave(){G.wUsed={};
   const wv=WAVES[G.wave];G.queue=wv.list.slice();G.phase='banner';G.pt=0;G.spawnT=0;let nm=wv.n;G.waveMax=wv.max;
-  if(!wv.boss){const R=lvR(G.round),EX=['small','grunt','brute','ninja','thrower','shield','bomber','charger','spinner','jumper','healer'].filter(k=>TY[k]),pool=EX.slice(0,Math.min(EX.length,2+(R-1)*2)),nMul=Math.pow(10,(clamp(G.round||1,1,MAXR)-1)/(MAXR-1)),extra=Math.max(0,Math.round((wv.list.length+Math.floor(G.wave*1.2))*nMul)-wv.list.length);
-    for(let i=0;i<extra;i++)G.queue.splice(Math.floor(Math.random()*(G.queue.length+1)),0,pool[Math.floor(Math.random()*pool.length)]);G.waveMax=Math.min(14,wv.max+Math.floor((clamp(G.round||1,1,MAXR)-1)*.55)+(G.wave>=2?1:0));if(extra>0)nm+=` · ${G.queue.length}명`}
+  if(!wv.boss){const R=lvR(G.round),EX=['small','grunt','brute','ninja','thrower','shield','bomber','charger','spinner','jumper','healer'].filter(k=>TY[k]),pool=EX.slice(0,Math.min(EX.length,2+(R-1)*2)),nMul=Math.pow(20,(clamp(G.round||1,1,MAXR)-1)/(MAXR-1)),extra=Math.max(0,Math.round((wv.list.length+Math.floor(G.wave*1.2))*nMul)-wv.list.length);
+    for(let i=0;i<extra;i++)G.queue.splice(Math.floor(Math.random()*(G.queue.length+1)),0,pool[Math.floor(Math.random()*pool.length)]);G.waveMax=Math.min(16,wv.max+Math.floor((clamp(G.round||1,1,MAXR)-1)*.65)+(G.wave>=2?1:0));if(extra>0)nm+=` · ${G.queue.length}명`}
   if(wv.boss){const bk=bossOfR(G.round);G.queue=[bk];nm=TY[bk].en+bossTagR(G.round)}
   G.banner={big:wv.boss?'BOSS':'WAVE '+(G.wave+1),small:(G.round>1?'ROUND '+G.round+' · ':'')+(G.wave===0&&!wv.boss?bioOf(G.round).n+' · ':'')+nm,t:0,dur:1.6};
   sfx('wave');
