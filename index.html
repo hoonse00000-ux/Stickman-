@@ -115,7 +115,7 @@ body:not(.desk) .keys{display:none}
 .keytab dt{white-space:nowrap}.keytab dd{margin:0}
 
 /* lobby */
-.lobby{position:fixed;inset:0;z-index:30;background:#050505;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.lobby{position:fixed;inset:0;z-index:30;background:#050505;overflow:hidden;overscroll-behavior:none}
 .lob{position:relative;max-width:520px;margin:0 auto;min-height:100%;box-sizing:border-box;display:flex;flex-direction:column;gap:18px;
   padding-block:calc(28px + env(safe-area-inset-top,0px)) calc(24px + env(safe-area-inset-bottom,0px));
   padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
@@ -360,7 +360,7 @@ body:not(.desk) .keys{display:none}
  .joy{width:100px;bottom:6px}
 }
 
-html,body{margin:0;height:100%;overflow:hidden}
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none}
 #charBack .cprev{overflow-x:hidden;overscroll-behavior:contain}#charBack .cprev>*,#charBack .cinfo *{max-width:100%;min-width:0;box-sizing:border-box}#charBack .cinfo{overflow-wrap:anywhere}
 @media (orientation:portrait) and (max-width:600px){
  #charBack .cbody{gap:10px;padding:8px 10px}
@@ -4863,6 +4863,8 @@ function drawBossHat(c,hat,hx,hy,hr,d,ink){c.save();c.lineCap='round';c.lineJoin
   case 'tiara':c.beginPath();c.moveTo(hx-hr*.8,hy-hr*.75);for(let i=0;i<=6;i++){const x=hx-hr*.8+i*hr*.267,top=i%2?hy-hr*.9:hy-hr*(1.35+(i===3?.35:0));c.lineTo(x,top)}c.stroke();c.beginPath();c.arc(hx,hy-hr*1.75,hr*.13,0,Math.PI*2);c.fill();break;
   case 'gat':c.fillStyle='#141018';c.beginPath();c.ellipse(hx,hy-hr*.8,hr*1.75,hr*.28,0,0,Math.PI*2);c.fill();c.stroke();c.beginPath();c.rect(hx-hr*.62,hy-hr*1.75,hr*1.24,hr*.95);c.fill();c.stroke();c.beginPath();c.moveTo(hx+d*hr*.4,hy-hr*.6);c.lineTo(hx+d*hr*.55,hy+hr*1.1);c.globalAlpha=.6;c.stroke();break}
   c.restore()}
+
+document.addEventListener('touchmove',ev=>{const lb=document.getElementById('lobby');if(!lb||lb.hidden||!lb.contains(ev.target))return;let el=ev.target;while(el&&el!==lb){const cs=getComputedStyle(el);if(/(auto|scroll)/.test(cs.overflowY+cs.overflowX)&&(el.scrollHeight>el.clientHeight+1||el.scrollWidth>el.clientWidth+1))return;el=el.parentElement}if(ev.cancelable)ev.preventDefault()},{passive:false});
 resize();
 (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{sizePreview()});
 requestAnimationFrame(frame);
