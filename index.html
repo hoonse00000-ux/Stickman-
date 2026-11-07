@@ -408,6 +408,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none}
 @media (max-width:899px) and (min-width:601px){.wrounds{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}}
 @media (max-width:600px){.wrounds{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.wrounds .wround{font-size:8px;letter-spacing:.05em;margin-bottom:3px}.wrounds .wround span{font-size:8px}.wgrid{gap:2px}}
 @media (max-width:600px){.sstage{height:clamp(170px,28vh,260px)}}
+.snav,.sback,.sbuy,.stabs button,.nav{touch-action:manipulation}
 </style>
 
 <div class="app">
@@ -3252,7 +3253,7 @@ function shopInfo(){if(shopTab==='skin')return skinInfo();const k=CLSK[shopI],c=
   $('#sInfo').querySelectorAll('.vars button').forEach(b2=>b2.onclick=()=>{SHOP.vars=SHOP.vars||{};SHOP.vars[k]=b2.dataset.v;G.clsVar=SHOP.vars;saveShop();shopInfo()});bindShopTabs()}
 function vioBox(){const S2=SKIN2.bard,vo=DEV.on||(SHOP.skins2||[]).includes('bard'),von=SHOP.skinOn.bard&&(SHOP.skinV||{}).bard==='violin';const b=!vo?(coinOK(S2.price)?`<button class="sbuy" id="sVio">스킨 구매 · ${S2.price.toLocaleString()} 코인</button>`:`<button class="sbuy" disabled>코인 부족 · ${COIN.toLocaleString()} / ${S2.price.toLocaleString()}</button>`):`<button class="sbuy ghost" id="sVio">${von?'착용 해제':'착용하기'}</button>`;return`<div class="sbox"><div class="sbt">추가 스킨<b>${S2.name}</b>${vo?'<span>보유</span>':''}</div><p>${S2.desc}</p>${b}</div>`}
 function shopGo(d){if(shopTab==='skin'){skinI=clamp(skinI+d,0,skinList(CLSK[shopI]).length-1);layoutShop();return}shopI=clamp(shopI+d,0,CLSK.length-1);layoutShop()}
-$('#shopBtn').onclick=()=>{closeTut();openShop()};$('#shopClose').onclick=closeShop;$('#sPrev').onclick=e=>{e.stopPropagation();shopGo(-1)};$('#sNext').onclick=e=>{e.stopPropagation();shopGo(1)};
+$('#shopBtn').onclick=()=>{closeTut();openShop()};$('#shopClose').onclick=closeShop;{let lpd=0;for(const [id,d] of [['#sPrev',-1],['#sNext',1]]){const b=$(id);b.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();lpd=performance.now();shopGo(d);sfx('ui')});b.onclick=e=>{e.stopPropagation();if(performance.now()-lpd>600)shopGo(d)}}}
 {const stg=$('#sStage');stg.addEventListener('pointerdown',e=>{if(e.target.closest('.snav'))return;shopDrag={x:e.clientX,id:e.pointerId,moved:false}});
   stg.addEventListener('pointermove',e=>{if(!shopDrag||e.pointerId!==shopDrag.id)return;const dx=e.clientX-shopDrag.x;if(Math.abs(dx)>6)shopDrag.moved=true;if(shopDrag.moved)layoutShop(dx)});
   const end=e=>{if(!shopDrag||e.pointerId!==shopDrag.id)return;const dx=e.clientX-shopDrag.x,cw=parseFloat($('#sTrack').style.getPropertyValue('--cw'))||200;if(shopDrag.moved){if(shopTab==='skin')skinI=clamp(skinI-Math.round(dx/(cw*.95)),0,skinList(CLSK[shopI]).length-1);else shopI=clamp(shopI-Math.round(dx/(cw*.95)),0,CLSK.length-1);layoutShop()}setTimeout(()=>{shopDrag=null},0)};
@@ -4767,10 +4768,12 @@ Object.assign(KPV,{kid:{punch:['w_k1',.42,0],kick:['w_kbonk',.78,0],upper:['w_ks
 for(const k of['kid','grad','seonbi'])CLIST[k]=XTRIG[k].map(([a,c])=>[a==='roll'?'구르기':KITN[k][a][2],'1',c]);
 
 
-function fitZoom(box,kids){kids=kids.filter(Boolean);for(const k of kids)k.style.zoom='';if(!box||box.hidden||!box.clientHeight)return;const cs=getComputedStyle(box),H=box.clientHeight-parseFloat(cs.paddingTop||0)-parseFloat(cs.paddingBottom||0)-2;
+function _hsS(t){let h=0;for(let i=0;i<t.length;i+=3)h=(h*31+t.charCodeAt(i))|0;return h+':'+t.length}
+function fitZoom(box,kids){kids=kids.filter(Boolean);if(!box||box.hidden||!box.clientHeight)return;const fk=kids.map(k=>_hsS(k.innerHTML)).join(',')+'|'+box.clientWidth+'x'+box.clientHeight;if(box._fk===fk)return;for(const k of kids)k.style.zoom='';const cs=getComputedStyle(box),H=box.clientHeight-parseFloat(cs.paddingTop||0)-parseFloat(cs.paddingBottom||0)-2;
   const row=kids.length>1&&((cs.display==='grid'&&cs.gridTemplateColumns.split(' ').length>1)||(cs.display==='flex'&&cs.flexDirection.startsWith('row')));
   if(row){for(const k of kids){const fits=()=>k.scrollHeight<=k.clientHeight+2&&k.getBoundingClientRect().height<=H+1;if(fits())continue;let lo=.5,hi=1;for(let it=0;it<8;it++){const m=(lo+hi)/2;k.style.zoom=m.toFixed(3);if(fits())lo=m;else hi=m}k.style.zoom=lo.toFixed(3)}}
-  else{let r=1;for(let it=0;it<6;it++){const need=box.scrollHeight-parseFloat(cs.paddingTop||0)-parseFloat(cs.paddingBottom||0);if(need<=H+3)break;r=Math.max(.55,r*(H+2)/need);for(const k of kids)k.style.zoom=r.toFixed(3)}}}
+  else{let r=1;for(let it=0;it<8;it++){const need=box.scrollHeight-parseFloat(cs.paddingTop||0)-parseFloat(cs.paddingBottom||0);if(need<=H+3)break;r=Math.max(.5,r*(H+2)/need*.995);for(const k of kids)k.style.zoom=r.toFixed(3)}box.scrollTop=0}
+  box._fk=kids.map(k=>_hsS(k.innerHTML)).join(',')+'|'+box.clientWidth+'x'+box.clientHeight}
 function fitCharRow(){const cb=$('#charBack .cbody'),cp=$('#charBack .cprev'),gr=$('#charGrid'),cv=cp&&cp.querySelector('canvas'),ci=$('#charInfo');if(!cb||!gr||!cp)return;
   cp.style.zoom='';gr.style.zoom='';ci&&(ci.style.zoom='');gr.style.gridTemplateColumns='';if(cv){cv.style.aspectRatio='';cv.style.height=''}
   const over=el=>el.scrollHeight>el.clientHeight+2;
