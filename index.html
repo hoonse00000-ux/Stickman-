@@ -143,6 +143,8 @@ body:not(.desk) .keys{display:none}
 .tabox h3{margin:0;font-family:var(--f-display);letter-spacing:.12em}.tabox p{margin:0;color:var(--dim);font-size:13px}
 .tatabs{display:flex;gap:6px;margin:4px 0 10px}.tatabs button{flex:1;background:transparent;border:1px solid #333;color:#9a9a9a;padding:8px;font:inherit;font-size:13px;cursor:pointer}.tatabs button.on{border-color:#f5f5f5;color:#fff}
 .tarank{max-height:52vh;overflow:auto}.tarsel{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}.tarsel button{background:transparent;border:1px solid #2a2a2a;color:#8a8a8a;padding:4px 8px;font:inherit;font-size:11.5px;cursor:pointer}.tarsel button.on{border-color:#fff;color:#fff}
+.stabs{display:flex;gap:6px;margin-bottom:12px}.stabs button{flex:1;font:600 13px var(--f-display);letter-spacing:.06em;padding:8px 10px;background:transparent;color:var(--dim);border:1px solid var(--line);cursor:pointer}.stabs button.on{color:#050505;background:var(--ink);border-color:var(--ink)}.stabs button[disabled]{opacity:.35;cursor:not-allowed}
+.cskn{display:flex;align-items:center;gap:8px}.cskn button.nav{width:34px;height:34px;flex:none;background:transparent;border:1px solid var(--line);color:var(--ink);font-size:18px;cursor:pointer}.cskn button.nav[disabled]{opacity:.3}.cskn .nm{flex:1;text-align:center;font:700 15px var(--f-display)}
 .tarnd{gap:3px}.tarnd button{min-width:38px;padding:4px 5px}#taGrid button[disabled]{opacity:.35;cursor:not-allowed}
 .tarmsg{color:#8a8a8a;font-size:12.5px;margin:8px 0}.tarlist{list-style:none;margin:0;padding:0;font-family:var(--f-mono);font-size:12.5px}.tarlist li{display:grid;grid-template-columns:2.4em 1fr auto auto;gap:10px;padding:6px 4px;border-bottom:1px solid #1d1d1d;align-items:center}.tarlist li b{font-weight:600;color:#eee;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tarlist li.mine{background:rgba(255,255,255,.07)}.tarlist .rk{color:#777}.tarlist li:nth-child(-n+3) .rk{color:#fff;font-weight:700}
 .tagrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
@@ -1464,7 +1466,7 @@ const CLSM={archer:[1.15,1.1],sword:[1.05,1.2],ninja:[.86,.9],gunner:[.66,.75],w
 const SHB={shield:1,golem:.25,m_titan:.8,titan:.45};
 function shieldBreak(e,dir){e.noShield=true;e.shHP=0;const sx=e.x+e.face*.14*e.size,sh=e.h+.55*e.size;ftext(e.x,e.h+1.2*e.size,'SHIELD BREAK',true);sfx('shatter');shake(.25);sparks(sx,sh,-dir,14,1.3);
   for(let q=0;q<9;q++)kfx.push({t:'shell',x:sx,h:sh+rnd(-.2,.2)*e.size,vx:-dir*rnd(-1,3),vh:rnd(1.5,4),life:1.2,max:1.2,r:rnd(0,6),big:1});if(!TY[e.kind].boss)setState(e,'hurt',.9);else e.flash=.2}
-function hitEnemy(e,dmg,kind,dir,kb){if(e.hell)return;if(e.ptrans>0){if(Math.random()<.3)ftext(e.x,e.h+e.size*1.1,'IMMUNE');return}if(CLSM[G.cls]&&!bt()&&kind!=='ally')dmg*=CLSM[G.cls][kind==='pult'?1:0];if(G.cls==='wolf'&&kind!=='ally'&&bfOn('wolf'))dmg*=.88;if(POW[kind]||ATK[kind])dmg*=p.atk||1;if(kind!=='ally')dmg*=(G.wk||1)*pBuffMul();if(POW[kind]||ATK[kind]||kind==='ally'||kind==='pult')e.byP=true;if(p&&kind!=='pult'&&!bfOn('wolf')&&(POW[kind]||ATK[kind]||kind==='ally')&&!bt()&&!p.pult&&!G.uo)p.ultG=Math.min(100,(p.ultG||0)+dmg*.45*(G.cls==='necro'?.4:1));
+function hitEnemy(e,dmg,kind,dir,kb){if(dmg>0&&e&&e.kind!=='hero')try{skinHit(e)}catch(_){}if(e.hell)return;if(e.ptrans>0){if(Math.random()<.3)ftext(e.x,e.h+e.size*1.1,'IMMUNE');return}if(CLSM[G.cls]&&!bt()&&kind!=='ally')dmg*=CLSM[G.cls][kind==='pult'?1:0];if(G.cls==='wolf'&&kind!=='ally'&&bfOn('wolf'))dmg*=.88;if(POW[kind]||ATK[kind])dmg*=p.atk||1;if(kind!=='ally')dmg*=(G.wk||1)*pBuffMul();if(POW[kind]||ATK[kind]||kind==='ally'||kind==='pult')e.byP=true;if(p&&kind!=='pult'&&!bfOn('wolf')&&(POW[kind]||ATK[kind]||kind==='ally')&&!bt()&&!p.pult&&!G.uo)p.ultG=Math.min(100,(p.ultG||0)+dmg*.45*(G.cls==='necro'?.4:1));
   if(SHB[e.kind]&&!e.noShield&&e.face===-dir&&e.state!=='dead'&&BREAK[kind]&&e.state!=='hurt'){if(e.shHP==null){e.shMax=e.max*SHB[e.kind];e.shHP=e.shMax}e.shHP-=dmg*.5;e.shFl=.12;if(e.shHP<=0)shieldBreak(e,dir)}
   if(SHB[e.kind]&&!e.noShield&&e.face===-dir&&e.state!=='hurt'&&e.state!=='dead'&&!BREAK[kind]){if(e.shHP==null){e.shMax=e.max*SHB[e.kind];e.shHP=e.shMax}e.shHP-=dmg;e.shFl=.12;const bd=Math.max(1,Math.round(dmg*.15));e.hp-=bd;e.flash=.05;e.vx=dir*.6;if(e.shHP<=0){shieldBreak(e,dir);if(e.hp<=0)kill(e,dir);return}
     ftext(e.x,e.h+1.15*e.size,'BLOCK');sparks(e.x+e.face*.14*e.size,e.h+.55*e.size,-dir,5,.8);sfx('block');if(e.hp<=0)kill(e,dir);return}
@@ -2014,7 +2016,7 @@ const SKINS={
   seonbi:{name:'암행어사',price:1400,ink:'#ffe6d6',glow:'rgba(255,120,80,.95)',desc:'마패를 품은 암행어사. 붉은빛으로 빛나요.'},
   grad:{name:'박사 졸업',price:1600,ink:'#e6eeff',glow:'rgba(120,170,255,.95)',desc:'드디어 졸업한 박사. 푸른빛으로 빛나요.'},
 };
-function heroSkinOn(e){const cl=(e&&e.cls)||G.cls||'base';if(e&&e.skin!=null)return e.skin?cl:null;if(bt())return null;if(G.admin)return G.adminSkin?cl:null;return SHOP.skinOn[cl]&&(ownS(cl)||(cl==='bard'&&(SHOP.skinV||{}).bard==='violin'&&(DEV.on||(SHOP.skins2||[]).includes('bard'))))?cl:null}
+function heroSkinOn(e){const cl=(e&&e.cls)||G.cls||'base';if(e&&e.skin!=null)return e.skin?cl:null;if(bt())return null;if(G.admin)return G.adminSkin?cl:null;return SHOP.skinOn[cl]&&skinOwned(cl,(SHOP.skinV||{})[cl]||cl)?cl:null}
 function bardViolin(e){return !!e&&e.kind==='hero'&&heroSkinOn(e)==='bard'&&(e.vio!=null?!!e.vio:((SHOP.skinV||{}).bard==='violin'&&(e===p||e.skin==null)))}
 function drawViolin(c,o,d,T,S,st,e,play,smash){const sh=o.sh,hp=o.hip;let cen,u;
   if(play){cen=[sh[0]+d*.14,sh[1]+.0];u=[d*.97,-.24]}else{cen=[(sh[0]+hp[0])/2-d*.13,(sh[1]+hp[1])/2];u=[d*.45,-.89]}if(smash){const hd=o.fa[2],el=o.fa[1],dx=hd[0]-el[0],dy=hd[1]-el[1],dl=Math.hypot(dx,dy)||1;u=[dx/dl,dy/dl];cen=[hd[0]+u[0]*.22,hd[1]+u[1]*.22]}
@@ -2028,7 +2030,7 @@ function drawViolin(c,o,d,T,S,st,e,play,smash){const sh=o.sh,hp=o.hip;let cen,u;
   c.restore()}
 
 const SKIN2={bard:{id:'violin',name:'바이올리니스트',price:5200,ink:'#f1e6ff',glow:'rgba(185,135,255,.95)',desc:'나비넥타이를 맨 바이올리니스트. 기타 대신 바이올린을 켜고, 보랏빛으로 빛나요. 음표 소리가 바이올린 소리로 바뀌어요.'}};
-function heroStyle(e){const sk=heroSkinOn(e),up=e===p&&p&&p.pult;if(!sk)return up?{...STY.hero,glow:.5,glowC:'rgba(255,255,255,1)'}:STY.hero;const S2=(sk==='bard'&&bardViolin(e))?SKIN2.bard:SKINS[sk];return{ink:S2.ink,glow:up?.55:.22,glowC:S2.glow,lw:STY.hero.lw}}
+function heroStyle(e){const sk=heroSkinOn(e),up=e===p&&p&&p.pult;if(!sk)return up?{...STY.hero,glow:.5,glowC:'rgba(255,255,255,1)'}:STY.hero;const xid=skinIdOf(e),XS=xid&&xid!==sk&&xid!=='violin'?(SKINX[sk]||[]).find(q=>q.id===xid):null,S2=XS||((sk==='bard'&&bardViolin(e))?SKIN2.bard:SKINS[sk]);return{ink:S2.ink,glow:up?.55:.22,glowC:S2.glow,lw:STY.hero.lw}}
 function drawSkinAcc(sk,c,o,d,T,S,st,e){const hc=o.hc,r=SK.head,line=(a0,b0)=>{const a=T(a0),b=T(b0);c.beginPath();c.moveTo(a[0],a[1]);c.lineTo(b[0],b[1]);c.stroke()},t=performance.now()/1000;
   c.strokeStyle=st.ink;c.fillStyle=st.ink;c.shadowColor=st.glowC;c.shadowBlur=S*.1;c.lineWidth=Math.max(1.3,S*.022);
   switch(sk){
@@ -2110,7 +2112,7 @@ function doPortal(s2,e){if(s2.done)return;s2.done=1;const dir=Math.sign(s2.vx)||
   fx.push({t:'r',x:p.x,y:p.h+.5,vx:0,vy:0,life:.3,max:.3,r:.5,w:3});sparks(p.x,p.h+.5,-dir,8,1);p.x=x;p.inv=Math.max(p.inv,.3);fx.push({t:'r',x:p.x,y:p.h+.5,vx:0,vy:0,life:.3,max:.3,r:.5,w:3});sparks(p.x,p.h+.5,dir,8,1);sfx('dodge');
   if(e&&e.state!=='dead'){p.face=dir;hitEnemy(e,18,'wpnH',dir,2.6)}}
 function updPshots(dt){
-  for(const s2 of pshots){if(s2.fu===undefined)s2.fu=!!(p.pult||s2.ult);G.uo=s2.fu;G.netR=!!s2.remote;if(s2.ult&&Math.random()<dt*40)fx.push({t:'e',x:s2.x,y:s2.h,vx:-s2.vx*.05,vy:-s2.vh*.05+.2,life:.3,max:.3,r:s2.big?.05:.018});if(s2.big&&s2.up!==windUp&&Math.random()<dt*60)fx.push({t:'s',x:s2.x-Math.sign(s2.vx)*.2,y:s2.h+rnd(-.15,.15),vx:-s2.vx*.3,vy:rnd(-1,1),life:.3,max:.3,big:true});
+  for(const s2 of pshots){if(!s2.remote&&s2.life>0&&Math.random()<dt*9)try{skinTrail(s2)}catch(_){};if(s2.fu===undefined)s2.fu=!!(p.pult||s2.ult);G.uo=s2.fu;G.netR=!!s2.remote;if(s2.ult&&Math.random()<dt*40)fx.push({t:'e',x:s2.x,y:s2.h,vx:-s2.vx*.05,vy:-s2.vh*.05+.2,life:.3,max:.3,r:s2.big?.05:.018});if(s2.big&&s2.up!==windUp&&Math.random()<dt*60)fx.push({t:'s',x:s2.x-Math.sign(s2.vx)*.2,y:s2.h+rnd(-.15,.15),vx:-s2.vx*.3,vy:rnd(-1,1),life:.3,max:.3,big:true});
   if(s2.fire&&Math.random()<dt*50)fx.push({t:'fl',x:s2.x-Math.sign(s2.vx)*.1,y:s2.h,vx:rnd(-.3,.3),vy:rnd(.2,.8),life:rnd(.25,.45),max:.45,r:rnd(.025,.05)});
   if(s2.kind==='rocket'&&Math.random()<dt*60)fx.push({t:'fs',x:s2.x,y:s2.h,vx:-s2.vx*.15+rnd(-.6,.6),vy:-s2.vh*.15+rnd(-.6,.6),life:rnd(.25,.5),max:.5,hue:s2.hue});
   const ox=s2.px!=null?s2.px:s2.x;s2.px=null;
@@ -3189,37 +3191,45 @@ $('#admOk').onclick=admTry;$('#admCancel').onclick=()=>{$('#admCode').hidden=tru
 $('#admIn').addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter')admTry();else if(e.key==='Escape')$('#admCode').hidden=true});
 $('#admClose').onclick=()=>{$('#admPanel').hidden=true};$('#admWaves').onclick=()=>openWaves(9999,-1,{admin:true});
 /* shop UI */
-let shopI=0,shopDrag=null;const LOCKSVG='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M8.2 10.5V7.6a3.8 3.8 0 0 1 7.6 0v2.9" fill="none" stroke="currentColor" stroke-width="2.2"/></svg>';
+let shopI=0,shopDrag=null,shopTab='char',skinI=0;const LOCKSVG='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M8.2 10.5V7.6a3.8 3.8 0 0 1 7.6 0v2.9" fill="none" stroke="currentColor" stroke-width="2.2"/></svg>';
 let shopPv=null;
 function openShop(){shopPv=null;shopI=Math.max(0,CLSK.indexOf(G.cls));$('#shopBack').hidden=false;buildShop()}
 function closeShop(){shopPv=null;$('#shopBack').hidden=true;showBest()}
-function buildShop(){const tr=$('#sTrack');tr.innerHTML=CLSK.map((k,i)=>{const c=CLS[k],own=ownC(k);return`<div class="scard${own?' own':''}" data-i="${i}"><canvas data-k="${k}"></canvas><b>${own?c.name:'???'}</b><small>${own?(G.cls===k?'사용 중':'보유'):LOCKSVG+(c.price||0).toLocaleString()+' 코인'}</small></div>`}).join('');
+function buildShop(){const tr=$('#sTrack');if(shopTab==='skin'&&!ownC(CLSK[shopI]))shopTab='char';if(shopTab==='skin'){const k=CLSK[shopI],L=skinList(k);skinI=clamp(skinI,0,Math.max(0,L.length-1));tr.innerHTML=L.map((sk,i)=>{const ow=skinOwned(k,sk.id),eq=skinEq(k)===sk.id;return`<div class="scard${ow?' own':''}" data-i="${i}"><canvas data-k="${k}" data-sk="${sk.id}"></canvas><b>${sk.name}</b><small>${eq?'착용 중':ow?'보유':LOCKSVG+skinPrice(k,sk.id).toLocaleString()+' 코인'}</small></div>`}).join('');
+    tr.querySelectorAll('.scard').forEach(el=>el.addEventListener('click',()=>{if(shopDrag&&shopDrag.moved)return;const i=+el.dataset.i;if(i!==skinI){skinI=i;layoutShop()}}));layoutShop();return}
+  tr.innerHTML=CLSK.map((k,i)=>{const c=CLS[k],own=ownC(k);return`<div class="scard${own?' own':''}" data-i="${i}"><canvas data-k="${k}"></canvas><b>${own?c.name:'???'}</b><small>${own?(G.cls===k?'사용 중':'보유'):LOCKSVG+(c.price||0).toLocaleString()+' 코인'}</small></div>`}).join('');
   tr.querySelectorAll('.scard').forEach(el=>el.addEventListener('click',()=>{if(shopDrag&&shopDrag.moved)return;const i=+el.dataset.i;if(i!==shopI){shopI=i;layoutShop()}}));layoutShop()}
 function layoutShop(dx){const st=$('#sStage').getBoundingClientRect(),cw=Math.max(110,Math.min(230,st.width*.3,(st.height*.94-46)/1.05));$('#sTrack').style.setProperty('--cw',cw+'px');
-  $('#sTrack').querySelectorAll('.scard').forEach(el=>{const i=+el.dataset.i,off=i-shopI+(dx||0)/(cw*.95),ao=Math.abs(off),sc=ao<1?lerp(1,.76,ao):ao<2?lerp(.76,.6,ao-1):.6,bl=ao<1?ao*2:2+(ao-1)*1.5,op=ao<1?lerp(1,.5,ao):ao<2?lerp(.5,.28,ao-1):Math.max(0,.28-(ao-2)*.3);
+  const CUR=shopTab==='skin'?skinI:shopI;$('#sTrack').querySelectorAll('.scard').forEach(el=>{const i=+el.dataset.i,off=i-CUR+(dx||0)/(cw*.95),ao=Math.abs(off),sc=ao<1?lerp(1,.76,ao):ao<2?lerp(.76,.6,ao-1):.6,bl=ao<1?ao*2:2+(ao-1)*1.5,op=ao<1?lerp(1,.5,ao):ao<2?lerp(.5,.28,ao-1):Math.max(0,.28-(ao-2)*.3);
     const xo=Math.sign(off)*(ao<1?ao*cw*.95:cw*.95+(Math.min(ao,3)-1)*cw*.72);el.style.transform=`translate(calc(-50% + ${xo}px),-50%) scale(${sc})`;el.style.filter='none';el.style.opacity=(op*(ao<.05?1:.85)).toFixed(2);el.style.zIndex=String(10-Math.round(ao*2));el.style.pointerEvents=ao>2.5?'none':'auto';el.classList.toggle('dragging',dx!=null)});
   if(dx==null)shopInfo()}
-function shopInfo(){const k=CLSK[shopI],c=CLS[k],own=ownC(k),sel=G.cls===k,prevOk=shopI===0||ownC(CLSK[shopI-1]);$('#shopExp').innerHTML='<span class="coinhud"><svg class=\"dico coini\" viewBox=\"0 0 24 24\" width=\"14\" height=\"14\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"8.5\"/><circle cx=\"12\" cy=\"12\" r=\"4.5\"/></svg>'+coinTxt()+'</span>';$('#shopExp').style.display='';
+function shopTabs(k,own){const n=skinList(k).length;return`<div class="stabs"><button data-t="char" class="${shopTab==='char'?'on':''}">캐릭터</button><button data-t="skin" class="${shopTab==='skin'?'on':''}"${own?'':' disabled'}>스킨 · ${n}</button></div>`}
+function bindShopTabs(){$('#sInfo').querySelectorAll('.stabs button').forEach(b=>b.onclick=()=>{if(b.disabled)return;const t=b.dataset.t;if(t===shopTab)return;shopTab=t;const k=CLSK[shopI];if(t==='skin'){const L=skinList(k),e=skinEq(k);skinI=Math.max(0,L.findIndex(q=>q.id===e))}sfx('ui');buildShop()})}
+function skinInfo(){const k=CLSK[shopI],c=CLS[k],L=skinList(k),sk=L[skinI];if(!sk){shopTab='char';return shopInfo()}const ow=skinOwned(k,sk.id),eq=skinEq(k)===sk.id,pr=skinPrice(k,sk.id),fx=SKFX[sk.id];
+  let b;if(!ow)b=coinOK(pr)?`<button class="sbuy" id="skAct">구매 · ${pr.toLocaleString()} 코인</button>`:`<button class="sbuy" disabled>코인 부족 · ${COIN.toLocaleString()} / ${pr.toLocaleString()}</button>`;else b=`<button class="sbuy${eq?' ghost':''}" id="skAct">${eq?'착용 해제':'착용하기'}</button>`;
+  $('#sInfo').innerHTML=shopTabs(k,true)+`<div class="shd"><h3>${sk.name}<span>${c.name} 스킨</span><span>${skinI+1} / ${L.length}</span></h3>${b}</div><div class="sgrid"><div class="scol"><p class="sdesc">${sk.desc}</p>${fx?`<div class="sbox"><div class="sbt">고유 이펙트</div><p>${fx.d}</p></div>`:''}<p style="font-size:12px;color:var(--dim)">스킨은 모습과 이펙트만 바꾸고 성능은 그대로예요. 옆으로 넘기면 다른 스킨을 볼 수 있어요.</p></div></div>`;
+  const a=$('#skAct');if(a)a.onclick=()=>{if(!ow){if(!buySkin(k,sk.id))return;setSkin(k,sk.id)}else setSkin(k,eq?null:sk.id);buildShop()};bindShopTabs()}
+function shopInfo(){if(shopTab==='skin')return skinInfo();const k=CLSK[shopI],c=CLS[k],own=ownC(k),sel=G.cls===k,prevOk=shopI===0||ownC(CLSK[shopI-1]);$('#shopExp').innerHTML='<span class="coinhud"><svg class=\"dico coini\" viewBox=\"0 0 24 24\" width=\"14\" height=\"14\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"8.5\"/><circle cx=\"12\" cy=\"12\" r=\"4.5\"/></svg>'+coinTxt()+'</span>';$('#shopExp').style.display='';
   const v=(SHOP.vars||{})[k]||(c.vars?c.vars[0][0]:''),sk=SKINS[k],skOwn=ownS(k),skOn=!!SHOP.skinOn[k]&&!(k==='bard'&&(SHOP.skinV||{}).bard==='violin'),bar=n=>'<i class="on"></i>'.repeat(n)+'<i></i>'.repeat(5-n);
   let btn;if(sel)btn='<button class="sbuy ghost" disabled>사용 중</button>';else if(own)btn='<button class="sbuy ghost" id="sAct">선택하기</button>';else if(!prevOk)btn=`<button class="sbuy" disabled>이전 캐릭터 먼저 잠금 해제</button>`;else if(!coinOK(c.price||0))btn=`<button class="sbuy" disabled>코인 부족 · ${COIN.toLocaleString()} / ${(c.price||0).toLocaleString()}</button>`;else btn=`<button class="sbuy" id="sAct">구매 · ${(c.price||0).toLocaleString()} 코인</button>`;
   let sbtn,pvb=own&&!(skOwn&&skOn)?`<button class="sbuy ghost" id="sPvSkin" style="margin-top:6px">${shopPv===k?'미리보기 끄기':'스킨 미리보기'}</button>`:'';if(!own)sbtn='<button class="sbuy" disabled>캐릭터를 먼저 잠금 해제하세요</button>';else if(!skOwn)sbtn=coinOK(skPrice(k))?`<button class="sbuy" id="sSkin">스킨 구매 · ${skPrice(k).toLocaleString()} 코인</button>`:`<button class="sbuy" disabled>코인 부족 · ${COIN.toLocaleString()} / ${skPrice(k).toLocaleString()}</button>`;else sbtn=`<button class="sbuy ghost" id="sSkin">${skOn?'착용 해제':'착용하기'}</button>`;
-  $('#sInfo').innerHTML=`<div class="shd"><h3>${c.name}<span>${c.job}</span><span>무기 · ${c.wpn}</span></h3>${btn}</div>
+  $('#sInfo').innerHTML=shopTabs(k,own)+`<div class="shd"><h3>${c.name}<span>${c.job}</span><span>무기 · ${c.wpn}</span></h3>${btn}</div>
   <div class="sgrid"><div class="scol"><p class="sdesc">${c.desc}</p>${c.kit?`<div class="sbox"><div class="sbt">전용 기술</div><dl class="sstats" style="gap:7px 12px">${c.kit.map(q=>`<dt><kbd>${q[0]}</kbd></dt><dd style="display:block;font-size:12.5px;color:var(--dim)"><b style="color:var(--ink);font-weight:600">${q[1]}</b> · ${q[2]}</dd>`).join('')}</dl></div>`:''}<dl class="sstats"><dt>공격력</dt><dd>${bar(c.st[0])}</dd><dt>사거리</dt><dd>${bar(c.st[1])}</dd><dt>속도</dt><dd>${bar(c.st[2])}</dd></dl>
     ${c.vars&&own?`<div class="vars">${c.vars.map(([id,nm])=>`<button data-v="${id}" class="${id===v?'on':''}">${nm}</button>`).join('')}</div>`:''}</div>
   <div class="scol"><div class="sbox"><div class="sbt">필살기<b>${c.ult.en}</b><span>PC R · 모바일 ★</span></div><p>${c.ult.desc}</p><p style="font-size:11.5px">공격하거나 맞으면 ULT 게이지가 차요. 가득 차면 발동할 수 있어요.</p></div>
-    <div class="sbox"><div class="sbt">고유 스킨<b>${sk.name}</b>${skOwn?'<span>보유</span>':(own?'<span>잠김 · 미리보기 가능</span>':'')}</div><p>${sk.desc}</p>${sbtn}${pvb}</div>${k==='bard'&&own?vioBox():''}</div></div>`;
-  if(!own)$('#sInfo').innerHTML=`<div class="shd"><h3>???<span>LOCKED</span><span>가격 · ${(c.price||0).toLocaleString()} 코인</span></h3>${btn}</div><div class="sgrid"><div class="scol"><p class="sdesc" style="color:var(--dim)">아직 잠겨 있는 캐릭터예요. 구매하면 모습과 무기, 전용 기술, 필살기, 고유 스킨이 공개돼요.</p></div></div>`;
+    <div class="sbox"><div class="sbt">스킨<b>${skinList(k).length}종</b><span>${skinEq(k)?'착용 중 · '+(skinList(k).find(q=>q.id===skinEq(k))||{}).name:'기본 모습'}</span></div><p>위의 <b>스킨</b> 탭에서 옆으로 넘기며 스킨을 보고 구매·착용할 수 있어요.</p></div></div></div>`;
+  if(!own)$('#sInfo').innerHTML=shopTabs(k,false)+`<div class="shd"><h3>???<span>LOCKED</span><span>가격 · ${(c.price||0).toLocaleString()} 코인</span></h3>${btn}</div><div class="sgrid"><div class="scol"><p class="sdesc" style="color:var(--dim)">아직 잠겨 있는 캐릭터예요. 구매하면 모습과 무기, 전용 기술, 필살기, 고유 스킨이 공개돼요.</p></div></div>`;
   const pv=$('#sPvSkin');if(pv)pv.onclick=()=>{shopPv=shopPv===k?null:k;buildShop()};
   const act=$('#sAct');if(act)act.onclick=()=>{if(!own){if(!prevOk||!coinOK(c.price||0))return;if(!DEV.on)COIN-=(c.price||0);SHOP.owned.push(k);sfx('wave')}SHOP.cls=k;G.cls=k;saveShop();buildShop()};
   const sb2=$('#sSkin');if(sb2)sb2.onclick=()=>{SHOP.skinV=SHOP.skinV||{};if(!skOwn){if(!coinOK(skPrice(k)))return;if(!DEV.on)COIN-=skPrice(k);SHOP.skins.push(k);SHOP.skinOn[k]=true;delete SHOP.skinV[k];sfx('wave')}else if(skOn)SHOP.skinOn[k]=false;else{SHOP.skinOn[k]=true;delete SHOP.skinV[k]}saveShop();buildShop()};
   const vb=$('#sVio');if(vb)vb.onclick=()=>{SHOP.skinV=SHOP.skinV||{};SHOP.skins2=SHOP.skins2||[];const vo=DEV.on||SHOP.skins2.includes('bard'),von=SHOP.skinOn.bard&&SHOP.skinV.bard==='violin';if(!vo){if(!coinOK(SKIN2.bard.price))return;if(!DEV.on)COIN-=SKIN2.bard.price;SHOP.skins2.push('bard');SHOP.skinOn.bard=true;SHOP.skinV.bard='violin';sfx('wave')}else if(von){SHOP.skinOn.bard=false;delete SHOP.skinV.bard}else{SHOP.skinOn.bard=true;SHOP.skinV.bard='violin'}saveShop();buildShop()};
-  $('#sInfo').querySelectorAll('.vars button').forEach(b2=>b2.onclick=()=>{SHOP.vars=SHOP.vars||{};SHOP.vars[k]=b2.dataset.v;G.clsVar=SHOP.vars;saveShop();shopInfo()})}
+  $('#sInfo').querySelectorAll('.vars button').forEach(b2=>b2.onclick=()=>{SHOP.vars=SHOP.vars||{};SHOP.vars[k]=b2.dataset.v;G.clsVar=SHOP.vars;saveShop();shopInfo()});bindShopTabs()}
 function vioBox(){const S2=SKIN2.bard,vo=DEV.on||(SHOP.skins2||[]).includes('bard'),von=SHOP.skinOn.bard&&(SHOP.skinV||{}).bard==='violin';const b=!vo?(coinOK(S2.price)?`<button class="sbuy" id="sVio">스킨 구매 · ${S2.price.toLocaleString()} 코인</button>`:`<button class="sbuy" disabled>코인 부족 · ${COIN.toLocaleString()} / ${S2.price.toLocaleString()}</button>`):`<button class="sbuy ghost" id="sVio">${von?'착용 해제':'착용하기'}</button>`;return`<div class="sbox"><div class="sbt">추가 스킨<b>${S2.name}</b>${vo?'<span>보유</span>':''}</div><p>${S2.desc}</p>${b}</div>`}
-function shopGo(d){shopI=clamp(shopI+d,0,CLSK.length-1);layoutShop()}
+function shopGo(d){if(shopTab==='skin'){skinI=clamp(skinI+d,0,skinList(CLSK[shopI]).length-1);layoutShop();return}shopI=clamp(shopI+d,0,CLSK.length-1);layoutShop()}
 $('#shopBtn').onclick=()=>{closeTut();openShop()};$('#shopClose').onclick=closeShop;$('#sPrev').onclick=e=>{e.stopPropagation();shopGo(-1)};$('#sNext').onclick=e=>{e.stopPropagation();shopGo(1)};
 {const stg=$('#sStage');stg.addEventListener('pointerdown',e=>{if(e.target.closest('.snav'))return;shopDrag={x:e.clientX,id:e.pointerId,moved:false}});
   stg.addEventListener('pointermove',e=>{if(!shopDrag||e.pointerId!==shopDrag.id)return;const dx=e.clientX-shopDrag.x;if(Math.abs(dx)>6)shopDrag.moved=true;if(shopDrag.moved)layoutShop(dx)});
-  const end=e=>{if(!shopDrag||e.pointerId!==shopDrag.id)return;const dx=e.clientX-shopDrag.x,cw=parseFloat($('#sTrack').style.getPropertyValue('--cw'))||200;if(shopDrag.moved){shopI=clamp(shopI-Math.round(dx/(cw*.95)),0,CLSK.length-1);layoutShop()}setTimeout(()=>{shopDrag=null},0)};
+  const end=e=>{if(!shopDrag||e.pointerId!==shopDrag.id)return;const dx=e.clientX-shopDrag.x,cw=parseFloat($('#sTrack').style.getPropertyValue('--cw'))||200;if(shopDrag.moved){if(shopTab==='skin')skinI=clamp(skinI-Math.round(dx/(cw*.95)),0,skinList(CLSK[shopI]).length-1);else shopI=clamp(shopI-Math.round(dx/(cw*.95)),0,CLSK.length-1);layoutShop()}setTimeout(()=>{shopDrag=null},0)};
   stg.addEventListener('pointerup',end);stg.addEventListener('pointercancel',end)}
 addEventListener('keydown',e=>{if($('#shopBack').hidden)return;if(e.key==='ArrowLeft')shopGo(-1);else if(e.key==='ArrowRight')shopGo(1);else if(e.key==='Escape')closeShop()});
 addEventListener('resize',()=>{if(!$('#shopBack').hidden)layoutShop()});
@@ -3234,31 +3244,39 @@ function drawSilhouette(c,cv2,f,P,x,gy,u,d){silCv=silCv||document.createElement(
 function drawLockedFig(c,w,gy,u,dt,T,key){const f=lockFig[key]||(lockFig[key]={kind:'hero',cls:'base',skin:false,x:0,h:0,size:1,face:1,state:'idle',st:0,dur:0,w:.3,phase:0,seed:3});c.save();c.filter='blur(2px)';drawFig(c,f,smooth(f,pose(f,T),dt),w/2,gy,u,.16);c.restore();
   c.save();c.fillStyle='rgba(245,245,245,.85)';c.shadowColor='rgba(255,255,255,.6)';c.shadowBlur=12;c.font=`700 ${Math.round(u*.42)}px ${FONT.disp}`;c.textAlign='center';c.textBaseline='middle';c.fillText('?',w/2,gy-u*.5);c.restore()}
 /* ---------- character select ---------- */
-let charSel='base';const charFig={};
+let charTab='info',charSkI=0,charSel='base';const charFig={};
 let charPv=null;
 function openChar(){charPv=null;charSel=SHOP.cls||'base';$('#charBack').hidden=false;buildChar()}
 function closeChar(){charPv=null;$('#charBack').hidden=true;showBest()}
 function progTxt(k){const g=getProg(k),m=Math.max(g.max||0,g.idx||0);return m>0?`최고 R${Math.floor(m/5)+1}-${m%5+1}`:'기록 없음'}
 function buildChar(){const cur=SHOP.cls||'base';$('#charCur').textContent=CLS[cur].name;
   $('#charGrid').innerHTML=CLSK.map(k=>{const own=ownC(k);return`<button class="ctile${k===charSel?' sel':''}${k===cur?' cur':''}${own?'':' lock'}" data-k="${k}"><canvas data-k="${k}"></canvas><b>${own?CLS[k].name:'???'}</b><small>${own?progTxt(k):LOCKSVG+(CLS[k].price||0).toLocaleString()+' 코인'}</small></button>`}).join('');
-  $('#charGrid').querySelectorAll('.ctile').forEach(b=>b.onclick=()=>{charSel=b.dataset.k;buildChar();sfx('dodge');if(innerWidth<=720){const cb=$('#charBack .cbody');try{cb.scrollTo({top:0,behavior:'smooth'})}catch(_){cb.scrollTop=0}}});
+  $('#charGrid').querySelectorAll('.ctile').forEach(b=>b.onclick=()=>{if(charSel!==b.dataset.k){charTab='info'}charSel=b.dataset.k;buildChar();sfx('dodge');if(innerWidth<=720){const cb=$('#charBack .cbody');try{cb.scrollTo({top:0,behavior:'smooth'})}catch(_){cb.scrollTop=0}}});
   const k=charSel,c=CLS[k],own=ownC(k),sk=SKINS[k],skOwn=ownS(k)||(k==="bard"&&(SHOP.skins2||[]).includes("bard")),skOn=!!SHOP.skinOn[k],v=(SHOP.vars||{})[k]||(c.vars?c.vars[0][0]:'');
   let btn;if(k===cur)btn='<button class="sbuy ghost" disabled>사용 중</button>';else if(own)btn='<button class="sbuy" id="cPick">이 캐릭터로 선택</button>';else btn='<button class="sbuy ghost" id="cShop">상점에서 구매하기</button>';
   if(!own){$('#charInfo').innerHTML=`<h3>???<span>LOCKED</span><span>가격 · ${(CLS[k].price||0).toLocaleString()} 코인</span></h3><p class="sdesc" style="font-size:13.5px;color:var(--dim)">아직 잠겨 있는 캐릭터예요. 상점에서 잠금 해제하면 모습과 능력이 공개돼요.</p><div class="cact">${btn}</div>`;const cs0=$('#cShop');if(cs0)cs0.onclick=()=>{closeChar();openShop();shopI=CLSK.indexOf(k);layoutShop();buildShop()};return}
-  $('#charInfo').innerHTML=`<h3>${c.name}<span>${c.job}</span></h3><div class="crow"><span class="ctag">무기 · ${c.wpn}</span><span class="ctag">필살기 · ${c.ult.en}</span><span class="ctag">${progTxt(k)}</span></div>
+  const ctabs=`<div class="stabs"><button data-t="info" class="${charTab==='info'?'on':''}">정보</button><button data-t="skin" class="${charTab==='skin'?'on':''}">스킨 · ${skinList(k).length}</button></div>`;
+  if(charTab==='skin'){const L=skinList(k);charSkI=clamp(charSkI,0,Math.max(0,L.length-1));const sk=L[charSkI],ow=sk&&skinOwned(k,sk.id),eq=sk&&skinEq(k)===sk.id,pr=sk?skinPrice(k,sk.id):0,fx=sk&&SKFX[sk.id];
+    const sb=!sk?'':!ow?(coinOK(pr)?`<button class="sbuy" id="cSkAct">구매 · ${pr.toLocaleString()} 코인</button>`:`<button class="sbuy" disabled>코인 부족 · ${COIN.toLocaleString()} / ${pr.toLocaleString()}</button>`):`<button class="sbuy${eq?' ghost':''}" id="cSkAct">${eq?'착용 해제':'이 스킨 착용'}</button>`;
+    $('#charInfo').innerHTML=`<h3>${c.name}<span>${c.job}</span></h3>${ctabs}${sk?`<div class="cskn"><button class="nav" id="cSkP" ${charSkI<=0?'disabled':''} aria-label="이전 스킨">‹</button><div class="nm">${sk.name}<div style="font-size:11px;color:var(--dim);font-weight:400">${charSkI+1} / ${L.length} · ${eq?'착용 중':ow?'보유':'미보유'}</div></div><button class="nav" id="cSkN" ${charSkI>=L.length-1?'disabled':''} aria-label="다음 스킨">›</button></div><p class="sdesc" style="font-size:13px;color:var(--dim)">${sk.desc}</p>${fx?`<p class="sdesc" style="font-size:12.5px"><b>고유 이펙트</b> · ${fx.d}</p>`:''}<p style="font-size:11.5px;color:var(--dim)">스킨은 모습과 이펙트만 바꾸고 성능은 그대로예요. 위 미리보기를 옆으로 밀어도 넘어가요.</p>`:'<p class="sdesc">스킨이 없어요.</p>'}<div class="cact">${sb}</div>`;
+    const go=d=>{charSkI=clamp(charSkI+d,0,L.length-1);sfx('ui');buildChar()};const pb=$('#cSkP'),nb=$('#cSkN');if(pb)pb.onclick=()=>go(-1);if(nb)nb.onclick=()=>go(1);
+    const ca=$('#cSkAct');if(ca)ca.onclick=()=>{if(!ow){if(!buySkin(k,sk.id))return;setSkin(k,sk.id)}else setSkin(k,eq?null:sk.id);buildChar()};
+    $('#charInfo').querySelectorAll('.stabs button').forEach(b=>b.onclick=()=>{charTab=b.dataset.t;buildChar()});return}
+  $('#charInfo').innerHTML=`<h3>${c.name}<span>${c.job}</span></h3>${ctabs}<div class="crow"><span class="ctag">무기 · ${c.wpn}</span><span class="ctag">필살기 · ${c.ult.en}</span><span class="ctag">${progTxt(k)}</span></div>
     <p class="sdesc" style="font-size:13.5px;color:var(--dim)">${c.desc}</p>
     ${c.vars&&own?`<div class="vars">${c.vars.map(([id,nm])=>`<button data-v="${id}" class="${id===v?'on':''}">${nm}</button>`).join('')}</div>`:''}
-    ${own&&skOwn?`<label class="admsk"><input type="checkbox" id="cSkin" ${skOn?'checked':''}> 고유 스킨 · ${sk.name}</label>`:''}${own&&!skOwn?`<div class="crow"><span class="ctag">고유 스킨 · ${sk.name} · 상점에서 잠금 해제</span><button class="sbuy ghost" id="cPvSkin" style="padding:6px 12px;font-size:13px">${charPv===k?'미리보기 끄기':'스킨 미리보기'}</button></div>`:''}
+    <div class="crow"><span class="ctag">스킨 · ${skinEq(k)?(skinList(k).find(q=>q.id===skinEq(k))||{}).name+' 착용 중':'기본 모습'}</span></div>
     ${own&&k==='necro'?`<div class="sbt" style="margin-top:4px">영혼 보관함</div><div class="vault" id="cVault">${vaultBtns()}</div>`:''}
     <div class="cact">${btn}</div>`;
   const pk=$('#cPick');if(pk)pk.onclick=()=>{SHOP.cls=k;G.cls=k;saveShop();sfx('wave');buildChar()};
   const cs=$('#cShop');if(cs)cs.onclick=()=>{closeChar();openShop();shopI=CLSK.indexOf(k);layoutShop();buildShop()};
   {const pv=$('#cPvSkin');if(pv)pv.onclick=()=>{charPv=charPv===k?null:k;buildChar()}}bindVault($('#cVault'));const sc=$('#cSkin');if(sc)sc.onchange=()=>{SHOP.skinOn[k]=sc.checked;saveShop()};
-  $('#charInfo').querySelectorAll('.vars button').forEach(b=>b.onclick=()=>{SHOP.vars=SHOP.vars||{};SHOP.vars[k]=b.dataset.v;G.clsVar=SHOP.vars;saveShop();buildChar()})}
+  $('#charInfo').querySelectorAll('.vars button').forEach(b=>b.onclick=()=>{SHOP.vars=SHOP.vars||{};SHOP.vars[k]=b.dataset.v;G.clsVar=SHOP.vars;saveShop();buildChar()});
+  $('#charInfo').querySelectorAll('.stabs button').forEach(b=>b.onclick=()=>{charTab=b.dataset.t;if(charTab==='skin'){const L=skinList(k),e=skinEq(k);charSkI=Math.max(0,L.findIndex(q=>q.id===e))}buildChar()})}
 function drawCharFig(cv2,k,demo,dt,T,key){const d=Math.min(2,devicePixelRatio||1),w=cv2.clientWidth,h=cv2.clientHeight;if(!w)return;if(cv2.width!==Math.round(w*d)||cv2.height!==Math.round(h*d)){cv2.width=Math.round(w*d);cv2.height=Math.round(h*d)}
   const c=cv2.getContext('2d');c.setTransform(d,0,0,d,0,0);c.clearRect(0,0,w,h);const gy=h*.86,u=Math.min(h*.58,w*.5);
   c.save();c.strokeStyle='#f5f5f5';c.shadowColor='rgba(255,255,255,.7)';c.shadowBlur=8;c.lineWidth=1.5;c.beginPath();c.moveTo(w*.1,gy);c.lineTo(w*.9,gy);c.stroke();c.restore();
-  const f=charFig[key]||(charFig[key]={kind:'hero',cls:k,skin:false,x:0,h:0,size:1,face:1,state:'idle',st:0,dur:0,w:.3,phase:0,seed:CLSK.indexOf(k)});if(f.cls!==k){f.cls=k;f._p=null}f.cvar=(SHOP.vars||{})[k];f.skin=!!(SHOP.skinOn[k]&&ownS(k))||(demo&&charPv===k);
+  const f=charFig[key]||(charFig[key]={kind:'hero',cls:k,skin:false,x:0,h:0,size:1,face:1,state:'idle',st:0,dur:0,w:.3,phase:0,seed:CLSK.indexOf(k)});if(f.cls!==k){f.cls=k;f._p=null}f.cvar=(SHOP.vars||{})[k];{const e0=skinEq(k);f.skin=!!e0||(demo&&charPv===k);f.vio=e0==='violin';f.skinId=e0;if(demo&&charTab==='skin'){const sk=skinList(k)[charSkI];if(sk){f.skin=true;f.vio=sk.id==='violin';f.skinId=sk.id}}}
   if(demo){const [stt,du]=SDEMO[k],cyc=du+1.1,tt=T%cyc,n=Math.floor(T/cyc);if(tt<du){f.state=stt;f.st=tt;f.dur=du;f.w=stt==='punch'?.2:.3;f.wcfg=k==='sword'?{swk:n%4}:null}else{f.state=k==='sword'||tt>du+.6?'idle':'walk';f.phase=T*7.5}}else f.state='idle';
   if(!ownC(k)){f.state=k==='baseball'?'w_batc':'idle';f.batG=.75;f.st=0;f.dur=9;f.skin=false;drawSilhouette(c,cv2,f,smooth(f,pose(f,T),dt),w/2,gy,u,d);return}drawFig(c,f,smooth(f,pose(f,T),dt),w/2,gy,u)}
 function renderChar(dt,T){drawCharFig($('#charCv'),charSel,true,dt,T,'big');$('#charGrid').querySelectorAll('canvas').forEach(cv2=>drawCharFig(cv2,cv2.dataset.k,false,dt,T,'t_'+cv2.dataset.k))}
@@ -3266,11 +3284,11 @@ $('#charBtn').onclick=()=>{closeTut();openChar()};$('#charClose').onclick=closeC
 addEventListener('keydown',e=>{if($('#charBack').hidden)return;const i=CLSK.indexOf(charSel);if(e.key==='Escape')closeChar();else if(e.key==='ArrowRight'||e.key==='ArrowLeft'){charSel=CLSK[clamp(i+(e.key==='ArrowRight'?1:-1),0,CLSK.length-1)];buildChar()}else if(e.key==='Enter'&&ownC(charSel)){SHOP.cls=charSel;G.cls=charSel;saveShop();buildChar()}});
 showBest();
 function renderShop(dt,T){const d=Math.min(2,devicePixelRatio||1);
-  $('#sTrack').querySelectorAll('canvas').forEach((cv2,idx)=>{const k=cv2.dataset.k,i=CLSK.indexOf(k);if(Math.abs(i-shopI)>2)return;const r2=cv2.getBoundingClientRect(),w=cv2.clientWidth,h=cv2.clientHeight;if(!w)return;
+  $('#sTrack').querySelectorAll('canvas').forEach((cv2,idx)=>{const k=cv2.dataset.k,skid=cv2.dataset.sk,i=skid?idx:CLSK.indexOf(k),CUR=skid?skinI:shopI;if(Math.abs(i-CUR)>2)return;const r2=cv2.getBoundingClientRect(),w=cv2.clientWidth,h=cv2.clientHeight;if(!w)return;
     if(cv2.width!==Math.round(w*d)){cv2.width=w*d;cv2.height=h*d}const c=cv2.getContext('2d');c.setTransform(d,0,0,d,0,0);c.clearRect(0,0,w,h);const gy=h*.88,u=h*.5;
     c.save();c.strokeStyle='#f5f5f5';c.shadowColor='rgba(255,255,255,.7)';c.shadowBlur=8;c.lineWidth=1.5;c.beginPath();c.moveTo(w*.12,gy);c.lineTo(w*.88,gy);c.stroke();c.restore();
-    const f=shopFig[k]||(shopFig[k]={kind:'hero',cls:k,skin:false,x:0,h:0,size:1,face:1,state:'idle',st:0,dur:0,w:.3,phase:0,seed:i});f.cls=k;f.skin=!!(SHOP.skinOn[k]&&ownS(k))||shopPv===k;
-    if(i===shopI){const [stt,du]=SDEMO[k],cyc=du+.9,tt=(T*1)%cyc;if(tt<du){f.state=stt;f.st=tt;f.dur=du;f.w=stt==='punch'?.2:.3}else f.state='idle'}else f.state='idle';
+    const fk=skid?'sk_'+skid:k,f=shopFig[fk]||(shopFig[fk]={kind:'hero',cls:k,skin:false,x:0,h:0,size:1,face:1,state:'idle',st:0,dur:0,w:.3,phase:0,seed:i});f.cls=k;if(skid){f.skin=true;f.vio=skid==='violin';f.skinId=skid}else{f.skin=!!skinEq(k)||shopPv===k;f.vio=skinEq(k)==='violin';f.skinId=skinEq(k)}
+    if(i===CUR){const [stt,du]=SDEMO[k],cyc=du+.9,tt=(T*1)%cyc;if(tt<du){f.state=stt;f.st=tt;f.dur=du;f.w=stt==='punch'?.2:.3}else f.state='idle'}else f.state='idle';
     if(!ownC(k)){f.state=k==='baseball'?'w_batc':'idle';f.batG=.75;f.st=0;f.dur=9;f.skin=false;drawSilhouette(c,cv2,f,smooth(f,pose(f,T),dt),w/2,gy,u,d);return}drawFig(c,f,smooth(f,pose(f,T),dt),w/2,gy,u)})}
 
 const ULT={boss:'ROYAL QUAKE',shadow:'ECLIPSE',golem:'AVALANCHE',bomblord:'MEGATON',storm:'TEMPEST',titan:'CEILING COLLAPSE',phantom:'GLITCH PRISON',warlord:'SPEAR RAIN',archmage:'ARCANE BEAM',emperor:'WORLD BREAK'};
@@ -3457,7 +3475,7 @@ function update(dt){
   updPlayer(dt);updCam();genWorld();G.maxX=Math.max(G.maxX,p.x);
   if(!G.gateOpen&&p.x>GATE){G.gateOpen=true;G.gateT=G.T;G.banner={big:'FIGHT!',small:'BEAT THE STICKMEN ON THE ROOFTOPS',t:0,dur:1.4};sfx('wave');shake(.15)}
   tickBuffs(dt);for(const e of enemies)updEnemy(e,dt);updUlts(dt);updPshots(dt);updAllies(dt);
-  separate();crowdBlock();
+  separate();crowdBlock();try{skinTick(dt)}catch(_){}
   enemies=enemies.filter(e=>!(e.state==='dead'&&e.st>1.4)&&!e.gone&&!(e.x<G.maxX-9&&!e.inZone));
   for(const w of waves){w.x+=w.dir*3.6*dt;w.life-=dt;if(!w.hit&&Math.abs(p.x-w.x)<.2&&p.h<.18&&hurtPlayer(w.dmg||TY.boss.dmg.wave,w.dir,2.6,w,w.ult?'ult':1))w.hit=true}
   waves=waves.filter(w=>w.life>0&&(!G.zone||(w.x>G.zone.x0&&w.x<G.zone.x1)));
@@ -4868,6 +4886,108 @@ function drawBossHat(c,hat,hx,hy,hr,d,ink){c.save();c.lineCap='round';c.lineJoin
   c.restore()}
 
 document.addEventListener('touchmove',ev=>{const lb=document.getElementById('lobby');if(!lb||lb.hidden||!lb.contains(ev.target))return;let el=ev.target;while(el&&el!==lb){const cs=getComputedStyle(el);if(/(auto|scroll)/.test(cs.overflowY+cs.overflowX)&&(el.scrollHeight>el.clientHeight+1||el.scrollWidth>el.clientWidth+1))return;el=el.parentElement}if(ev.cancelable)ev.preventDefault()},{passive:false});
+/* ---------- 스킨 시스템 (캐릭터당 여러 스킨) ---------- */
+const SKINX={}; // 앞으로 추가할 스킨: SKINX[cls]=[{id,name,price,ink,glow,desc}]
+function skinList(k){const L=[];if(SKINS[k])L.push(Object.assign({id:k},SKINS[k]));if(k==='bard'&&SKIN2.bard)L.push(Object.assign({},SKIN2.bard,{id:'violin'}));for(const x of (SKINX[k]||[]))L.push(x);return L}
+function skinPrice(k,id){const s=skinList(k).find(q=>q.id===id);return id===k?skPrice(k):(s?s.price:0)}
+function skinOwned(k,id){if(DEV.on)return true;if(!id)return false;if(id===k)return SHOP.skins.includes(k);if(id==='violin')return (SHOP.skins2||[]).includes('bard');return (SHOP.skinX||[]).includes(k+':'+id)}
+function skinEq(k){return SHOP.skinOn[k]?((SHOP.skinV||{})[k]||k):null}
+function setSkin(k,id){SHOP.skinV=SHOP.skinV||{};if(!id){SHOP.skinOn[k]=false;delete SHOP.skinV[k]}else{SHOP.skinOn[k]=true;if(id===k)delete SHOP.skinV[k];else SHOP.skinV[k]=id}saveShop()}
+function buySkin(k,id){if(skinOwned(k,id))return true;const pr=skinPrice(k,id);if(!coinOK(pr))return false;if(!DEV.on)COIN-=pr;if(id===k)SHOP.skins.push(k);else if(id==='violin'){SHOP.skins2=SHOP.skins2||[];SHOP.skins2.push('bard')}else{SHOP.skinX=SHOP.skinX||[];SHOP.skinX.push(k+':'+id)}sfx('wave');saveShop();return true}
+function skinIdOf(e){if(!e||e.kind!=='hero')return null;const sk=heroSkinOn(e);if(!sk)return null;if(sk==='bard'&&bardViolin(e))return 'violin';if(e.skinId)return e.skinId;const v=(SHOP.skinV||{})[sk];return (e===p&&v)?v:sk}
+/* ---------- 스킨별 고유 이펙트 ---------- */
+const SKFX={
+  base:{sh:'spark',col:['#ffe9a0','#ffd04a'],amb:6,hit:'star',d:'몸 주위로 금빛 불꽃이 튀고, 때리면 금빛 별이 터져요.'},
+  archer:{sh:'leaf',col:['#9dffb0','#4fd27a'],amb:3,hit:'leaf',trail:'leaf',d:'나뭇잎이 흩날리고, 화살 뒤로 잎사귀가 따라가요. 맞히면 잎사귀가 터져요.'},
+  sword:{sh:'pixel',col:['#ff6a7a','#ffd0d6'],amb:5,hit:'xslash',d:'붉은 레이저 입자가 떠다니고, 베면 레이저 십자 섬광이 번쩍여요.'},
+  ninja:{sh:'smoke',col:['#aab8cc','#dfe7f2'],amb:4,feet:1,hit:'star4',d:'발밑에 그림자 연기가 깔리고, 맞히면 표창 모양 섬광이 튀어요.'},
+  bomber:{sh:'ember',col:['#ffb04a','#ff7a2a','#ffe08a'],amb:7,hit:'firework',trail:'ember',d:'불티가 피어오르고, 맞히면 작은 불꽃놀이가 터져요.'},
+  gunner:{sh:'dust',col:['#e8cfa0','#c8a878'],amb:4,feet:1,hit:'sheriff',trail:'dust',d:'발밑에 황야의 먼지가 일고, 맞히면 보안관 별이 반짝여요.'},
+  necro:{sh:'wisp',col:['#7dffd9','#c8fff0'],amb:4,hit:'skull',trail:'wisp',d:'청록 영혼 불꽃이 피어오르고, 맞힌 적에게서 해골 영혼이 빠져나와요.'},
+  magician:{sh:'suit',col:['#ff5a8a','#ffffff'],amb:3,hit:'suit',trail:'suit',d:'트럼프 무늬가 맴돌고, 맞히면 카드 무늬가 흩어져요.'},
+  porter:{sh:'pixel',col:['#4fe6ff','#d0fbff'],amb:6,hit:'glitch',trail:'pixel',d:'푸른 픽셀이 지직거리고, 맞히면 깨진 화면 같은 픽셀 조각이 튀어요.'},
+  baseball:{sh:'star',col:['#7ab0ff','#ffffff'],amb:3,hit:'ball',trail:'star',d:'파란 별빛이 반짝이고, 맞히면 야구공 실밥 모양 섬광이 터져요.'},
+  volt:{sh:'bolt',col:['#fff07a','#ffffff'],amb:5,hit:'bolt',trail:'bolt',d:'몸 주위로 금빛 전류가 튀고, 맞히면 번개가 갈라져요.'},
+  wolf:{sh:'ember',col:['#ff9a2a','#ffd08a'],amb:3,hit:'claw',d:'주황빛 기운이 일렁이고, 맞히면 호랑이 발톱 자국이 남아요.'},
+  bard:{sh:'note',col:['#a8ff8a','#e8ffe0'],amb:3,hit:'note',trail:'note',d:'초록 음표가 떠오르고, 맞히면 음표가 흩날려요.'},
+  violin:{sh:'note',col:['#c8a0ff','#f1e6ff'],amb:3,hit:'note',trail:'note',d:'보랏빛 음표가 떠오르고, 맞히면 음표가 퍼져요.'},
+  frost:{sh:'snow',col:['#bfefff','#ffffff'],amb:5,hit:'ice',trail:'snow',d:'눈송이가 흩날리고, 맞히면 얼음 결정이 부서져요.'},
+  druid:{sh:'petal',col:['#ffb0d0','#ffe0ee'],amb:4,hit:'petal',trail:'petal',d:'꽃잎이 흩날리고, 맞히면 꽃잎이 터져요.'},
+  shade:{sh:'smoke',col:['#4a4a4a','#ff4a4a'],amb:5,hit:'redslash',trail:'smoke',d:'검은 그림자 연기가 피어오르고, 맞히면 붉은 베기 자국이 남아요.'},
+  kid:{sh:'rain',col:['#ffe36a','#9fdcff'],amb:5,hit:'splash',d:'노란 빗방울이 톡톡 떨어지고, 맞히면 물방울이 튀어요.'},
+  seonbi:{sh:'glyph',ch:['御','暗','行','使'],col:['#ff7a5a','#ffd0c0'],amb:2,hit:'stamp',trail:'glyph',d:'붉은 한자가 떠오르고, 맞히면 붉은 먹물과 함께 마패 도장이 찍혀요.'},
+  grad:{sh:'glyph',ch:['∑','π','√','∞','∫'],col:['#8ab4ff','#e6eeff'],amb:2,hit:'confetti',trail:'glyph',d:'수식 기호가 떠다니고, 맞히면 졸업 축하 꽃가루가 터져요.'}};
+const SUITS=['♠','♥','♦','♣'];
+function skCount(){let n=0;for(const k of kfx)if(k.t==='skp')n++;return n}
+function skPart(f,sh,x,h,o){kfx.push(Object.assign({t:'skp',sh,col:f.col[Math.floor(Math.random()*f.col.length)],x,h,vx:0,vh:0,g:0,life:.8,max:.8,rot:Math.random()*6,vr:rnd(-3,3),s:1,ch:f.ch?f.ch[Math.floor(Math.random()*f.ch.length)]:SUITS[Math.floor(Math.random()*4)],dr:DRW.skp,up:skUp,net:0},o||{}))}
+function skUp(k,dt){k.x+=k.vx*dt;k.h+=k.vh*dt;k.vh-=k.g*dt;k.rot+=k.vr*dt;if(k.sway)k.x+=Math.sin(G.T*3+k.rot)*k.sway*dt}
+DRW.skp=function(c,k,a,X,Yh){const q=k.life/k.max,x=X(k.x),y=Yh(k.h),s=U*.05*k.s;c.save();c.globalAlpha=Math.min(1,q*2.2);c.translate(x,y);c.rotate(k.rot);c.fillStyle=k.col;c.strokeStyle=k.col;c.lineWidth=Math.max(1.2,U*.012);
+  switch(k.sh){
+  case 'spark':c.beginPath();c.moveTo(-s,0);c.lineTo(s,0);c.moveTo(0,-s);c.lineTo(0,s);c.stroke();break;
+  case 'leaf':c.beginPath();c.ellipse(0,0,s*1.3,s*.55,0,0,Math.PI*2);c.fill();c.strokeStyle='rgba(0,0,0,.35)';c.beginPath();c.moveTo(-s*1.2,0);c.lineTo(s*1.2,0);c.stroke();break;
+  case 'pixel':c.fillRect(-s*.6,-s*.6,s*1.2,s*1.2);break;
+  case 'smoke':c.globalAlpha*=.45;c.beginPath();c.arc(0,0,s*(1.4+(1-q)*1.8),0,Math.PI*2);c.fill();break;
+  case 'ember':c.beginPath();c.arc(0,0,s*.55*(.5+q*.5),0,Math.PI*2);c.fill();break;
+  case 'dust':c.globalAlpha*=.5;c.beginPath();c.arc(0,0,s*(1+(1-q)*1.4),0,Math.PI*2);c.fill();break;
+  case 'wisp':c.beginPath();c.moveTo(0,-s*1.6);c.quadraticCurveTo(s,-s*.2,0,s*.8);c.quadraticCurveTo(-s,-s*.2,0,-s*1.6);c.fill();break;
+  case 'suit':case 'glyph':c.rotate(-k.rot*.8);c.font=`700 ${Math.round(U*.16*k.s)}px serif`;c.textAlign='center';c.textBaseline='middle';c.fillText(k.ch,0,0);break;
+  case 'star':c.beginPath();for(let i=0;i<10;i++){const r=i%2?s*.45:s*1.1,an=i*Math.PI/5;c.lineTo(Math.cos(an)*r,Math.sin(an)*r)}c.closePath();c.fill();break;
+  case 'bolt':c.beginPath();c.moveTo(-s*1.2,-s*.8);c.lineTo(-s*.1,-s*.1);c.lineTo(-s*.4,s*.2);c.lineTo(s*1.2,s*.9);c.stroke();break;
+  case 'note':c.rotate(-k.rot);c.font=`700 ${Math.round(U*.17*k.s)}px serif`;c.textAlign='center';c.textBaseline='middle';c.fillText(k.ch2||'♪',0,0);break;
+  case 'snow':c.beginPath();for(let i=0;i<3;i++){const an=i*Math.PI/3;c.moveTo(Math.cos(an)*s,Math.sin(an)*s);c.lineTo(-Math.cos(an)*s,-Math.sin(an)*s)}c.stroke();break;
+  case 'petal':c.beginPath();c.ellipse(0,0,s*1.1,s*.5,0,0,Math.PI*2);c.fill();break;
+  case 'rain':c.rotate(-k.rot);c.beginPath();c.moveTo(0,-s*1.2);c.quadraticCurveTo(s*.7,s*.2,0,s*.6);c.quadraticCurveTo(-s*.7,s*.2,0,-s*1.2);c.fill();break;
+  case 'shard':c.beginPath();c.moveTo(0,-s*1.3);c.lineTo(s*.45,0);c.lineTo(0,s*1.3);c.lineTo(-s*.45,0);c.closePath();c.fill();break;
+  case 'conf':c.fillRect(-s*.8,-s*.35,s*1.6,s*.7);break;
+  case 'skull':c.rotate(-k.rot);c.font=`${Math.round(U*.24)}px serif`;c.textAlign='center';c.textBaseline='middle';c.fillText('☠',0,0);break}
+  c.restore()};
+DRW.skflash=function(c,k,a,X,Yh){const q=k.life/k.max,x=X(k.x),y=Yh(k.h),R=U*.38*(k.s||1);c.save();c.globalAlpha=Math.min(1,q*1.8);c.translate(x,y);c.strokeStyle=k.col;c.fillStyle=k.col;c.lineCap='round';c.shadowColor=k.col;c.shadowBlur=G.lowfx?0:10;const g=1+(1-q)*.4;
+  switch(k.sh){
+  case 'xslash':c.lineWidth=U*.05;c.beginPath();c.moveTo(-R*g,-R*g);c.lineTo(R*g,R*g);c.moveTo(R*g,-R*g);c.lineTo(-R*g,R*g);c.stroke();break;
+  case 'claw':c.lineWidth=U*.045;for(let i=-1;i<=1;i++){c.beginPath();c.moveTo(-R*.8+i*R*.35,-R);c.quadraticCurveTo(i*R*.3,0,R*.8+i*R*.35,R);c.stroke()}break;
+  case 'redslash':c.lineWidth=U*.06;c.beginPath();c.moveTo(-R*1.3*g,R*.6);c.quadraticCurveTo(0,-R*.2,R*1.3*g,-R*.6);c.stroke();break;
+  case 'boltx':c.lineWidth=U*.035;for(let j=0;j<3;j++){const an=k.a0+j*2.1;c.beginPath();let px=0,py=0;c.moveTo(0,0);for(let i=0;i<4;i++){px+=Math.cos(an)*R*.4+rnd(-R*.15,R*.15);py+=Math.sin(an)*R*.4+rnd(-R*.15,R*.15);c.lineTo(px,py)}c.stroke()}break;
+  case 'sheriff':c.translate(0,-(1-q)*U*.4);c.beginPath();for(let i=0;i<12;i++){const r=i%2?R*.3:R*.62,an=i*Math.PI/6-Math.PI/2;c.lineTo(Math.cos(an)*r,Math.sin(an)*r)}c.closePath();c.fill();break;
+  case 'ball':c.lineWidth=U*.025;c.beginPath();c.arc(0,0,R*.55*g,0,Math.PI*2);c.stroke();c.beginPath();c.arc(-R*.75*g,0,R*.5*g,-.9,.9);c.stroke();c.beginPath();c.arc(R*.75*g,0,R*.5*g,Math.PI-.9,Math.PI+.9);c.stroke();break;
+  case 'stamp':c.rotate(-.2);c.lineWidth=U*.03;c.strokeRect(-R*.5,-R*.5,R,R);c.font=`700 ${Math.round(R*.75)}px serif`;c.textAlign='center';c.textBaseline='middle';c.fillText('御',0,R*.04);break;
+  case 'ring':c.lineWidth=U*.03;c.beginPath();c.arc(0,0,R*g,0,Math.PI*2);c.stroke();break}
+  c.restore()};
+function skFlash(sh,col,x,h,o){kfx.push(Object.assign({t:'skf',sh,col,x,h,life:.32,max:.32,s:1,a0:Math.random()*6,dr:DRW.skflash,net:0},o||{}))}
+function skinTick(dt){if(!p||G.mode!=='play'||p.state==='dead')return;const id=skinIdOf(p),f=id&&SKFX[id];if(!f)return;if(skCount()>70)return;
+  const moving=Math.abs(p.vx||0)>.4;if(f.feet&&!moving&&Math.random()>.3)return;if(Math.random()>f.amb*dt)return;const S=p.size||HERO;
+  switch(f.sh){
+  case 'leaf':case 'petal':skPart(f,f.sh,p.x+rnd(-.5,.5),p.h+S*rnd(1,1.5),{vx:rnd(-.3,.3),vh:-rnd(.4,.7),sway:.6,life:1.6,max:1.6});break;
+  case 'snow':skPart(f,'snow',p.x+rnd(-.6,.6),p.h+S*rnd(1.1,1.6),{vh:-rnd(.3,.5),sway:.4,life:1.8,max:1.8,vr:rnd(-1,1)});break;
+  case 'rain':skPart(f,'rain',p.x+rnd(-.5,.5),p.h+S*rnd(1.3,1.6),{vh:-rnd(2.5,3.5),rot:0,vr:0,life:.5,max:.5});break;
+  case 'smoke':case 'dust':skPart(f,f.sh,p.x+rnd(-.25,.25),p.h+(f.feet?.06:S*rnd(.1,.9)),{vx:-(p.vx||0)*.15+rnd(-.3,.3),vh:rnd(.1,.4),life:.9,max:.9});break;
+  case 'ember':case 'wisp':skPart(f,f.sh,p.x+rnd(-.3,.3),p.h+S*rnd(.2,1),{vx:rnd(-.15,.15),vh:rnd(.6,1.1),life:.9,max:.9,vr:0,rot:0});break;
+  case 'glyph':case 'suit':case 'note':skPart(f,f.sh,p.x+rnd(-.5,.5),p.h+S*rnd(.6,1.3),{vx:rnd(-.2,.2),vh:rnd(.35,.6),life:1.4,max:1.4,ch2:Math.random()<.5?'♪':'♫',vr:rnd(-.5,.5)});break;
+  default:skPart(f,f.sh,p.x+rnd(-.4,.4),p.h+S*rnd(.2,1.2),{vx:rnd(-.3,.3),vh:rnd(-.2,.4),life:.45,max:.45})}}
+function skinHit(e){if(!p||G.mode!=='play'||!e)return;const id=skinIdOf(p),f=id&&SKFX[id];if(!f)return;if((e._skt||0)>G.T)return;e._skt=G.T+.14;if(skCount()>90)return;const x=e.x,h=e.h+(e.size||1)*.55,c0=f.col[0],burst=(sh,n,o)=>{for(let i=0;i<n;i++){const an=Math.random()*Math.PI*2,sp=rnd(1.2,2.6);skPart(f,sh,x,h,Object.assign({vx:Math.cos(an)*sp,vh:Math.sin(an)*sp+.6,g:3,life:.55,max:.55},o||{}))}};
+  switch(f.hit){
+  case 'star':burst('star',6,{s:1.2});break;
+  case 'leaf':burst('leaf',7,{g:1.2,sway:.4});break;
+  case 'petal':burst('petal',8,{g:1.2,sway:.4});break;
+  case 'xslash':skFlash('xslash',c0,x,h);burst('pixel',5);break;
+  case 'star4':skFlash('xslash',c0,x,h,{s:.7});burst('smoke',3,{g:0,vx:0,vh:.3,life:.6,max:.6});break;
+  case 'firework':for(let i=0;i<10;i++){const an=i/10*Math.PI*2;skPart(f,'ember',x,h,{vx:Math.cos(an)*2.6,vh:Math.sin(an)*2.6,g:1.5,life:.6,max:.6,col:['#ffd04a','#ff6a3a','#ffffff','#ffb04a'][i%4],s:1.3})}break;
+  case 'sheriff':skFlash('sheriff','#ffd76a',x,h+.2,{life:.6,max:.6});break;
+  case 'skull':skPart(f,'skull',x,h+.2,{vh:1,life:.9,max:.9,rot:0,vr:0});burst('wisp',3,{g:-1});break;
+  case 'suit':burst('suit',6,{g:2,s:1.1});break;
+  case 'glitch':burst('pixel',10,{g:0,life:.35,max:.35});skFlash('ring',c0,x,h,{s:.6,life:.2,max:.2});break;
+  case 'ball':skFlash('ball','#ffffff',x,h);burst('star',4);break;
+  case 'bolt':skFlash('boltx',c0,x,h);break;
+  case 'claw':skFlash('claw',c0,x,h);break;
+  case 'note':burst('note',5,{g:.5,ch2:'♫',s:1.2});break;
+  case 'ice':burst('shard',8,{g:3});burst('snow',3,{g:1});break;
+  case 'redslash':skFlash('redslash','#ff4a4a',x,h);burst('smoke',3,{g:0,vh:.4,col:'#3a3a3a'});break;
+  case 'splash':burst('rain',8,{g:5,life:.5,max:.5});break;
+  case 'stamp':skFlash('stamp','#ff5a4a',x,h+.25,{life:.55,max:.55});try{inkSplat(x,h,6,.8)}catch(_){}break;
+  case 'confetti':for(let i=0;i<10;i++){const an=-Math.PI/2+rnd(-1.2,1.2)+Math.PI;skPart(f,'conf',x,h,{vx:rnd(-2,2),vh:rnd(1.5,3.2),g:4,sway:1,life:.8,max:.8,col:['#ff6a8a','#ffd04a','#6ad0ff','#8aff9a','#ffffff'][i%5]})}break}}
+function skinTrail(s2){if(!p||G.mode!=='play')return;const id=skinIdOf(p),f=id&&SKFX[id];if(!f||!f.trail)return;if(skCount()>70)return;
+  skPart(f,f.trail,s2.x+rnd(-.05,.05),s2.h+rnd(-.05,.05),{vx:-(s2.vx||0)*.05,vh:rnd(-.1,.2),life:.4,max:.4,s:.85,ch2:'♪'})}
+
+{const cv=document.getElementById('charCv');if(cv){let sx=null;cv.addEventListener('pointerdown',e=>{if(charTab==='skin')sx=e.clientX});cv.addEventListener('pointerup',e=>{if(sx==null)return;const dx=e.clientX-sx;sx=null;if(Math.abs(dx)<36)return;const L=skinList(charSel);charSkI=clamp(charSkI+(dx<0?1:-1),0,L.length-1);sfx('ui');buildChar()});cv.addEventListener('pointercancel',()=>{sx=null})}}
 resize();
 (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{sizePreview()});
 requestAnimationFrame(frame);
