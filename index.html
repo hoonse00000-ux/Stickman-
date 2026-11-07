@@ -4689,10 +4689,16 @@ for(const k of['kid','grad','seonbi'])CLIST[k]=XTRIG[k].map(([a,c])=>[a==='roll'
 
 
 function fitZoom(box,kids){kids=kids.filter(Boolean);for(const k of kids)k.style.zoom='';if(!box||box.hidden||!box.clientHeight)return;const cs=getComputedStyle(box),H=box.clientHeight-parseFloat(cs.paddingTop||0)-parseFloat(cs.paddingBottom||0)-2;
-  const row=cs.display==='grid'&&kids.length>1&&cs.gridTemplateColumns.split(' ').length>1;
-  if(row){for(const k of kids){let r=1;for(let it=0;it<4;it++){const need=k.getBoundingClientRect().height;if(need<=H+1)break;r=Math.max(.55,r*H/need);k.style.zoom=r.toFixed(3)}}}
+  const row=kids.length>1&&((cs.display==='grid'&&cs.gridTemplateColumns.split(' ').length>1)||(cs.display==='flex'&&cs.flexDirection.startsWith('row')));
+  if(row){for(const k of kids){const fits=()=>k.scrollHeight<=k.clientHeight+2&&k.getBoundingClientRect().height<=H+1;if(fits())continue;let lo=.5,hi=1;for(let it=0;it<8;it++){const m=(lo+hi)/2;k.style.zoom=m.toFixed(3);if(fits())lo=m;else hi=m}k.style.zoom=lo.toFixed(3)}}
   else{let r=1;for(let it=0;it<6;it++){const need=box.scrollHeight-parseFloat(cs.paddingTop||0)-parseFloat(cs.paddingBottom||0);if(need<=H+3)break;r=Math.max(.55,r*(H+2)/need);for(const k of kids)k.style.zoom=r.toFixed(3)}}}
-function fitScreens(){try{fitZoom($('#lobby'),[$('#lobby .lob')]);const cb=$('#charBack .cbody');if(cb&&!$('#charBack').hidden)fitZoom(cb,getComputedStyle($('#charBack .cprev')).display==='contents'?[$('#charGrid'),$('#charInfo')]:[$('#charBack .cprev'),$('#charGrid')])}catch(_){}}
+function fitCharRow(){const cb=$('#charBack .cbody'),cp=$('#charBack .cprev'),gr=$('#charGrid'),cv=cp&&cp.querySelector('canvas'),ci=$('#charInfo');if(!cb||!gr||!cp)return;
+  cp.style.zoom='';gr.style.zoom='';ci&&(ci.style.zoom='');gr.style.gridTemplateColumns='';if(cv)cv.style.aspectRatio='';
+  const over=el=>el.scrollHeight>el.clientHeight+2;
+  if(over(gr)){const n=gr.children.length;for(let c=Math.max(3,getComputedStyle(gr).gridTemplateColumns.split(' ').length+1);c<=Math.max(4,n);c++){gr.style.gridTemplateColumns=`repeat(${c},minmax(0,1fr))`;if(!over(gr))break}}
+  if(over(cp)&&cv){for(const ar of ['1.6/1','2/1','2.5/1','3/1','3.6/1']){cv.style.aspectRatio=ar;if(!over(cp))break}}
+  if(over(cp)&&ci){let lo=.6,hi=1;for(let it=0;it<7;it++){const m=(lo+hi)/2;ci.style.zoom=m.toFixed(3);if(over(cp))hi=m;else lo=m}ci.style.zoom=lo.toFixed(3)}}
+function fitScreens(){try{fitZoom($('#lobby'),[$('#lobby .lob')]);const cb=$('#charBack .cbody');if(cb&&!$('#charBack').hidden){const cs2=getComputedStyle(cb);if(cs2.display==='flex'&&cs2.flexDirection.startsWith('row'))fitCharRow();else fitZoom(cb,getComputedStyle($('#charBack .cprev')).display==='contents'?[$('#charGrid'),$('#charInfo')]:[$('#charBack .cprev'),$('#charGrid')])}}catch(_){}}
 {const _b=buildChar;buildChar=function(){const r=_b.apply(this,arguments);setTimeout(fitScreens,30);return r}}
 addEventListener('resize',()=>setTimeout(fitScreens,60));addEventListener('orientationchange',()=>setTimeout(fitScreens,250));setInterval(fitScreens,1200);
 /* ---------- 캐릭터별 컨셉 효과음 ---------- */
