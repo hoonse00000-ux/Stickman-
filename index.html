@@ -5005,7 +5005,13 @@ DRW.skp=function(c,k,a,X,Yh){const q=k.life/k.max,x=X(k.x),y=Yh(k.h),s=U*.05*k.s
   case 'rain':c.rotate(-k.rot);c.beginPath();c.moveTo(0,-s*1.2);c.quadraticCurveTo(s*.7,s*.2,0,s*.6);c.quadraticCurveTo(-s*.7,s*.2,0,-s*1.2);c.fill();break;
   case 'shard':c.beginPath();c.moveTo(0,-s*1.3);c.lineTo(s*.45,0);c.lineTo(0,s*1.3);c.lineTo(-s*.45,0);c.closePath();c.fill();break;
   case 'conf':c.fillRect(-s*.8,-s*.35,s*1.6,s*.7);break;
-  case 'skull':c.rotate(-k.rot);c.font=`${Math.round(U*.24)}px serif`;c.textAlign='center';c.textBaseline='middle';c.fillText('☠',0,0);break}
+  case 'skull':{c.rotate(-k.rot*.3);const r=s*1.9;c.shadowColor=k.col;c.shadowBlur=G.lowfx?0:8;c.fillStyle='#f2efe6';c.strokeStyle=k.col;c.lineWidth=Math.max(1,r*.09);
+    c.beginPath();c.arc(0,-r*.12,r*.72,Math.PI*.92,Math.PI*.08,false);c.lineTo(r*.46,r*.42);c.quadraticCurveTo(r*.44,r*.62,r*.3,r*.66);c.lineTo(-r*.3,r*.66);c.quadraticCurveTo(-r*.44,r*.62,-r*.46,r*.42);c.closePath();c.fill();c.stroke();c.shadowBlur=0;
+    c.fillStyle='#120e18';for(const sx of[-1,1]){c.beginPath();c.ellipse(sx*r*.28,r*.02,r*.19,r*.22,sx*.25,0,Math.PI*2);c.fill()}
+    c.fillStyle=k.col;for(const sx of[-1,1]){c.beginPath();c.arc(sx*r*.28,r*.04,r*.06,0,Math.PI*2);c.fill()}
+    c.fillStyle='#120e18';c.beginPath();c.moveTo(0,r*.2);c.lineTo(-r*.08,r*.36);c.lineTo(r*.08,r*.36);c.closePath();c.fill();
+    c.strokeStyle='#120e18';c.lineWidth=Math.max(.8,r*.06);c.beginPath();c.moveTo(-r*.28,r*.5);c.lineTo(r*.28,r*.5);for(let i=-2;i<=2;i++){c.moveTo(i*r*.12,r*.44);c.lineTo(i*r*.12,r*.64)}c.stroke();
+    c.strokeStyle='rgba(18,14,24,.55)';c.lineWidth=Math.max(.7,r*.045);c.beginPath();c.moveTo(r*.18,-r*.62);c.lineTo(r*.1,-r*.42);c.lineTo(r*.2,-r*.3);c.stroke();break}}
   c.restore()};
 DRW.skflash=function(c,k,a,X,Yh){const q=k.life/k.max,x=X(k.x),y=Yh(k.h),R=U*.38*(k.s||1);c.save();c.globalAlpha=Math.min(1,q*1.8);c.translate(x,y);c.strokeStyle=k.col;c.fillStyle=k.col;c.lineCap='round';c.shadowColor=k.col;c.shadowBlur=G.lowfx?0:10;const g=1+(1-q)*.4;
   switch(k.sh){
