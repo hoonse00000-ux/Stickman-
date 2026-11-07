@@ -962,7 +962,7 @@ function drawFig(c,e,P,X,Y,S,alpha=1){if(P&&P.alpha!=null)alpha*=P.alpha;
   c.globalAlpha=alpha;c.beginPath();poly([o.hip,o.sh,o.nk]);poly(kb?o.bl:o.fl);poly(o.fa);c.stroke();
   const h=T(o.hc),hr=SK.head*S;
   c.beginPath();c.arc(h[0],h[1],hr,0,Math.PI*2);
-  if(e.kind==='hero')c.stroke();
+  if(e.kind==='hero'){c.stroke();try{const XS=heroXSkin(e);if(XS&&XS.acc)drawSkinAcc(c,XS,h[0],h[1],hr,d)}catch(_){}}
   else{c.fill();c.shadowBlur=0;c.strokeStyle='#0b0b0b';c.lineWidth=Math.max(1.2,S*.016);
     c.beginPath();poly(o.brow);c.stroke();const ey=T(o.eye);c.fillStyle='#0b0b0b';c.beginPath();c.arc(ey[0],ey[1],Math.max(1,S*.011),0,Math.PI*2);c.fill();
     {const tz=TY[e.kind];if(tz&&tz.hat){c.shadowColor=st.glowC;c.shadowBlur=st.glow*S;drawBossHat(c,tz.hat,h[0],h[1],hr,d,fl?'#fff':st.ink);c.shadowBlur=0}}}
@@ -2016,7 +2016,7 @@ const SKINS={
   seonbi:{name:'암행어사',price:1400,ink:'#ffe6d6',glow:'rgba(255,120,80,.95)',desc:'마패를 품은 암행어사. 붉은빛으로 빛나요.'},
   grad:{name:'박사 졸업',price:1600,ink:'#e6eeff',glow:'rgba(120,170,255,.95)',desc:'드디어 졸업한 박사. 푸른빛으로 빛나요.'},
 };
-function heroSkinOn(e){const cl=(e&&e.cls)||G.cls||'base';if(e&&e.skin!=null)return e.skin?cl:null;if(bt())return null;if(G.admin)return G.adminSkin?cl:null;return SHOP.skinOn[cl]&&skinOwned(cl,(SHOP.skinV||{})[cl]||cl)?cl:null}
+function heroSkinOn(e){const cl=(e&&e.cls)||G.cls||'base';if(e&&e.skin!=null)return e.skin&&(!e.skinId||e.skinId===cl||e.skinId==='violin')?cl:null;if(bt())return null;if(G.admin)return G.adminSkin?cl:null;{const v=(SHOP.skinV||{})[cl]||cl;return SHOP.skinOn[cl]&&skinOwned(cl,v)&&(v===cl||v==='violin')?cl:null}}
 function bardViolin(e){return !!e&&e.kind==='hero'&&heroSkinOn(e)==='bard'&&(e.vio!=null?!!e.vio:((SHOP.skinV||{}).bard==='violin'&&(e===p||e.skin==null)))}
 function drawViolin(c,o,d,T,S,st,e,play,smash){const sh=o.sh,hp=o.hip;let cen,u;
   if(play){cen=[sh[0]+d*.14,sh[1]+.0];u=[d*.97,-.24]}else{cen=[(sh[0]+hp[0])/2-d*.13,(sh[1]+hp[1])/2];u=[d*.45,-.89]}if(smash){const hd=o.fa[2],el=o.fa[1],dx=hd[0]-el[0],dy=hd[1]-el[1],dl=Math.hypot(dx,dy)||1;u=[dx/dl,dy/dl];cen=[hd[0]+u[0]*.22,hd[1]+u[1]*.22]}
@@ -2030,7 +2030,7 @@ function drawViolin(c,o,d,T,S,st,e,play,smash){const sh=o.sh,hp=o.hip;let cen,u;
   c.restore()}
 
 const SKIN2={bard:{id:'violin',name:'바이올리니스트',price:5200,ink:'#f1e6ff',glow:'rgba(185,135,255,.95)',desc:'나비넥타이를 맨 바이올리니스트. 기타 대신 바이올린을 켜고, 보랏빛으로 빛나요. 음표 소리가 바이올린 소리로 바뀌어요.'}};
-function heroStyle(e){const sk=heroSkinOn(e),up=e===p&&p&&p.pult;if(!sk)return up?{...STY.hero,glow:.5,glowC:'rgba(255,255,255,1)'}:STY.hero;const xid=skinIdOf(e),XS=xid&&xid!==sk&&xid!=='violin'?(SKINX[sk]||[]).find(q=>q.id===xid):null,S2=XS||((sk==='bard'&&bardViolin(e))?SKIN2.bard:SKINS[sk]);return{ink:S2.ink,glow:up?.55:.22,glowC:S2.glow,lw:STY.hero.lw}}
+function heroStyle(e){const sk=heroSkinOn(e),up=e===p&&p&&p.pult,XS0=heroXSkin(e);if(XS0)return{ink:XS0.ink,glow:up?.55:.22,glowC:XS0.glow,lw:STY.hero.lw};if(!sk)return up?{...STY.hero,glow:.5,glowC:'rgba(255,255,255,1)'}:STY.hero;const xid=skinIdOf(e),XS=xid&&xid!==sk&&xid!=='violin'?(SKINX[sk]||[]).find(q=>q.id===xid):null,S2=XS||((sk==='bard'&&bardViolin(e))?SKIN2.bard:SKINS[sk]);return{ink:S2.ink,glow:up?.55:.22,glowC:S2.glow,lw:STY.hero.lw}}
 function drawSkinAcc(sk,c,o,d,T,S,st,e){const hc=o.hc,r=SK.head,line=(a0,b0)=>{const a=T(a0),b=T(b0);c.beginPath();c.moveTo(a[0],a[1]);c.lineTo(b[0],b[1]);c.stroke()},t=performance.now()/1000;
   c.strokeStyle=st.ink;c.fillStyle=st.ink;c.shadowColor=st.glowC;c.shadowBlur=S*.1;c.lineWidth=Math.max(1.3,S*.022);
   switch(sk){
@@ -2066,7 +2066,7 @@ let COIN=0;try{COIN=+(localStorage.getItem('zm-fight-coin')||0)||0}catch(_){}
 function saveShop(){try{localStorage.setItem('zm-fight-exp',String(EXP));localStorage.setItem('zm-fight-coin',String(COIN));localStorage.setItem('zm-fight-shop',JSON.stringify(SHOP))}catch(_){}}
 const EXPV={small:4,grunt:6,brute:12,thrower:6,bomber:5,ninja:8,shield:9,charger:8,spinner:8,healer:7,jumper:6};
 function giveExp(e){if(G.tutorial||G.admin||G.ta||G.online||e.clone!=null)return;const t=TY[e.kind];let n=t.boss?250:t.mid?80:(EXPV[e.kind]||0);if(!n)return;n=Math.round(n*(1+.25*(G.round-1)));
-  EXP+=n;G.runExp=(G.runExp||0)+n;texts.push({x:e.x,y:e.h+e.size*.9+.45,txt:'+'+n+' EXP',big:false,life:.9,max:.9});saveShop();dropCoins(e,Math.round(n*1.25*bossCoinMul(e)))}
+  EXP+=n;G.runExp=(G.runExp||0)+n;texts.push({x:e.x,y:e.h+e.size*.9+.45,txt:'+'+n+' EXP',big:false,life:.9,max:.9});saveShop();dropCoins(e,Math.round(n*1.25*(t.boss?1+.15*(clamp(G.round||1,1,MAXR)-1):1)*bossCoinMul(e)))}
 function bossCoinMul(e){const t=TY[e.kind];if(!t||!(t.boss||t.mid)||G.admin||G.tutorial)return 1;let R={t:0,k:{}};try{R=JSON.parse(localStorage.getItem('zm-fight-bkc')||'null')||R}catch(_){}const now=Date.now();if(!R.t||now-R.t>=864e5)R={t:now,k:{}};const c=R.k[e.kind]||0;R.k[e.kind]=c+1;try{localStorage.setItem('zm-fight-bkc',JSON.stringify(R))}catch(_){}const m=Math.max(.05,Math.pow(.55,c));if(c>0){const left=Math.max(0,864e5-(now-R.t)),hh=Math.floor(left/36e5),mm=Math.floor(left%36e5/6e4);texts.push({x:e.x,y:e.h+e.size*.9+.9,txt:`코인 ${Math.round(m*100)}% · ${hh}시간 ${mm}분 뒤 초기화`,big:false,life:1.8,max:1.8})}return m}
 function dropCoins(e,v){if(!G.coins)G.coins=[];const k=Math.min(8,Math.max(1,Math.round(v/12)));let left=v;for(let i=0;i<k;i++){const pv=i===k-1?left:Math.floor(v/k);left-=pv;G.coins.push({x:e.x+rnd(-.15,.15),h:e.h+e.size*.6,vx:rnd(-2.2,2.2),vh:rnd(2.5,4.5),v:pv,t:0,gnd:false})}}
 function collectCoins(all){if(!G.coins||!G.coins.length)return;let got=0;for(const c of G.coins){if(all||c.got){got+=c.v;c.dead=1}}if(got){COIN+=got;G.runCoin=(G.runCoin||0)+got;saveShop()}G.coins=G.coins.filter(c=>!c.dead)}
@@ -4895,7 +4895,7 @@ function skinOwned(k,id){if(DEV.on)return true;if(!id)return false;if(id===k)ret
 function skinEq(k){return SHOP.skinOn[k]?((SHOP.skinV||{})[k]||k):null}
 function setSkin(k,id){SHOP.skinV=SHOP.skinV||{};if(!id){SHOP.skinOn[k]=false;delete SHOP.skinV[k]}else{SHOP.skinOn[k]=true;if(id===k)delete SHOP.skinV[k];else SHOP.skinV[k]=id}saveShop()}
 function buySkin(k,id){if(skinOwned(k,id))return true;const pr=skinPrice(k,id);if(!coinOK(pr))return false;if(!DEV.on)COIN-=pr;if(id===k)SHOP.skins.push(k);else if(id==='violin'){SHOP.skins2=SHOP.skins2||[];SHOP.skins2.push('bard')}else{SHOP.skinX=SHOP.skinX||[];SHOP.skinX.push(k+':'+id)}sfx('wave');saveShop();return true}
-function skinIdOf(e){if(!e||e.kind!=='hero')return null;const sk=heroSkinOn(e);if(!sk)return null;if(sk==='bard'&&bardViolin(e))return 'violin';if(e.skinId)return e.skinId;const v=(SHOP.skinV||{})[sk];return (e===p&&v)?v:sk}
+function skinIdOf(e){if(!e||e.kind!=='hero')return null;{const XS=heroXSkin(e);if(XS)return XS.id}const sk=heroSkinOn(e);if(!sk)return null;if(sk==='bard'&&bardViolin(e))return 'violin';if(e.skinId)return e.skinId;const v=(SHOP.skinV||{})[sk];return (e===p&&v)?v:sk}
 /* ---------- 스킨별 고유 이펙트 ---------- */
 const SKFX={
   base:{sh:'spark',col:['#ffe9a0','#ffd04a'],amb:6,hit:'star',d:'몸 주위로 금빛 불꽃이 튀고, 때리면 금빛 별이 터져요.'},
@@ -4954,8 +4954,8 @@ DRW.skflash=function(c,k,a,X,Yh){const q=k.life/k.max,x=X(k.x),y=Yh(k.h),R=U*.38
   case 'ring':c.lineWidth=U*.03;c.beginPath();c.arc(0,0,R*g,0,Math.PI*2);c.stroke();break}
   c.restore()};
 function skFlash(sh,col,x,h,o){kfx.push(Object.assign({t:'skf',sh,col,x,h,life:.32,max:.32,s:1,a0:Math.random()*6,dr:DRW.skflash,net:0},o||{}))}
-function skinTick(dt){if(!p||G.mode!=='play'||p.state==='dead')return;const id=skinIdOf(p),f=id&&SKFX[id];if(!f)return;if(skCount()>70)return;
-  const moving=Math.abs(p.vx||0)>.4;if(f.feet&&!moving&&Math.random()>.3)return;if(Math.random()>f.amb*dt)return;const S=p.size||HERO;
+function skinTick(dt){if(!p||G.mode!=='play'||p.state==='dead')return;const id=skinIdOf(p),f=id&&SKFX[id];if(!f){p._skU=0;return}if(p.pult&&!p._skU){p._skU=1;try{skinUltBurst()}catch(_){}}if(!p.pult)p._skU=0;const ULTB=p.pult?4:1;if(skCount()>(p.pult?110:70))return;
+  const moving=Math.abs(p.vx||0)>.4;if(f.feet&&!moving&&!p.pult&&Math.random()>.3)return;if(Math.random()>f.amb*dt*ULTB)return;if(p.pult&&Math.random()<.35){const S=p.size||HERO,an=Math.random()*Math.PI*2;skPart(f,f.trail||f.sh,p.x+Math.cos(an)*.9,p.h+S*.6+Math.sin(an)*.9,{vx:-Math.cos(an)*.8,vh:-Math.sin(an)*.8,life:.7,max:.7,s:1.3,ch2:'♫'});return}const S=p.size||HERO;
   switch(f.sh){
   case 'leaf':case 'petal':skPart(f,f.sh,p.x+rnd(-.5,.5),p.h+S*rnd(1,1.5),{vx:rnd(-.3,.3),vh:-rnd(.4,.7),sway:.6,life:1.6,max:1.6});break;
   case 'snow':skPart(f,'snow',p.x+rnd(-.6,.6),p.h+S*rnd(1.1,1.6),{vh:-rnd(.3,.5),sway:.4,life:1.8,max:1.8,vr:rnd(-1,1)});break;
@@ -4964,7 +4964,7 @@ function skinTick(dt){if(!p||G.mode!=='play'||p.state==='dead')return;const id=s
   case 'ember':case 'wisp':skPart(f,f.sh,p.x+rnd(-.3,.3),p.h+S*rnd(.2,1),{vx:rnd(-.15,.15),vh:rnd(.6,1.1),life:.9,max:.9,vr:0,rot:0});break;
   case 'glyph':case 'suit':case 'note':skPart(f,f.sh,p.x+rnd(-.5,.5),p.h+S*rnd(.6,1.3),{vx:rnd(-.2,.2),vh:rnd(.35,.6),life:1.4,max:1.4,ch2:Math.random()<.5?'♪':'♫',vr:rnd(-.5,.5)});break;
   default:skPart(f,f.sh,p.x+rnd(-.4,.4),p.h+S*rnd(.2,1.2),{vx:rnd(-.3,.3),vh:rnd(-.2,.4),life:.45,max:.45})}}
-function skinHit(e){if(!p||G.mode!=='play'||!e)return;const id=skinIdOf(p),f=id&&SKFX[id];if(!f)return;if((e._skt||0)>G.T)return;e._skt=G.T+.14;if(skCount()>90)return;const x=e.x,h=e.h+(e.size||1)*.55,c0=f.col[0],burst=(sh,n,o)=>{for(let i=0;i<n;i++){const an=Math.random()*Math.PI*2,sp=rnd(1.2,2.6);skPart(f,sh,x,h,Object.assign({vx:Math.cos(an)*sp,vh:Math.sin(an)*sp+.6,g:3,life:.55,max:.55},o||{}))}};
+function skinHit(e){if(!p||G.mode!=='play'||!e)return;const id=skinIdOf(p),f=id&&SKFX[id];if(!f)return;if((e._skt||0)>G.T)return;e._skt=G.T+.14;if(skCount()>(p.pult?130:90))return;const UL=!!p.pult,x=e.x,h=e.h+(e.size||1)*.55,c0=f.col[0];if(UL)skFlash('ring',c0,x,h,{s:1.4,life:.35,max:.35});const burst=(sh,n,o)=>{n=UL?Math.round(n*1.8):n;for(let i=0;i<n;i++){const an=Math.random()*Math.PI*2,sp=rnd(1.2,2.6);skPart(f,sh,x,h,Object.assign({vx:Math.cos(an)*sp,vh:Math.sin(an)*sp+.6,g:3,life:.55,max:.55},o||{}))}};
   switch(f.hit){
   case 'star':burst('star',6,{s:1.2});break;
   case 'leaf':burst('leaf',7,{g:1.2,sway:.4});break;
@@ -4984,10 +4984,69 @@ function skinHit(e){if(!p||G.mode!=='play'||!e)return;const id=skinIdOf(p),f=id&
   case 'redslash':skFlash('redslash','#ff4a4a',x,h);burst('smoke',3,{g:0,vh:.4,col:'#3a3a3a'});break;
   case 'splash':burst('rain',8,{g:5,life:.5,max:.5});break;
   case 'stamp':skFlash('stamp','#ff5a4a',x,h+.25,{life:.55,max:.55});try{inkSplat(x,h,6,.8)}catch(_){}break;
+  case 'stampring':skFlash('ring',c0,x,h,{s:1.1});skFlash('ring',f.col[1]||c0,x,h,{s:.6,life:.25,max:.25});burst(f.sh,4,{g:0});break;
   case 'confetti':for(let i=0;i<10;i++){const an=-Math.PI/2+rnd(-1.2,1.2)+Math.PI;skPart(f,'conf',x,h,{vx:rnd(-2,2),vh:rnd(1.5,3.2),g:4,sway:1,life:.8,max:.8,col:['#ff6a8a','#ffd04a','#6ad0ff','#8aff9a','#ffffff'][i%5]})}break}}
 function skinTrail(s2){if(!p||G.mode!=='play')return;const id=skinIdOf(p),f=id&&SKFX[id];if(!f||!f.trail)return;if(skCount()>70)return;
   skPart(f,f.trail,s2.x+rnd(-.05,.05),s2.h+rnd(-.05,.05),{vx:-(s2.vx||0)*.05,vh:rnd(-.1,.2),life:.4,max:.4,s:.85,ch2:'♪'})}
 
+/* ---------- 추가 스킨 (캐릭터당 3개) ---------- */
+const SKX=(cls,id,name,price,ink,glow,acc,desc,fx)=>{(SKINX[cls]=SKINX[cls]||[]).push({id,name,price,ink,glow,acc,desc});SKFX[id]=fx};
+SKX('base','base_crimson','크림슨 파이터',650,'#ffd6d6','rgba(255,60,60,.95)','headband','붉은 머리띠를 휘날리는 열혈 파이터.',{sh:'ember',col:['#ff5a4a','#ffb08a'],amb:6,hit:'firework',d:'붉은 불씨가 피어오르고, 때리면 붉은 불꽃이 터져요.'});
+SKX('base','base_holo','홀로그램',1200,'#d6fbff','rgba(80,230,255,.95)','visor','반투명하게 깜빡이는 홀로그램 파이터.',{sh:'pixel',col:['#6af0ff','#ffffff'],amb:7,hit:'glitch',d:'몸 주위로 홀로그램 픽셀이 깜빡이고, 맞히면 픽셀 조각이 흩어져요.'});
+SKX('archer','archer_frost','서리 사수',600,'#e6f6ff','rgba(130,210,255,.95)','hood','서리 후드를 쓴 북방의 사수.',{sh:'snow',col:['#bfefff','#ffffff'],amb:5,hit:'ice',trail:'snow',d:'눈송이가 흩날리고 화살 뒤로 서리가 남아요. 맞히면 얼음 결정이 부서져요.'});
+SKX('archer','archer_gold','황금 사수',1100,'#fff4cc','rgba(255,210,70,.95)','crown','황금 왕관을 쓴 왕실 궁수.',{sh:'star',col:['#ffe27a','#ffffff'],amb:4,hit:'star',trail:'star',d:'금빛 별이 반짝이고, 맞히면 별이 터져요.'});
+SKX('sword','sword_sakura','벚꽃 검객',900,'#ffe6f0','rgba(255,150,200,.95)','headband','벚꽃이 흩날리는 검객.',{sh:'petal',col:['#ffb7d5','#ffe4ef'],amb:5,hit:'petal',d:'벚꽃잎이 흩날리고, 베면 꽃잎이 흩어져요.'});
+SKX('sword','sword_obsidian','흑요 검객',1500,'#e0d6ff','rgba(150,90,255,.95)','horns','흑요석 뿔을 단 마검사.',{sh:'smoke',col:['#5a3a8a','#c8a0ff'],amb:5,hit:'redslash',d:'보랏빛 어둠이 피어오르고, 베면 날카로운 베기 자국이 남아요.'});
+SKX('ninja','ninja_crimson','붉은 그림자',1100,'#ffd8d8','rgba(255,70,70,.9)','scarf','붉은 목도리를 두른 암살자.',{sh:'ember',col:['#ff4a4a','#ff9a8a'],amb:5,hit:'star4',trail:'ember',d:'붉은 불티가 날리고, 표창 뒤로 불씨가 따라가요.'});
+SKX('ninja','ninja_white','백야 닌자',1700,'#ffffff','rgba(220,235,255,.95)','scarf','눈처럼 하얀 닌자.',{sh:'snow',col:['#ffffff','#dfe7f2'],amb:5,hit:'ice',trail:'snow',d:'눈발이 날리고, 맞히면 얼음 조각이 튀어요.'});
+SKX('bomber','bomber_neon','네온 펑크',1500,'#ffd6ff','rgba(255,80,230,.95)','visor','형광빛 바이저를 쓴 폭탄 펑크.',{sh:'pixel',col:['#ff5ae6','#5affea','#ffe85a'],amb:7,hit:'firework',trail:'pixel',d:'형광 픽셀이 튀고, 맞히면 형형색색 불꽃놀이가 터져요.'});
+SKX('bomber','bomber_ice','얼음 폭탄마',2300,'#e6f6ff','rgba(120,200,255,.95)','crown','얼음 결정 왕관을 쓴 폭탄마.',{sh:'snow',col:['#bfefff','#ffffff'],amb:5,hit:'ice',trail:'snow',d:'냉기가 흩날리고, 맞히면 얼음 파편이 튀어요.'});
+SKX('gunner','gunner_space','우주 보안관',2000,'#d6f4ff','rgba(80,200,255,.95)','visor','우주 헬멧 바이저를 쓴 보안관.',{sh:'star',col:['#8ad8ff','#ffffff'],amb:4,hit:'sheriff',trail:'star',d:'우주 별빛이 반짝이고, 맞히면 보안관 별이 떠올라요.'});
+SKX('gunner','gunner_noir','누아르',2900,'#e8e8e8','rgba(255,215,120,.85)','hood','긴 코트를 걸친 탐정.',{sh:'smoke',col:['#8a8a8a','#ffd77a'],amb:4,feet:1,hit:'xslash',trail:'smoke',d:'담배 연기 같은 안개가 깔리고, 맞히면 금빛 섬광이 번쩍여요.'});
+SKX('necro','necro_dark','흑마법사',2600,'#ead6ff','rgba(170,90,255,.95)','hood','보랏빛 후드를 쓴 흑마법사.',{sh:'wisp',col:['#b07aff','#e8d6ff'],amb:5,hit:'skull',trail:'wisp',d:'보랏빛 혼불이 피어오르고, 맞힌 적에게서 해골 영혼이 빠져나와요.'});
+SKX('necro','necro_bone','해골왕',3600,'#f6f2e8','rgba(255,240,200,.9)','crown','뼈 왕관을 쓴 해골들의 왕.',{sh:'shard',col:['#f6f2e8','#d8d0c0'],amb:4,hit:'ice',trail:'shard',d:'뼛조각이 흩날리고, 맞히면 뼛조각이 부서져요.'});
+SKX('magician','magician_galaxy','은하 마술사',3200,'#d6dcff','rgba(110,130,255,.95)','star','머리 위에 별이 떠 있는 은하의 마술사.',{sh:'star',col:['#9aa8ff','#ffffff','#ffd0ff'],amb:5,hit:'star',trail:'star',d:'은하수 별빛이 맴돌고, 맞히면 별이 터져요.'});
+SKX('magician','magician_jester','광대',4200,'#fff2c8','rgba(255,200,60,.95)','horns','방울 모자를 쓴 광대.',{sh:'conf',col:['#ff6a8a','#ffd04a','#6ad0ff'],amb:4,hit:'confetti',trail:'suit',d:'색종이가 흩날리고, 맞히면 꽃가루가 터져요.'});
+SKX('porter','porter_void','공허 여행자',4000,'#e8d6ff','rgba(150,80,255,.95)','halo','공허의 고리를 머리에 띄운 여행자.',{sh:'smoke',col:['#3a1a6a','#b07aff'],amb:5,hit:'glitch',trail:'smoke',d:'공허의 안개가 일렁이고, 맞히면 공간이 깨지듯 조각이 튀어요.'});
+SKX('porter','porter_chrono','크로노',5200,'#fff4d6','rgba(255,200,90,.95)','visor','시간을 다루는 황금 여행자.',{sh:'glyph',ch:['Ⅰ','Ⅲ','Ⅵ','Ⅸ','Ⅻ'],col:['#ffd77a','#fff4d6'],amb:3,hit:'stampring',trail:'glyph',d:'시계 숫자가 떠다니고, 맞히면 금빛 시계 고리가 퍼져요.'});
+SKX('baseball','baseball_legend','레전드',5000,'#fff4cc','rgba(255,210,70,.95)','crown','명예의 전당에 오른 전설의 타자.',{sh:'star',col:['#ffe27a','#ffffff'],amb:4,hit:'ball',trail:'star',d:'금빛 별이 반짝이고, 맞히면 금빛 야구공 섬광이 터져요.'});
+SKX('baseball','baseball_night','야간 경기',6400,'#d6ffe0','rgba(80,255,140,.95)','visor','조명탑 아래 야간 경기의 강타자.',{sh:'pixel',col:['#6aff9a','#ffffff'],amb:5,hit:'xslash',trail:'pixel',d:'전광판 같은 초록 픽셀이 깜빡이고, 맞히면 섬광이 번쩍여요.'});
+SKX('volt','volt_storm','폭풍 정령',6000,'#e6fbff','rgba(120,230,255,.95)','halo','폭풍의 고리를 두른 정령.',{sh:'bolt',col:['#8af0ff','#ffffff'],amb:6,hit:'bolt',trail:'bolt',d:'푸른 전류가 튀고, 맞히면 푸른 번개가 갈라져요.'});
+SKX('volt','volt_plasma','플라즈마',7400,'#ffd6f6','rgba(255,80,220,.95)','antenna','플라즈마 안테나를 단 실험체.',{sh:'bolt',col:['#ff6ae6','#ffffff'],amb:6,hit:'bolt',trail:'pixel',d:'분홍 플라즈마가 튀고, 맞히면 분홍 번개가 갈라져요.'});
+SKX('wolf','wolf_white','백랑',7000,'#ffffff','rgba(200,230,255,.95)','scarf','눈보라 속의 흰 늑대.',{sh:'snow',col:['#ffffff','#dfefff'],amb:5,hit:'claw',d:'눈보라가 일고, 맞히면 하얀 발톱 자국이 남아요.'});
+SKX('wolf','wolf_hell','지옥견',8600,'#ffd6c8','rgba(255,70,30,.95)','horns','뿔이 돋은 지옥의 사냥개.',{sh:'ember',col:['#ff5a2a','#ffb04a'],amb:7,hit:'claw',d:'지옥 불티가 피어오르고, 맞히면 불타는 발톱 자국이 남아요.'});
+SKX('bard','bard_rock','록스타',7800,'#ffd6d6','rgba(255,60,90,.95)','star','무대를 뒤흔드는 록스타.',{sh:'note',col:['#ff5a7a','#ffd04a'],amb:4,hit:'firework',trail:'note',d:'붉은 음표가 튀고, 맞히면 무대 불꽃이 터져요.'});
+SKX('frost','frost_king','겨울왕',8600,'#ffffff','rgba(170,220,255,.95)','crown','얼음 왕좌의 주인.',{sh:'snow',col:['#ffffff','#bfe6ff'],amb:6,hit:'ice',trail:'shard',d:'눈송이가 소용돌이치고, 맞히면 거대한 얼음 결정이 부서져요.'});
+SKX('frost','frost_aurora','오로라',10200,'#e6ffef','rgba(120,255,200,.95)','halo','오로라를 두른 북극의 마법사.',{sh:'star',col:['#7affc8','#b07aff','#7ad8ff'],amb:5,hit:'star',trail:'star',d:'오로라 빛이 반짝이고, 맞히면 오색 별빛이 터져요.'});
+SKX('druid','druid_autumn','가을 정령',9400,'#fff0d6','rgba(255,160,60,.95)','flower','단풍잎 화관을 쓴 가을 정령.',{sh:'leaf',col:['#ff9a3a','#ffd04a','#e05a2a'],amb:5,hit:'leaf',trail:'leaf',d:'단풍잎이 흩날리고, 맞히면 낙엽이 터져요.'});
+SKX('druid','druid_moon','달빛 정령',11000,'#eef2ff','rgba(180,200,255,.95)','halo','달빛을 머금은 숲의 정령.',{sh:'petal',col:['#ffffff','#c8d4ff'],amb:5,hit:'petal',trail:'petal',d:'하얀 꽃잎이 흩날리고, 맞히면 달빛 꽃잎이 터져요.'});
+SKX('shade','shade_light','빛의 사신',10400,'#fffbe6','rgba(255,230,140,.95)','halo','후광을 두른 빛의 사신.',{sh:'spark',col:['#fff0a0','#ffffff'],amb:6,hit:'xslash',trail:'spark',d:'금빛 빛줄기가 반짝이고, 맞히면 빛의 십자 섬광이 번쩍여요.'});
+SKX('shade','shade_blood','핏빛 사신',12000,'#ffd6d6','rgba(220,30,50,.95)','hood','핏빛 망토의 사신.',{sh:'ember',col:['#ff2a3a','#8a0a1a'],amb:6,hit:'redslash',trail:'ember',d:'붉은 기운이 피어오르고, 맞히면 핏빛 베기 자국이 남아요.'});
+SKX('kid','kid_space','우주 잼민이',1500,'#d6f4ff','rgba(90,200,255,.95)','antenna','안테나 헬멧을 쓴 우주 잼민이.',{sh:'star',col:['#8ad8ff','#ffffff'],amb:4,hit:'star',d:'우주 별빛이 반짝이고, 맞히면 별이 터져요.'});
+SKX('kid','kid_dino','공룡 잼민이',2200,'#e0ffd6','rgba(110,230,90,.95)','spikes','공룡 옷을 입은 잼민이. 머리에 뾰족한 등가시.',{sh:'leaf',col:['#7ae05a','#c8ff9a'],amb:3,hit:'claw',d:'풀잎이 흩날리고, 맞히면 공룡 발톱 자국이 남아요.'});
+SKX('seonbi','seonbi_sage','신선',2200,'#ffffff','rgba(220,240,255,.95)','halo','구름을 타고 다니는 신선.',{sh:'smoke',col:['#ffffff','#e6f0ff'],amb:5,hit:'stampring',d:'구름 같은 안개가 피어오르고, 맞히면 신선의 기운이 퍼져요.'});
+SKX('seonbi','seonbi_general','장군',3200,'#ffe6c8','rgba(255,170,60,.95)','plume','투구에 깃을 꽂은 장군.',{sh:'glyph',ch:['將','勇','忠'],col:['#ffb04a','#ffe6c8'],amb:2,hit:'stamp',trail:'glyph',d:'금빛 한자가 떠오르고, 맞히면 장군의 인장이 찍혀요.'});
+SKX('grad','grad_prof','교수님',2500,'#f0f0f0','rgba(255,255,255,.9)','cap','학사모를 쓴 정년 교수.',{sh:'glyph',ch:['A+','Q.E.D.','∴'],col:['#ffffff','#ffd77a'],amb:2,hit:'confetti',trail:'glyph',d:'채점 기호가 떠다니고, 맞히면 축하 꽃가루가 터져요.'});
+SKX('grad','grad_hacker','해커',3600,'#d6ffd8','rgba(60,255,110,.95)','visor','초록 코드가 흐르는 해커.',{sh:'glyph',ch:['0','1','{','}','<','>'],col:['#5aff7a','#c8ffd0'],amb:5,hit:'glitch',trail:'pixel',d:'초록 코드가 흘러내리고, 맞히면 화면이 깨지듯 픽셀이 튀어요.'});
+function heroXSkin(e){if(!e||e.kind!=='hero')return null;const cl=e.cls||G.cls||'base';let id=null;if(e.skin!=null){if(!e.skin)return null;id=e.skinId}else{if(bt()||G.admin||!SHOP.skinOn[cl])return null;id=(SHOP.skinV||{})[cl];if(!id||!skinOwned(cl,id))return null}if(!id||id===cl||id==='violin')return null;return (SKINX[cl]||[]).find(q=>q.id===id)||null}
+function drawSkinAcc(c,S,hx,hy,hr,d){const col=S.ink,T=G.T;c.save();c.lineCap='round';c.lineJoin='round';c.strokeStyle=col;c.fillStyle=col;c.shadowColor=S.glow;c.shadowBlur=G.lowfx?0:hr*.6;c.lineWidth=Math.max(1.4,hr*.16);
+  switch(S.acc){
+  case 'headband':c.beginPath();c.moveTo(hx-hr*1.02,hy-hr*.3);c.quadraticCurveTo(hx,hy-hr*.62,hx+hr*1.02,hy-hr*.3);c.stroke();for(const k of[0,1]){c.beginPath();c.moveTo(hx-d*hr,hy-hr*.35);c.quadraticCurveTo(hx-d*hr*1.6,hy-hr*(.2-k*.3)+Math.sin(T*9+k)*hr*.2,hx-d*hr*2.1,hy+hr*(.05+k*.35));c.stroke()}break;
+  case 'visor':c.lineWidth=Math.max(2,hr*.32);c.beginPath();c.moveTo(hx+d*hr*.05,hy-hr*.15);c.lineTo(hx+d*hr*1.05,hy-hr*.15);c.stroke();break;
+  case 'hood':c.beginPath();c.arc(hx,hy,hr*1.28,Math.PI*1.0,Math.PI*2.0);c.moveTo(hx-d*hr*1.28,hy);c.quadraticCurveTo(hx-d*hr*1.5,hy+hr*.9,hx-d*hr*.6,hy+hr*1.2);c.stroke();break;
+  case 'crown':c.beginPath();c.moveTo(hx-hr*.7,hy-hr*.8);c.lineTo(hx-hr*.75,hy-hr*1.55);c.lineTo(hx-hr*.35,hy-hr*1.1);c.lineTo(hx,hy-hr*1.65);c.lineTo(hx+hr*.35,hy-hr*1.1);c.lineTo(hx+hr*.75,hy-hr*1.55);c.lineTo(hx+hr*.7,hy-hr*.8);c.closePath();c.stroke();break;
+  case 'horns':for(const sd of[-1,1]){c.beginPath();c.moveTo(hx+sd*hr*.55,hy-hr*.75);c.quadraticCurveTo(hx+sd*hr*1.2,hy-hr*1.1,hx+sd*hr*.95,hy-hr*1.7);c.stroke()}break;
+  case 'scarf':c.lineWidth=Math.max(2,hr*.3);c.beginPath();c.moveTo(hx-hr*.6,hy+hr*1.0);c.lineTo(hx+hr*.6,hy+hr*1.0);c.stroke();c.lineWidth=Math.max(1.6,hr*.22);c.beginPath();c.moveTo(hx-d*hr*.5,hy+hr*1.0);let x=hx-d*hr*.5,y=hy+hr*1.0;for(let i=1;i<=6;i++){x-=d*hr*.35;y+=Math.sin(T*8+i)*hr*.12+hr*.04;c.lineTo(x,y)}c.stroke();break;
+  case 'halo':c.lineWidth=Math.max(1.6,hr*.18);c.beginPath();c.ellipse(hx,hy-hr*1.55+Math.sin(T*3)*hr*.08,hr*.75,hr*.22,0,0,Math.PI*2);c.stroke();break;
+  case 'star':{const sy=hy-hr*1.9+Math.sin(T*3)*hr*.12;c.beginPath();for(let i=0;i<10;i++){const r=i%2?hr*.22:hr*.5,an=i*Math.PI/5-Math.PI/2+T;c.lineTo(hx+Math.cos(an)*r,sy+Math.sin(an)*r)}c.closePath();c.fill();break}
+  case 'antenna':for(const sd of[-1,1]){c.beginPath();c.moveTo(hx+sd*hr*.35,hy-hr*.9);c.lineTo(hx+sd*hr*.6,hy-hr*1.7);c.stroke();c.beginPath();c.arc(hx+sd*hr*.62,hy-hr*1.78,hr*.16+Math.sin(T*8+sd)*hr*.04,0,Math.PI*2);c.fill()}break;
+  case 'flower':for(let i=0;i<5;i++){const an=Math.PI*(1.1+i*.2);c.beginPath();c.arc(hx+Math.cos(an)*hr*1.05,hy+Math.sin(an)*hr*1.05,hr*.2,0,Math.PI*2);c.fill()}break;
+  case 'spikes':c.beginPath();for(let i=0;i<4;i++){const a=Math.PI*(1.15+i*.23),x0=hx+Math.cos(a)*hr,y0=hy+Math.sin(a)*hr;c.moveTo(x0,y0);c.lineTo(hx+Math.cos(a+.1)*hr*1.55,hy+Math.sin(a+.1)*hr*1.55);c.lineTo(hx+Math.cos(a+.22)*hr,hy+Math.sin(a+.22)*hr)}c.stroke();break;
+  case 'plume':c.beginPath();c.arc(hx,hy,hr*1.08,Math.PI*1.05,Math.PI*1.95);c.stroke();c.lineWidth=Math.max(2.5,hr*.34);c.beginPath();c.moveTo(hx+d*hr*.5,hy-hr*1.05);c.quadraticCurveTo(hx,hy-hr*1.9,hx-d*hr*1.2,hy-hr*1.0);c.stroke();break;
+  case 'cap':c.fillStyle='#151515';c.beginPath();c.moveTo(hx-hr*1.25,hy-hr*.95);c.lineTo(hx,hy-hr*1.35);c.lineTo(hx+hr*1.25,hy-hr*.95);c.lineTo(hx,hy-hr*.62);c.closePath();c.fill();c.stroke();c.beginPath();c.moveTo(hx+hr*.2,hy-hr*1.0);c.lineTo(hx+d*hr*1.1,hy-hr*.5+Math.sin(T*4)*hr*.06);c.stroke();break}
+  c.restore()}
+function skinUltBurst(){const id=skinIdOf(p),f=id&&SKFX[id];if(!f)return;const S=p.size||HERO,sh=f.trail||f.sh;for(let i=0;i<22;i++){const an=i/22*Math.PI*2,sp=rnd(2.2,3.6);skPart(f,sh==='feet'?'spark':sh,p.x,p.h+S*.6,{vx:Math.cos(an)*sp,vh:Math.sin(an)*sp,g:0,life:.8,max:.8,s:1.5,ch2:'♫'})}
+  skFlash('ring',f.col[0],p.x,p.h+S*.6,{s:2.6,life:.5,max:.5});skFlash('ring',f.col[f.col.length-1],p.x,p.h+S*.6,{s:1.6,life:.4,max:.4})}
 {const cv=document.getElementById('charCv');if(cv){let sx=null;cv.addEventListener('pointerdown',e=>{if(charTab==='skin')sx=e.clientX});cv.addEventListener('pointerup',e=>{if(sx==null)return;const dx=e.clientX-sx;sx=null;if(Math.abs(dx)<36)return;const L=skinList(charSel);charSkI=clamp(charSkI+(dx<0?1:-1),0,L.length-1);sfx('ui');buildChar()});cv.addEventListener('pointercancel',()=>{sx=null})}}
 resize();
 (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{sizePreview()});
