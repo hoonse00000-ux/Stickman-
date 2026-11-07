@@ -3251,7 +3251,8 @@ function openChar(){charPv=null;charSel=SHOP.cls||'base';$('#charBack').hidden=f
 function closeChar(){charPv=null;$('#charBack').hidden=true;showBest()}
 function progTxt(k){const g=getProg(k),m=Math.max(g.max||0,g.idx||0);return m>0?`최고 R${Math.floor(m/5)+1}-${m%5+1}`:'기록 없음'}
 function buildChar(){const cur=SHOP.cls||'base';$('#charCur').textContent=CLS[cur].name;
-  $('#charGrid').innerHTML=CLSK.map(k=>{const own=ownC(k);return`<button class="ctile${k===charSel?' sel':''}${k===cur?' cur':''}${own?'':' lock'}" data-k="${k}"><canvas data-k="${k}"></canvas><b>${own?CLS[k].name:'???'}</b><small>${own?progTxt(k):LOCKSVG+(CLS[k].price||0).toLocaleString()+' 코인'}</small></button>`}).join('');
+  {const _old={};$('#charGrid').querySelectorAll('canvas').forEach(cv=>_old[cv.dataset.k]=cv);window._cgOld=_old}$('#charGrid').innerHTML=CLSK.map(k=>{const own=ownC(k);return`<button class="ctile${k===charSel?' sel':''}${k===cur?' cur':''}${own?'':' lock'}" data-k="${k}"><canvas data-k="${k}"></canvas><b>${own?CLS[k].name:'???'}</b><small>${own?progTxt(k):LOCKSVG+(CLS[k].price||0).toLocaleString()+' 코인'}</small></button>`}).join('');
+  $('#charGrid').querySelectorAll('canvas').forEach(cv=>{const o=window._cgOld&&window._cgOld[cv.dataset.k];if(o&&o!==cv)cv.replaceWith(o)});window._cgOld=null;
   $('#charGrid').querySelectorAll('.ctile').forEach(b=>b.onclick=()=>{if(charSel!==b.dataset.k){charTab='info'}charSel=b.dataset.k;buildChar();sfx('dodge');if(innerWidth<=720){const cb=$('#charBack .cbody');try{cb.scrollTo({top:0,behavior:'smooth'})}catch(_){cb.scrollTop=0}}});
   const k=charSel,c=CLS[k],own=ownC(k),sk=SKINS[k],skOwn=ownS(k)||(k==="bard"&&(SHOP.skins2||[]).includes("bard")),skOn=!!SHOP.skinOn[k],v=(SHOP.vars||{})[k]||(c.vars?c.vars[0][0]:'');
   let btn;if(k===cur)btn='<button class="sbuy ghost" disabled>사용 중</button>';else if(own)btn='<button class="sbuy" id="cPick">이 캐릭터로 선택</button>';else btn='<button class="sbuy ghost" id="cShop">상점에서 구매하기</button>';
@@ -3275,18 +3276,18 @@ function buildChar(){const cur=SHOP.cls||'base';$('#charCur').textContent=CLS[cu
   $('#charInfo').querySelectorAll('.vars button').forEach(b=>b.onclick=()=>{SHOP.vars=SHOP.vars||{};SHOP.vars[k]=b.dataset.v;G.clsVar=SHOP.vars;saveShop();buildChar()});
   $('#charInfo').querySelectorAll('.stabs button').forEach(b=>b.onclick=()=>{charTab=b.dataset.t;if(charTab==='skin'){const L=skinList(k),e=skinEq(k);charSkI=Math.max(0,L.findIndex(q=>q.id===e))}buildChar()})}
 function drawCharFig(cv2,k,demo,dt,T,key){const d=Math.min(2,devicePixelRatio||1),w=cv2.clientWidth,h=cv2.clientHeight;if(!w)return;if(cv2.width!==Math.round(w*d)||cv2.height!==Math.round(h*d)){cv2.width=Math.round(w*d);cv2.height=Math.round(h*d)}
-  const c=cv2.getContext('2d');c.setTransform(d,0,0,d,0,0);c.clearRect(0,0,w,h);const gy=h*.86,u=Math.min(h*.58,w*.5);
+  const c=cv2.getContext('2d');if(!c)return;c.setTransform(d,0,0,d,0,0);c.clearRect(0,0,w,h);const gy=h*.86,u=Math.min(h*.58,w*.5);
   c.save();c.strokeStyle='#f5f5f5';c.shadowColor='rgba(255,255,255,.7)';c.shadowBlur=8;c.lineWidth=1.5;c.beginPath();c.moveTo(w*.1,gy);c.lineTo(w*.9,gy);c.stroke();c.restore();
   const f=charFig[key]||(charFig[key]={kind:'hero',cls:k,skin:false,x:0,h:0,size:1,face:1,state:'idle',st:0,dur:0,w:.3,phase:0,seed:CLSK.indexOf(k)});if(f.cls!==k){f.cls=k;f._p=null}f.cvar=(SHOP.vars||{})[k];{const e0=skinEq(k);f.skin=!!e0||(demo&&charPv===k);f.vio=e0==='violin';f.skinId=e0;if(demo&&charTab==='skin'){const sk=skinList(k)[charSkI];if(sk){f.skin=true;f.vio=sk.id==='violin';f.skinId=sk.id}}}
   if(demo){const [stt,du]=SDEMO[k],cyc=du+1.1,tt=T%cyc,n=Math.floor(T/cyc);if(tt<du){f.state=stt;f.st=tt;f.dur=du;f.w=stt==='punch'?.2:.3;f.wcfg=k==='sword'?{swk:n%4}:null}else{f.state=k==='sword'||tt>du+.6?'idle':'walk';f.phase=T*7.5}}else f.state='idle';
   if(!ownC(k)){f.state=k==='baseball'?'w_batc':'idle';f.batG=.75;f.st=0;f.dur=9;f.skin=false;drawSilhouette(c,cv2,f,smooth(f,pose(f,T),dt),w/2,gy,u,d);return}drawFig(c,f,smooth(f,pose(f,T),dt),w/2,gy,u)}
-function renderChar(dt,T){drawCharFig($('#charCv'),charSel,true,dt,T,'big');$('#charGrid').querySelectorAll('canvas').forEach(cv2=>drawCharFig(cv2,cv2.dataset.k,false,dt,T,'t_'+cv2.dataset.k))}
+function renderChar(dt,T){try{drawCharFig($('#charCv'),charSel,true,dt,T,'big')}catch(_){}$('#charGrid').querySelectorAll('canvas').forEach(cv2=>{try{drawCharFig(cv2,cv2.dataset.k,false,dt,T,'t_'+cv2.dataset.k)}catch(_){}})}
 $('#charBtn').onclick=()=>{closeTut();openChar()};$('#charClose').onclick=closeChar;
 addEventListener('keydown',e=>{if($('#charBack').hidden)return;const i=CLSK.indexOf(charSel);if(e.key==='Escape')closeChar();else if(e.key==='ArrowRight'||e.key==='ArrowLeft'){charSel=CLSK[clamp(i+(e.key==='ArrowRight'?1:-1),0,CLSK.length-1)];buildChar()}else if(e.key==='Enter'&&ownC(charSel)){SHOP.cls=charSel;G.cls=charSel;saveShop();buildChar()}});
 showBest();
 function renderShop(dt,T){const d=Math.min(2,devicePixelRatio||1);
   $('#sTrack').querySelectorAll('canvas').forEach((cv2,idx)=>{const k=cv2.dataset.k,skid=cv2.dataset.sk,i=skid?idx:CLSK.indexOf(k),CUR=skid?skinI:shopI;if(Math.abs(i-CUR)>2)return;const r2=cv2.getBoundingClientRect(),w=cv2.clientWidth,h=cv2.clientHeight;if(!w)return;
-    if(cv2.width!==Math.round(w*d)){cv2.width=w*d;cv2.height=h*d}const c=cv2.getContext('2d');c.setTransform(d,0,0,d,0,0);c.clearRect(0,0,w,h);const gy=h*.88,u=h*.5;
+    if(cv2.width!==Math.round(w*d)){cv2.width=w*d;cv2.height=h*d}const c=cv2.getContext('2d');if(!c)return;c.setTransform(d,0,0,d,0,0);c.clearRect(0,0,w,h);const gy=h*.88,u=h*.5;
     c.save();c.strokeStyle='#f5f5f5';c.shadowColor='rgba(255,255,255,.7)';c.shadowBlur=8;c.lineWidth=1.5;c.beginPath();c.moveTo(w*.12,gy);c.lineTo(w*.88,gy);c.stroke();c.restore();
     const fk=skid?'sk_'+skid:k,f=shopFig[fk]||(shopFig[fk]={kind:'hero',cls:k,skin:false,x:0,h:0,size:1,face:1,state:'idle',st:0,dur:0,w:.3,phase:0,seed:i});f.cls=k;if(skid){f.skin=true;f.vio=skid==='violin';f.skinId=skid}else{f.skin=!!skinEq(k)||shopPv===k;f.vio=skinEq(k)==='violin';f.skinId=skinEq(k)}
     if(i===CUR){const [stt,du]=SDEMO[k],cyc=du+.9,tt=(T*1)%cyc;if(tt<du){f.state=stt;f.st=tt;f.dur=du;f.w=stt==='punch'?.2:.3}else f.state='idle'}else f.state='idle';
@@ -5187,6 +5188,9 @@ function skinSnd(f,big){if(!f||!f.snd||!AC||mute)return;const now=AC.currentTime
 skinUltBurst=function(){const id=skinIdOf(p),f=id&&SKFX[id];if(!f)return;const S=p.size||HERO,sh=f.trail||f.sh;for(let i=0;i<22;i++){const an=i/22*Math.PI*2,sp=rnd(2.2,3.6);skPart(f,sh,p.x,p.h+S*.6,{vx:Math.cos(an)*sp,vh:Math.sin(an)*sp,g:0,life:.8,max:.8,s:1.5,ch2:'♫'})}
   skFlash('ring',f.col[0],p.x,p.h+S*.6,{s:2.6,life:.5,max:.5});if(f.fl&&f.fl!=='none'&&f.fl!=='stamp')skFlash(f.fl,f.col[f.col.length-1],p.x,p.h+S*.6,{s:2,life:.6,max:.6});skinSnd(f,true);setTimeout(()=>skinSnd(f,true),120)};
 {const cv=document.getElementById('charCv');if(cv){let sx=null;cv.addEventListener('pointerdown',e=>{if(charTab==='skin')sx=e.clientX});cv.addEventListener('pointerup',e=>{if(sx==null)return;const dx=e.clientX-sx;sx=null;if(Math.abs(dx)<36)return;const L=skinList(charSel);charSkI=clamp(charSkI+(dx<0?1:-1),0,L.length-1);sfx('ui');buildChar()});cv.addEventListener('pointercancel',()=>{sx=null})}}
+
+/* Safari: free backing store of canvases removed from DOM so total canvas memory never hits the cap */
+try{new MutationObserver(ms=>{for(const m of ms)for(const n of m.removedNodes){if(n.nodeType!==1)continue;const L=n.tagName==='CANVAS'?[n]:n.querySelectorAll?n.querySelectorAll('canvas'):[];for(const cv of L){if(!cv.isConnected){cv.width=0;cv.height=0}}}}).observe(document.body,{childList:true,subtree:true})}catch(_){}
 resize();
 (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{sizePreview()});
 requestAnimationFrame(frame);
