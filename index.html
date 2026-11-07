@@ -239,7 +239,7 @@ body:not(.desk) .keys{display:none}
 .admsk{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink)}
 .cbody{flex:1;min-height:0;display:flex;gap:18px;padding:14px 18px calc(14px + env(safe-area-inset-bottom,0px));max-width:1200px;width:100%;margin:0 auto;box-sizing:border-box}
 .cprev{flex:0 0 min(40%,420px);display:flex;flex-direction:column;gap:10px;min-height:0;overflow:auto}
-.cprev canvas{width:100%;aspect-ratio:1.25/1;display:block;border:1px solid var(--line);background:radial-gradient(ellipse at 50% 85%,rgba(255,255,255,.08),transparent 65%)}
+.cprev canvas{width:100%;box-sizing:border-box;aspect-ratio:1.25/1;display:block;border:1px solid var(--line);background:radial-gradient(ellipse at 50% 85%,rgba(255,255,255,.08),transparent 65%)}
 .cinfo{display:flex;flex-direction:column;gap:9px}
 .cinfo h3{margin:0;font-family:var(--f-display);font-size:26px;letter-spacing:.06em;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .cinfo h3 span{font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;color:var(--dim)}
@@ -361,6 +361,7 @@ body:not(.desk) .keys{display:none}
 }
 
 html,body{margin:0;height:100%;overflow:hidden}
+#charBack .cprev{overflow-x:hidden;overscroll-behavior:contain}#charBack .cprev>*,#charBack .cinfo *{max-width:100%;min-width:0;box-sizing:border-box}#charBack .cinfo{overflow-wrap:anywhere}
 @media (orientation:portrait) and (max-width:600px){
  #charBack .cbody{gap:10px;padding:8px 10px}
  #charBack .cprev{gap:6px}
@@ -4697,9 +4698,9 @@ function fitZoom(box,kids){kids=kids.filter(Boolean);for(const k of kids)k.style
 function fitCharRow(){const cb=$('#charBack .cbody'),cp=$('#charBack .cprev'),gr=$('#charGrid'),cv=cp&&cp.querySelector('canvas'),ci=$('#charInfo');if(!cb||!gr||!cp)return;
   cp.style.zoom='';gr.style.zoom='';ci&&(ci.style.zoom='');gr.style.gridTemplateColumns='';if(cv)cv.style.aspectRatio='';
   const over=el=>el.scrollHeight>el.clientHeight+2;
-  if(over(gr)){const n=gr.children.length;for(let c=Math.max(3,getComputedStyle(gr).gridTemplateColumns.split(' ').length+1);c<=Math.max(4,n);c++){gr.style.gridTemplateColumns=`repeat(${c},minmax(0,1fr))`;if(!over(gr))break}}
   if(over(cp)&&cv){for(const ar of ['1.6/1','2/1','2.5/1','3/1','3.6/1']){cv.style.aspectRatio=ar;if(!over(cp))break}}
-  if(over(cp)&&ci){let lo=.6,hi=1;for(let it=0;it<7;it++){const m=(lo+hi)/2;ci.style.zoom=m.toFixed(3);if(over(cp))hi=m;else lo=m}ci.style.zoom=lo.toFixed(3)}}
+  if(over(cp)&&ci){let lo=.5,hi=1;for(let it=0;it<8;it++){const m=(lo+hi)/2;ci.style.zoom=m.toFixed(3);if(over(cp))hi=m;else lo=m}ci.style.zoom=lo.toFixed(3)}
+  cp.style.overflowY=over(cp)?'auto':'hidden';cp.scrollLeft=0}
 function fitScreens(){try{fitZoom($('#lobby'),[$('#lobby .lob')]);const cb=$('#charBack .cbody');if(cb&&!$('#charBack').hidden){const cs2=getComputedStyle(cb);if(cs2.display==='flex'&&cs2.flexDirection.startsWith('row'))fitCharRow();else fitZoom(cb,getComputedStyle($('#charBack .cprev')).display==='contents'?[$('#charGrid'),$('#charInfo')]:[$('#charBack .cprev'),$('#charGrid')])}}catch(_){}}
 {const _b=buildChar;buildChar=function(){const r=_b.apply(this,arguments);setTimeout(fitScreens,30);return r}}
 addEventListener('resize',()=>setTimeout(fitScreens,60));addEventListener('orientationchange',()=>setTimeout(fitScreens,250));setInterval(fitScreens,1200);
