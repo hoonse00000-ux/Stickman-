@@ -962,7 +962,7 @@ function drawFig(c,e,P,X,Y,S,alpha=1){if(P&&P.alpha!=null)alpha*=P.alpha;
   c.globalAlpha=alpha;c.beginPath();poly([o.hip,o.sh,o.nk]);poly(kb?o.bl:o.fl);poly(o.fa);c.stroke();
   const h=T(o.hc),hr=SK.head*S;
   c.beginPath();c.arc(h[0],h[1],hr,0,Math.PI*2);
-  if(e.kind==='hero'){c.stroke();try{const XS=heroXSkin(e);if(XS&&XS.acc)drawSkinAcc(c,XS,h[0],h[1],hr,d)}catch(_){}}
+  if(e.kind==='hero'){c.stroke();try{const XS=heroXSkin(e);if(XS&&XS.acc)drawXSkinAcc(c,XS,h[0],h[1],hr,d)}catch(_){}}
   else{c.fill();c.shadowBlur=0;c.strokeStyle='#0b0b0b';c.lineWidth=Math.max(1.2,S*.016);
     c.beginPath();poly(o.brow);c.stroke();const ey=T(o.eye);c.fillStyle='#0b0b0b';c.beginPath();c.arc(ey[0],ey[1],Math.max(1,S*.011),0,Math.PI*2);c.fill();
     {const tz=TY[e.kind];if(tz&&tz.hat){c.shadowColor=st.glowC;c.shadowBlur=st.glow*S;drawBossHat(c,tz.hat,h[0],h[1],hr,d,fl?'#fff':st.ink);c.shadowBlur=0}}}
@@ -3570,7 +3570,7 @@ function drawWx(c,cam,gy,fx){const T=G.T||0,o=cam*U*.5;c.save();
   c.restore()}
 function noBlur(c,on){try{if(on){if(!c._nb){Object.defineProperty(c,'shadowBlur',{configurable:true,get(){return 0},set(v){}});c._nb=1}}else if(c._nb){delete c.shadowBlur;c._nb=0}}catch(_){}}
 function render(rdt){
-  const c=ctx;c.setTransform(DPR,0,0,DPR,0,0);const LQ=!!G.lowfx;noBlur(c,LQ);
+  const c=ctx;c.setTransform(DPR,0,0,DPR,0,0);const LQ=!!G.lowfx;noBlur(c,LQ);c.shadowBlur=0;c.shadowColor='rgba(0,0,0,0)';c.globalAlpha=1;c.globalCompositeOperation='source-over';
   c.fillStyle='#0b0b0b';c.fillRect(0,0,W,H);
   let sx=0,sy=0;if(G.shake>0){sx=rnd(-1,1)*G.shake*U*.12;sy=rnd(-1,1)*G.shake*U*.12}
   c.save();c.translate(sx+(G.kick||0)*U,sy);if(G.zoom>.001){const zx=(p.x-G.camX)*U,zy=GY-(p.h+.5-G.camY)*U,z=1+G.zoom;c.translate(zx,zy);c.scale(z,z);c.translate(-zx,-zy)}
@@ -5030,7 +5030,7 @@ SKX('seonbi','seonbi_general','장군',3200,'#ffe6c8','rgba(255,170,60,.95)','pl
 SKX('grad','grad_prof','교수님',2500,'#f0f0f0','rgba(255,255,255,.9)','cap','학사모를 쓴 정년 교수.',{sh:'glyph',ch:['A+','Q.E.D.','∴'],col:['#ffffff','#ffd77a'],amb:2,hit:'confetti',trail:'glyph',d:'채점 기호가 떠다니고, 맞히면 축하 꽃가루가 터져요.'});
 SKX('grad','grad_hacker','해커',3600,'#d6ffd8','rgba(60,255,110,.95)','visor','초록 코드가 흐르는 해커.',{sh:'glyph',ch:['0','1','{','}','<','>'],col:['#5aff7a','#c8ffd0'],amb:5,hit:'glitch',trail:'pixel',d:'초록 코드가 흘러내리고, 맞히면 화면이 깨지듯 픽셀이 튀어요.'});
 function heroXSkin(e){if(!e||e.kind!=='hero')return null;const cl=e.cls||G.cls||'base';let id=null;if(e.skin!=null){if(!e.skin)return null;id=e.skinId}else{if(bt()||G.admin||!SHOP.skinOn[cl])return null;id=(SHOP.skinV||{})[cl];if(!id||!skinOwned(cl,id))return null}if(!id||id===cl||id==='violin')return null;return (SKINX[cl]||[]).find(q=>q.id===id)||null}
-function drawSkinAcc(c,S,hx,hy,hr,d){const col=S.ink,T=G.T;c.save();c.lineCap='round';c.lineJoin='round';c.strokeStyle=col;c.fillStyle=col;c.shadowColor=S.glow;c.shadowBlur=G.lowfx?0:hr*.6;c.lineWidth=Math.max(1.4,hr*.16);
+function drawXSkinAcc(c,S,hx,hy,hr,d){const col=S.ink,T=G.T;c.save();c.lineCap='round';c.lineJoin='round';c.strokeStyle=col;c.fillStyle=col;c.shadowColor=S.glow;c.shadowBlur=G.lowfx?0:hr*.6;c.lineWidth=Math.max(1.4,hr*.16);
   switch(S.acc){
   case 'headband':c.beginPath();c.moveTo(hx-hr*1.02,hy-hr*.3);c.quadraticCurveTo(hx,hy-hr*.62,hx+hr*1.02,hy-hr*.3);c.stroke();for(const k of[0,1]){c.beginPath();c.moveTo(hx-d*hr,hy-hr*.35);c.quadraticCurveTo(hx-d*hr*1.6,hy-hr*(.2-k*.3)+Math.sin(T*9+k)*hr*.2,hx-d*hr*2.1,hy+hr*(.05+k*.35));c.stroke()}break;
   case 'visor':c.lineWidth=Math.max(2,hr*.32);c.beginPath();c.moveTo(hx+d*hr*.05,hy-hr*.15);c.lineTo(hx+d*hr*1.05,hy-hr*.15);c.stroke();break;
