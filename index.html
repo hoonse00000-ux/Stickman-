@@ -986,7 +986,7 @@ function drawWithFx(c,e,P,S,alpha,rdt,mx,my){
   const tk=TIP[e.state];
   if(tk&&o&&o[tk]){const tp=o[tk][2];e.trail.push({x:e.x+tp[0]*e.size,y:e.h-tp[1]*e.size,age:0,k:e.state})}
   if(e.trail.length>1){c.save();c.lineCap='round';c.shadowColor='rgba(255,255,255,.9)';c.shadowBlur=10;
-    const tsk=e.kind==='hero'?heroSkinOn(e):null,tcol=tsk==='sword'?'255,55,75':tsk==='shade'?'0,0,0':'255,255,255';if(tsk==='sword')c.shadowColor='rgba(255,40,60,.95)';if(tsk==='shade')c.shadowColor='rgba(255,255,255,.35)';
+    const tsk=e.kind==='hero'?heroSkinOn(e):null,XT=e.kind==='hero'?heroXSkin(e):null,xm=XT&&/rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(XT.glow);let tcol=tsk==='sword'?'255,55,75':tsk==='shade'?'0,0,0':'255,255,255';if(xm)tcol=xm[1]+','+xm[2]+','+xm[3];if(tsk==='sword')c.shadowColor='rgba(255,40,60,.95)';if(tsk==='shade')c.shadowColor='rgba(255,255,255,.35)';if(XT)c.shadowColor=XT.glow;
     for(let i=1;i<e.trail.length;i++){const a=e.trail[i-1],b=e.trail[i];if(a.k!==b.k)continue;const f=1-b.age/.2,hv=(POW[e.state]||1);
       c.strokeStyle=`rgba(${tcol},${(f*(tsk==='shade'?.95:tsk==='sword'?.9:.75)*alpha).toFixed(3)})`;c.lineWidth=Math.max(1.5,S*(.045+.025*hv)*f*(tsk==='shade'?1.6:tsk==='sword'?1.3:1));c.shadowBlur=8+6*hv;c.beginPath();c.moveTo(mx(a.x),my(a.y));c.lineTo(mx(b.x),my(b.y));c.stroke()}
     c.restore()}
@@ -4957,11 +4957,12 @@ function skFlash(sh,col,x,h,o){kfx.push(Object.assign({t:'skf',sh,col,x,h,life:.
 function skinTick(dt){if(!p||G.mode!=='play'||p.state==='dead')return;const id=skinIdOf(p),f=id&&SKFX[id];if(!f){p._skU=0;return}if(p.pult&&!p._skU){p._skU=1;try{skinUltBurst()}catch(_){}}if(!p.pult)p._skU=0;const ULTB=p.pult?4:1;if(skCount()>(p.pult?110:70))return;
   const moving=Math.abs(p.vx||0)>.4;if(f.feet&&!moving&&!p.pult&&Math.random()>.3)return;if(Math.random()>f.amb*dt*ULTB)return;if(p.pult&&Math.random()<.35){const S=p.size||HERO,an=Math.random()*Math.PI*2;skPart(f,f.trail||f.sh,p.x+Math.cos(an)*.9,p.h+S*.6+Math.sin(an)*.9,{vx:-Math.cos(an)*.8,vh:-Math.sin(an)*.8,life:.7,max:.7,s:1.3,ch2:'♫'});return}const S=p.size||HERO;
   switch(f.sh){
-  case 'leaf':case 'petal':skPart(f,f.sh,p.x+rnd(-.5,.5),p.h+S*rnd(1,1.5),{vx:rnd(-.3,.3),vh:-rnd(.4,.7),sway:.6,life:1.6,max:1.6});break;
+  case 'leaf':case 'petal':case 'feather':case 'sakura':case 'coin':skPart(f,f.sh,p.x+rnd(-.5,.5),p.h+S*rnd(1,1.5),{vx:rnd(-.3,.3),vh:-rnd(.4,.7),sway:.6,life:1.6,max:1.6});break;
   case 'snow':skPart(f,'snow',p.x+rnd(-.6,.6),p.h+S*rnd(1.1,1.6),{vh:-rnd(.3,.5),sway:.4,life:1.8,max:1.8,vr:rnd(-1,1)});break;
   case 'rain':skPart(f,'rain',p.x+rnd(-.5,.5),p.h+S*rnd(1.3,1.6),{vh:-rnd(2.5,3.5),rot:0,vr:0,life:.5,max:.5});break;
   case 'smoke':case 'dust':skPart(f,f.sh,p.x+rnd(-.25,.25),p.h+(f.feet?.06:S*rnd(.1,.9)),{vx:-(p.vx||0)*.15+rnd(-.3,.3),vh:rnd(.1,.4),life:.9,max:.9});break;
   case 'ember':case 'wisp':skPart(f,f.sh,p.x+rnd(-.3,.3),p.h+S*rnd(.2,1),{vx:rnd(-.15,.15),vh:rnd(.6,1.1),life:.9,max:.9,vr:0,rot:0});break;
+  case 'bubble':case 'cloud':case 'eye':case 'crown':case 'moon':case 'heart':case 'ring':case 'diamond':case 'bone':case 'gear':case 'flame':
   case 'glyph':case 'suit':case 'note':skPart(f,f.sh,p.x+rnd(-.5,.5),p.h+S*rnd(.6,1.3),{vx:rnd(-.2,.2),vh:rnd(.35,.6),life:1.4,max:1.4,ch2:Math.random()<.5?'♪':'♫',vr:rnd(-.5,.5)});break;
   default:skPart(f,f.sh,p.x+rnd(-.4,.4),p.h+S*rnd(.2,1.2),{vx:rnd(-.3,.3),vh:rnd(-.2,.4),life:.45,max:.45})}}
 function skinHit(e){if(!p||G.mode!=='play'||!e)return;const id=skinIdOf(p),f=id&&SKFX[id];if(!f)return;if((e._skt||0)>G.T)return;e._skt=G.T+.14;if(skCount()>(p.pult?130:90))return;const UL=!!p.pult,x=e.x,h=e.h+(e.size||1)*.55,c0=f.col[0];if(UL)skFlash('ring',c0,x,h,{s:1.4,life:.35,max:.35});const burst=(sh,n,o)=>{n=UL?Math.round(n*1.8):n;for(let i=0;i<n;i++){const an=Math.random()*Math.PI*2,sp=rnd(1.2,2.6);skPart(f,sh,x,h,Object.assign({vx:Math.cos(an)*sp,vh:Math.sin(an)*sp+.6,g:3,life:.55,max:.55},o||{}))}};
@@ -5047,6 +5048,144 @@ function drawSkinAcc(c,S,hx,hy,hr,d){const col=S.ink,T=G.T;c.save();c.lineCap='r
   c.restore()}
 function skinUltBurst(){const id=skinIdOf(p),f=id&&SKFX[id];if(!f)return;const S=p.size||HERO,sh=f.trail||f.sh;for(let i=0;i<22;i++){const an=i/22*Math.PI*2,sp=rnd(2.2,3.6);skPart(f,sh==='feet'?'spark':sh,p.x,p.h+S*.6,{vx:Math.cos(an)*sp,vh:Math.sin(an)*sp,g:0,life:.8,max:.8,s:1.5,ch2:'♫'})}
   skFlash('ring',f.col[0],p.x,p.h+S*.6,{s:2.6,life:.5,max:.5});skFlash('ring',f.col[f.col.length-1],p.x,p.h+S*.6,{s:1.6,life:.4,max:.4})}
+/* ---------- 스킨 이펙트 · 효과음 (스킨마다 전부 다르게) ---------- */
+// [평소 입자, 타격 입자, 타격 섬광, 색들, 평소 빈도, 투사체 자취, 효과음[종류,음높이], 설명]
+const SKT={
+  base:['spark','star','ring',['#ffe9a0','#ffd04a'],6,'spark',['chime',880],'금빛 불꽃이 튀고, 때리면 금빛 별과 고리가 퍼져요.'],
+  base_crimson:['flame','ember','pillar',['#ff5a4a','#ffb08a'],6,'flame',['fire',220],'붉은 불꽃이 일렁이고, 때리면 불기둥이 솟아요.'],
+  base_holo:['pixel','cube','scan',['#6af0ff','#ffffff'],7,'pixel',['glitch',660],'홀로그램 픽셀이 깜빡이고, 때리면 큐브 조각과 스캔선이 지나가요.'],
+  archer:['leaf','leaf','none',['#9dffb0','#4fd27a'],3,'leaf',['wood',900],'나뭇잎이 흩날리고 화살 뒤로 잎사귀가 따라가요. 맞히면 잎사귀가 터져요.'],
+  archer_frost:['snow','shard','hexa',['#bfefff','#ffffff'],5,'snow',['glass',2400],'눈송이가 흩날리고, 맞히면 얼음 파편과 육각 결정이 퍼져요.'],
+  archer_gold:['coin','coin','sunburst',['#ffe27a','#fff4cc'],4,'coin',['coin',1320],'금화가 반짝이고, 맞히면 금화가 쏟아지며 햇살이 퍼져요.'],
+  sword:['beam','tri','xslash',['#ff5a6a','#ffd0d6'],5,'beam',['laser',700],'붉은 레이저 입자가 떠다니고, 베면 레이저 십자 섬광이 번쩍여요.'],
+  sword_sakura:['sakura','sakura','crescent',['#ffb7d5','#ffe4ef'],5,'sakura',['bell',1047],'벚꽃이 흩날리고, 베면 초승달 모양 꽃바람이 일어요.'],
+  sword_obsidian:['diamond','diamond','arc',['#a070ff','#e0d0ff'],5,'diamond',['metal',330],'보랏빛 흑요석 조각이 떠다니고, 베면 보랏빛 베기 자국이 남아요.'],
+  ninja:['smoke','shuriken','cross',['#aab8cc','#dfe7f2'],4,'shuriken',['whoosh',1800],'발밑에 그림자 연기가 깔리고, 맞히면 표창이 흩어져요.'],
+  ninja_crimson:['crescent','crescent','claw',['#ff4a4a','#ff9a8a'],4,'crescent',['whoosh',900],'붉은 초승달 칼날이 날리고, 맞히면 붉은 할퀸 자국이 남아요.'],
+  ninja_white:['feather','feather','spiral',['#ffffff','#dfe7f2'],4,'feather',['wind',600],'하얀 깃털이 흩날리고, 맞히면 깃털 소용돌이가 일어요.'],
+  bomber:['ember','firework','ring',['#ffb04a','#ff7a2a','#ffe08a'],7,'ember',['pop',300],'불티가 피어오르고, 맞히면 작은 불꽃놀이가 터져요.'],
+  bomber_neon:['tri','conf','boltx',['#ff5ae6','#5affea','#ffe85a'],7,'tri',['buzz',150],'형광 삼각 조각이 튀고, 맞히면 형광 색종이와 전류가 터져요.'],
+  bomber_ice:['bubble','shard','pillar',['#bfefff','#7ad8ff'],5,'bubble',['glass',1800],'차가운 거품이 떠오르고, 맞히면 얼음 기둥과 파편이 솟아요.'],
+  gunner:['dust','dust','star6',['#e8cfa0','#ffd76a'],4,'dust',['wood',500],'걸을 때 황야 먼지가 일고, 맞히면 보안관 별이 떠올라요.'],
+  gunner_space:['ring','star','spiral',['#8ad8ff','#ffffff'],4,'ring',['laser',1200],'작은 궤도 고리가 떠다니고, 맞히면 별과 은하 소용돌이가 퍼져요.'],
+  gunner_noir:['smoke','casing','xslash',['#9a9a9a','#ffd77a'],4,'smoke',['metal',800],'안개가 깔리고, 맞히면 탄피가 튀며 금빛 섬광이 번쩍여요.'],
+  necro:['wisp','skull','none',['#7dffd9','#c8fff0'],4,'wisp',['choir',392],'청록 혼불이 피어오르고, 맞힌 적에게서 해골 영혼이 빠져나와요.'],
+  necro_dark:['eye','skull','spiral',['#b07aff','#e8d6ff'],4,'eye',['choir',262],'보랏빛 눈동자가 떠다니고, 맞히면 해골과 저주의 소용돌이가 퍼져요.'],
+  necro_bone:['bone','bone','cross',['#f6f2e8','#d8d0c0'],4,'bone',['wood',1400],'뼛조각이 떠다니고, 맞히면 뼈가 부서지며 십자 섬광이 나요.'],
+  magician:['suit','suit','none',['#ff5a8a','#ffffff'],3,'suit',['harp',784],'트럼프 무늬가 맴돌고, 맞히면 카드 무늬가 흩어져요.'],
+  magician_galaxy:['star','moon','sunburst',['#9aa8ff','#ffffff','#ffd0ff'],5,'star',['sparkle',1568],'은하 별빛이 맴돌고, 맞히면 달 조각과 별빛이 터져요.'],
+  magician_jester:['conf','heart','ring',['#ff6a8a','#ffd04a','#6ad0ff'],4,'conf',['pop',600],'색종이가 흩날리고, 맞히면 하트가 퐁퐁 터져요.'],
+  porter:['pixel','tri','ring',['#4fe6ff','#d0fbff'],6,'pixel',['glitch',440],'푸른 픽셀이 지직거리고, 맞히면 삼각 조각과 고리가 퍼져요.'],
+  porter_void:['smoke','bubble','spiral',['#6a3aaa','#b07aff'],5,'smoke',['gong',110],'공허의 안개가 일렁이고, 맞히면 공허 거품이 소용돌이쳐요.'],
+  porter_chrono:['glyph','gear','ring',['#ffd77a','#fff4d6'],3,'glyph',['coin',990],'시계 숫자가 떠다니고, 맞히면 톱니바퀴가 튀며 시계 고리가 퍼져요.'],
+  baseball:['star','ball','none',['#7ab0ff','#ffffff'],3,'star',['wood',1200],'파란 별빛이 반짝이고, 맞히면 야구공 실밥 섬광이 터져요.'],
+  baseball_legend:['crown','coin','star6',['#ffe27a','#ffffff'],3,'coin',['bell',1319],'작은 왕관이 반짝이고, 맞히면 금화와 명예의 별이 떠올라요.'],
+  baseball_night:['beam','cube','scan',['#6aff9a','#ffffff'],5,'beam',['buzz',220],'전광판 같은 초록 빛줄기가 흐르고, 맞히면 큐브와 스캔선이 지나가요.'],
+  volt:['bolt','spark','boltx',['#fff07a','#ffffff'],5,'bolt',['zap',880],'금빛 전류가 튀고, 맞히면 번개가 갈라져요.'],
+  volt_storm:['cloud','bolt','pillar',['#8af0ff','#ffffff'],5,'bolt',['zap',440],'작은 먹구름이 떠다니고, 맞히면 번개 기둥이 내리꽂혀요.'],
+  volt_plasma:['bubble','pixel','boltx',['#ff6ae6','#ffffff'],6,'pixel',['buzz',330],'분홍 플라즈마 방울이 떠오르고, 맞히면 분홍 전류가 튀어요.'],
+  wolf:['ember','ember','claw',['#ff9a2a','#ffd08a'],3,'ember',['drum',140],'주황빛 기운이 일렁이고, 맞히면 호랑이 발톱 자국이 남아요.'],
+  wolf_white:['snow','feather','claw',['#ffffff','#dfefff'],5,'snow',['wind',400],'눈보라가 일고, 맞히면 흰 털과 하얀 발톱 자국이 남아요.'],
+  wolf_hell:['flame','skull','claw',['#ff5a2a','#ffb04a'],7,'flame',['fire',110],'지옥 불꽃이 피어오르고, 맞히면 불타는 해골과 발톱 자국이 남아요.'],
+  bard:['note','note','none',['#a8ff8a','#e8ffe0'],3,'note',['pluck',659],'초록 음표가 떠오르고, 맞히면 음표가 흩날려요.'],
+  violin:['note','butterfly','ring',['#c8a0ff','#f1e6ff'],3,'note',['harp',523],'보랏빛 음표가 떠오르고, 맞히면 나비가 날아올라요.'],
+  bard_rock:['star','note','pillar',['#ff5a7a','#ffd04a'],4,'note',['buzz',110],'붉은 별빛이 튀고, 맞히면 음표와 무대 불기둥이 솟아요.'],
+  frost:['snow','snow','hexa',['#bfefff','#ffffff'],5,'snow',['glass',3000],'눈송이가 흩날리고, 맞히면 눈송이와 육각 결정이 퍼져요.'],
+  frost_king:['crown','shard','star6',['#ffffff','#bfe6ff'],5,'shard',['bell',1760],'얼음 왕관이 반짝이고, 맞히면 얼음 파편과 왕의 별이 떠올라요.'],
+  frost_aurora:['ring','star','sunburst',['#7affc8','#b07aff','#7ad8ff'],5,'star',['sparkle',1175],'오로라 고리가 떠다니고, 맞히면 오색 별빛이 퍼져요.'],
+  druid:['petal','petal','none',['#ffb0d0','#ffe0ee'],4,'petal',['harp',988],'꽃잎이 흩날리고, 맞히면 꽃잎이 터져요.'],
+  druid_autumn:['leaf','leaf','crescent',['#ff9a3a','#ffd04a','#e05a2a'],5,'leaf',['wood',700],'단풍잎이 흩날리고, 맞히면 낙엽이 휘몰아쳐요.'],
+  druid_moon:['moon','sakura','ring',['#ffffff','#c8d4ff'],5,'moon',['bell',880],'초승달 빛이 떠다니고, 맞히면 하얀 꽃이 피어나요.'],
+  shade:['smoke','eye','arc',['#555555','#ff4a4a'],5,'smoke',['gong',73],'검은 연기가 피어오르고, 맞히면 붉은 눈과 베기 자국이 남아요.'],
+  shade_light:['spark','feather','cross',['#fff0a0','#ffffff'],6,'spark',['choir',523],'금빛 빛줄기가 반짝이고, 맞히면 빛의 깃털과 십자 섬광이 퍼져요.'],
+  shade_blood:['drop','drop','arc',['#ff2a3a','#8a0a1a'],6,'drop',['metal',220],'핏방울이 떨어지고, 맞히면 핏빛 베기 자국이 남아요.'],
+  kid:['rain','rain','ring',['#ffe36a','#9fdcff'],5,'rain',['water',600],'노란 빗방울이 톡톡 떨어지고, 맞히면 물방울과 물결이 퍼져요.'],
+  kid_space:['star','tri','spiral',['#8ad8ff','#ffffff'],4,'star',['laser',1600],'우주 별빛이 반짝이고, 맞히면 별 조각이 소용돌이쳐요.'],
+  kid_dino:['leaf','bone','claw',['#7ae05a','#c8ff9a'],3,'leaf',['drum',200],'풀잎이 흩날리고, 맞히면 뼈다귀와 공룡 발톱 자국이 남아요.'],
+  seonbi:['glyph','glyph','stamp',['#ff7a5a','#ffd0c0'],2,'glyph',['bell',587],'붉은 한자가 떠오르고, 맞히면 마패 도장이 찍혀요.'],
+  seonbi_sage:['cloud','cloud','ring',['#ffffff','#e6f0ff'],4,'cloud',['wind',800],'구름이 피어오르고, 맞히면 구름이 피어나며 기운이 퍼져요.'],
+  seonbi_general:['glyph','diamond','stamp',['#ffb04a','#ffe6c8'],2,'glyph',['drum',100],'금빛 한자가 떠오르고, 맞히면 장군의 인장이 찍혀요.'],
+  grad:['glyph','conf','none',['#8ab4ff','#e6eeff'],2,'glyph',['pluck',988],'수식 기호가 떠다니고, 맞히면 졸업 축하 꽃가루가 터져요.'],
+  grad_prof:['glyph','star','star6',['#ffffff','#ffd77a'],2,'glyph',['bell',1175],'채점 기호가 떠다니고, 맞히면 A+ 별이 떠올라요.'],
+  grad_hacker:['glyph','pixel','scan',['#5aff7a','#c8ffd0'],5,'pixel',['glitch',880],'초록 코드가 흘러내리고, 맞히면 픽셀과 스캔선이 지나가요.']};
+for(const id in SKT){const [sh,hs,fl,col,amb,trail,snd,d]=SKT[id],old=SKFX[id]||{};SKFX[id]={sh,hs,fl,col,amb,trail,snd,d,ch:old.ch,feet:old.feet}}
+/* 새 입자 모양 */
+{const old=DRW.skp;DRW.skp=function(c,k,a,X,Yh){const q=k.life/k.max,x=X(k.x),y=Yh(k.h),s=U*.05*k.s;
+  const NS={heart:1,diamond:1,ring:1,crescent:1,feather:1,bubble:1,cube:1,flame:1,gear:1,bone:1,butterfly:1,tri:1,cross:1,coin:1,eye:1,sakura:1,moon:1,beam:1,cloud:1,drop:1,shuriken:1,casing:1,crown:1,firework:1};if(!NS[k.sh])return old(c,k,a,X,Yh);
+  c.save();c.globalAlpha=Math.min(1,q*2.2);c.translate(x,y);c.rotate(k.rot);c.fillStyle=k.col;c.strokeStyle=k.col;c.lineWidth=Math.max(1.2,U*.012);
+  switch(k.sh){
+  case 'heart':c.rotate(-k.rot);c.beginPath();c.moveTo(0,s*.9);c.bezierCurveTo(-s*1.4,-s*.2,-s*.6,-s*1.2,0,-s*.4);c.bezierCurveTo(s*.6,-s*1.2,s*1.4,-s*.2,0,s*.9);c.fill();break;
+  case 'diamond':c.beginPath();c.moveTo(0,-s*1.1);c.lineTo(s*.7,0);c.lineTo(0,s*1.1);c.lineTo(-s*.7,0);c.closePath();c.fill();c.strokeStyle='rgba(255,255,255,.6)';c.stroke();break;
+  case 'ring':c.beginPath();c.arc(0,0,s*.9,0,Math.PI*2);c.stroke();break;
+  case 'crescent':c.beginPath();c.arc(0,0,s*1.1,.3,Math.PI*1.7);c.arc(s*.4,0,s*.8,Math.PI*1.6,.4,true);c.closePath();c.fill();break;
+  case 'feather':c.beginPath();c.ellipse(0,0,s*1.4,s*.38,0,0,Math.PI*2);c.fill();c.strokeStyle='rgba(0,0,0,.25)';c.beginPath();c.moveTo(-s*1.5,0);c.lineTo(s*1.4,0);c.stroke();break;
+  case 'bubble':c.globalAlpha*=.8;c.beginPath();c.arc(0,0,s*(.7+.4*(1-q)),0,Math.PI*2);c.stroke();c.beginPath();c.arc(-s*.25,-s*.25,s*.15,0,Math.PI*2);c.fill();break;
+  case 'cube':c.strokeRect(-s*.7,-s*.7,s*1.4,s*1.4);c.beginPath();c.moveTo(-s*.7,-s*.7);c.lineTo(-s*.3,-s*1.1);c.lineTo(s*1.1,-s*1.1);c.lineTo(s*.7,-s*.7);c.moveTo(s*1.1,-s*1.1);c.lineTo(s*1.1,s*.3);c.lineTo(s*.7,s*.7);c.stroke();break;
+  case 'flame':c.rotate(-k.rot);c.beginPath();c.moveTo(0,-s*1.5*(.6+.4*q));c.quadraticCurveTo(s*.9,0,0,s*.7);c.quadraticCurveTo(-s*.9,0,0,-s*1.5*(.6+.4*q));c.fill();break;
+  case 'gear':c.beginPath();for(let i=0;i<16;i++){const r=i%2?s*.75:s*1.05,an=i*Math.PI/8;c.lineTo(Math.cos(an)*r,Math.sin(an)*r)}c.closePath();c.stroke();c.beginPath();c.arc(0,0,s*.3,0,Math.PI*2);c.stroke();break;
+  case 'bone':c.lineWidth=s*.45;c.beginPath();c.moveTo(-s,0);c.lineTo(s,0);c.stroke();for(const sx of[-1,1])for(const sy of[-1,1]){c.beginPath();c.arc(sx*s,sy*s*.28,s*.3,0,Math.PI*2);c.fill()}break;
+  case 'butterfly':{c.rotate(-k.rot*.6);const fl=Math.abs(Math.sin(G.T*14+k.x*9));for(const sd of[-1,1]){c.beginPath();c.ellipse(sd*s*.55*fl,-s*.25,s*.6*fl+.5,s*.5,0,0,Math.PI*2);c.fill();c.beginPath();c.ellipse(sd*s*.4*fl,s*.35,s*.4*fl+.5,s*.35,0,0,Math.PI*2);c.fill()}break}
+  case 'tri':c.beginPath();c.moveTo(0,-s);c.lineTo(s*.9,s*.7);c.lineTo(-s*.9,s*.7);c.closePath();c.fill();break;
+  case 'cross':c.lineWidth=s*.4;c.beginPath();c.moveTo(0,-s);c.lineTo(0,s);c.moveTo(-s*.65,-s*.3);c.lineTo(s*.65,-s*.3);c.stroke();break;
+  case 'coin':{const w=Math.abs(Math.cos(G.T*8+k.rot));c.rotate(-k.rot);c.beginPath();c.ellipse(0,0,s*.85*w+.6,s*.85,0,0,Math.PI*2);c.fill();c.strokeStyle='rgba(120,80,0,.6)';c.stroke();break}
+  case 'eye':c.rotate(-k.rot);c.beginPath();c.moveTo(-s*1.2,0);c.quadraticCurveTo(0,-s*.9,s*1.2,0);c.quadraticCurveTo(0,s*.9,-s*1.2,0);c.stroke();c.beginPath();c.arc(0,0,s*.35,0,Math.PI*2);c.fill();break;
+  case 'sakura':for(let i=0;i<5;i++){const an=i*Math.PI*2/5;c.beginPath();c.ellipse(Math.cos(an)*s*.55,Math.sin(an)*s*.55,s*.45,s*.28,an,0,Math.PI*2);c.fill()}break;
+  case 'moon':c.beginPath();c.arc(0,0,s,0,Math.PI*2);c.arc(s*.45,-s*.2,s*.85,0,Math.PI*2,true);c.fill('evenodd');break;
+  case 'beam':c.lineWidth=s*.35;c.beginPath();c.moveTo(-s*1.6,0);c.lineTo(s*1.6,0);c.stroke();break;
+  case 'cloud':c.globalAlpha*=.75;for(const [ox,oy,r] of[[-.6,.1,.55],[0,-.2,.7],[.6,.1,.55]]){c.beginPath();c.arc(ox*s*1.2,oy*s*1.2,r*s*1.2,0,Math.PI*2);c.fill()}break;
+  case 'drop':c.rotate(-k.rot);c.beginPath();c.moveTo(0,-s*1.1);c.quadraticCurveTo(s*.75,s*.2,0,s*.7);c.quadraticCurveTo(-s*.75,s*.2,0,-s*1.1);c.fill();break;
+  case 'shuriken':c.beginPath();for(let i=0;i<8;i++){const r=i%2?s*.3:s*1.1,an=i*Math.PI/4;c.lineTo(Math.cos(an)*r,Math.sin(an)*r)}c.closePath();c.fill();break;
+  case 'casing':c.fillRect(-s*.7,-s*.25,s*1.4,s*.5);break;
+  case 'crown':c.rotate(-k.rot);c.beginPath();c.moveTo(-s,s*.5);c.lineTo(-s,-s*.4);c.lineTo(-s*.5,s*.05);c.lineTo(0,-s*.7);c.lineTo(s*.5,s*.05);c.lineTo(s,-s*.4);c.lineTo(s,s*.5);c.closePath();c.fill();break;
+  case 'firework':c.beginPath();c.arc(0,0,s*.55*(.5+q*.5),0,Math.PI*2);c.fill();break}
+  c.restore()}}
+/* 새 섬광 */
+{const old=DRW.skflash;DRW.skflash=function(c,k,a,X,Yh){const NF={pillar:1,scan:1,hexa:1,sunburst:1,crescent:1,arc:1,cross:1,spiral:1,star6:1};if(!NF[k.sh])return old(c,k,a,X,Yh);
+  const q=k.life/k.max,x=X(k.x),y=Yh(k.h),R=U*.38*(k.s||1),g=1+(1-q)*.5;c.save();c.globalAlpha=Math.min(1,q*1.8);c.translate(x,y);c.strokeStyle=k.col;c.fillStyle=k.col;c.lineCap='round';c.shadowColor=k.col;c.shadowBlur=G.lowfx?0:10;
+  switch(k.sh){
+  case 'pillar':c.globalAlpha*=.7;c.fillRect(-R*.35*q,-R*3,R*.7*q,R*3.6);break;
+  case 'scan':c.lineWidth=U*.025;for(let i=-2;i<=2;i++){c.beginPath();c.moveTo(-R*1.3,i*R*.3+(1-q)*R*.6);c.lineTo(R*1.3,i*R*.3+(1-q)*R*.6);c.stroke()}break;
+  case 'hexa':c.lineWidth=U*.03;c.beginPath();for(let i=0;i<=6;i++){const an=i*Math.PI/3;c.lineTo(Math.cos(an)*R*g,Math.sin(an)*R*g)}c.stroke();break;
+  case 'sunburst':c.lineWidth=U*.03;for(let i=0;i<12;i++){const an=i*Math.PI/6;c.beginPath();c.moveTo(Math.cos(an)*R*.4,Math.sin(an)*R*.4);c.lineTo(Math.cos(an)*R*1.2*g,Math.sin(an)*R*1.2*g);c.stroke()}break;
+  case 'crescent':c.lineWidth=U*.07;c.beginPath();c.arc(0,0,R*g,-Math.PI*.8,Math.PI*.2);c.stroke();break;
+  case 'arc':c.lineWidth=U*.06;c.beginPath();c.moveTo(-R*1.3*g,R*.6);c.quadraticCurveTo(0,-R*.2,R*1.3*g,-R*.6);c.stroke();break;
+  case 'cross':c.lineWidth=U*.05;c.beginPath();c.moveTo(0,-R*1.2*g);c.lineTo(0,R*1.2*g);c.moveTo(-R*.8*g,-R*.3);c.lineTo(R*.8*g,-R*.3);c.stroke();break;
+  case 'spiral':c.lineWidth=U*.025;c.beginPath();for(let i=0;i<40;i++){const an=i*.35+(1-q)*4,r=i/40*R*1.3;c.lineTo(Math.cos(an)*r,Math.sin(an)*r)}c.stroke();break;
+  case 'star6':c.translate(0,-(1-q)*U*.4);c.beginPath();for(let i=0;i<12;i++){const r=i%2?R*.3:R*.62,an=i*Math.PI/6-Math.PI/2;c.lineTo(Math.cos(an)*r,Math.sin(an)*r)}c.closePath();c.fill();break}
+  c.restore()}}
+/* 통합 타격 이펙트 */
+skinHit=function(e){if(!p||G.mode!=='play'||!e)return;const id=skinIdOf(p),f=id&&SKFX[id];if(!f)return;if((e._skt||0)>G.T)return;e._skt=G.T+.14;if(skCount()>(p.pult?130:90))return;const UL=!!p.pult,x=e.x,h=e.h+(e.size||1)*.55,c0=f.col[0],hs=f.hs||f.sh;
+  const n0=UL?14:8,rise={skull:1,eye:1,glyph:1,note:1,heart:1,butterfly:1,cloud:1,crown:1},fall={leaf:1,petal:1,sakura:1,feather:1,conf:1,snow:1,coin:1};
+  if(hs==='firework'){for(let i=0;i<(UL?16:10);i++){const an=i/(UL?16:10)*Math.PI*2;skPart(f,'firework',x,h,{vx:Math.cos(an)*2.6,vh:Math.sin(an)*2.6,g:1.5,life:.6,max:.6,col:['#ffd04a','#ff6a3a','#ffffff','#ffb04a'][i%4],s:1.3})}}
+  else for(let i=0;i<(rise[hs]?Math.ceil(n0/3):n0);i++){const an=Math.random()*Math.PI*2,sp=rnd(1.2,2.6);if(rise[hs])skPart(f,hs,x+rnd(-.2,.2),h+.1,{vx:rnd(-.3,.3),vh:rnd(.8,1.3),g:0,life:.8,max:.8,s:1.2,ch2:'♫'});else skPart(f,hs,x,h,{vx:Math.cos(an)*sp,vh:Math.sin(an)*sp+.6,g:fall[hs]?1.4:3,sway:fall[hs]?.5:0,life:.6,max:.6,s:hs==='beam'?.8:1.1,ch2:'♫',col:hs==='conf'?['#ff6a8a','#ffd04a','#6ad0ff','#8aff9a','#ffffff'][i%5]:undefined})}
+  const fl=f.fl;if(fl&&fl!=='none'){const map={xslash:'xslash',claw:'claw',boltx:'boltx',ring:'ring',stamp:'stamp'};if(fl==='stamp')skFlash('stamp',c0,x,h+.25,{life:.55,max:.55});else skFlash(map[fl]||fl,c0,x,h,{life:fl==='star6'?.6:.32,max:fl==='star6'?.6:.32})}
+  if(UL)skFlash('ring',f.col[f.col.length-1],x,h,{s:1.4,life:.35,max:.35});skinSnd(f,UL)};
+/* 스킨 효과음 */
+function skinSnd(f,big){if(!f||!f.snd||!AC||mute)return;const now=AC.currentTime;if(!big&&(G._sks||0)>now)return;G._sks=now+.09;const [r,fq]=f.snd,v=big?1.6:1;
+  try{switch(r){
+  case 'chime':chime([fq,fq*1.26,fq*1.5],{vol:.05*v,step:.035,dur:.35});break;
+  case 'bell':syn({type:'sine',f0:fq,dur:.55,vol:.08*v,wet:.5});syn({type:'sine',f0:fq*2.76,dur:.25,vol:.03*v,wet:.5});break;
+  case 'laser':syn({type:'sawtooth',f0:fq*2,f1:fq*.45,dur:.14,vol:.06*v,flt:{type:'lowpass',f0:3500}});break;
+  case 'zap':crackle(.1,{n:5,vol:.18*v});syn({type:'square',f0:fq,f1:fq*.4,dur:.1,vol:.05*v});break;
+  case 'whoosh':nz(.16,{type:'bandpass',f0:fq*.5,f1:fq*1.6,q:1.6,vol:.16*v});break;
+  case 'pluck':syn({type:'triangle',f0:fq,dur:.3,vol:.09*v});syn({type:'triangle',f0:fq*1.5,dur:.25,vol:.05*v,delay:.05});break;
+  case 'drum':syn({type:'sine',f0:fq,f1:fq*.5,dur:.2,vol:.22*v});nz(.08,{type:'lowpass',f0:900,vol:.15*v});break;
+  case 'glass':syn({type:'sine',f0:fq,dur:.2,vol:.06*v});syn({type:'sine',f0:fq*1.5,dur:.15,vol:.04*v,delay:.02});nz(.06,{type:'highpass',f0:6000,vol:.1*v});break;
+  case 'pop':nz(.07,{type:'lowpass',f0:1400,vol:.22*v});syn({type:'sine',f0:fq,f1:fq*2.2,dur:.08,vol:.08*v});break;
+  case 'buzz':syn({type:'sawtooth',f0:fq,dur:.16,vol:.06*v,am:{f:35,d:.6},flt:{type:'lowpass',f0:1600}});break;
+  case 'sparkle':for(let i=0;i<3;i++)syn({type:'triangle',f0:fq*[1,1.25,1.5][i],dur:.18,vol:.04*v,delay:i*.04,wet:.5});break;
+  case 'wood':nz(.035,{type:'bandpass',f0:fq,q:6,vol:.3*v});nz(.03,{type:'bandpass',f0:fq*1.3,q:6,vol:.2*v,delay:.05});break;
+  case 'metal':syn({type:'sine',f0:fq*3,dur:.35,vol:.04*v,wet:.4});syn({type:'sine',f0:fq*4.2,dur:.25,vol:.03*v,wet:.4});nz(.05,{type:'highpass',f0:3000,vol:.12*v});break;
+  case 'water':syn({type:'sine',f0:fq,f1:fq*2.2,dur:.09,vol:.08*v});syn({type:'sine',f0:fq*1.3,f1:fq*2.6,dur:.08,vol:.06*v,delay:.07});break;
+  case 'wind':windTone({dur:.35*v,vol:.12*v});break;
+  case 'choir':syn({type:'sawtooth',f0:fq,dur:.45,vol:.04*v,lfo:{f:5,d:4},flt:{type:'lowpass',f0:1200},swell:.4,wet:.7});syn({type:'sawtooth',f0:fq*1.5,dur:.45,vol:.03*v,lfo:{f:5.5,d:4},flt:{type:'lowpass',f0:1200},swell:.4,wet:.7});break;
+  case 'coin':syn({type:'square',f0:fq,dur:.06,vol:.04*v,flt:{type:'lowpass',f0:4000}});syn({type:'square',f0:fq*1.335,dur:.18,vol:.04*v,delay:.06,flt:{type:'lowpass',f0:4000}});break;
+  case 'glitch':for(let i=0;i<4;i++)syn({type:'square',f0:fq*rnd(.5,2),dur:.03,vol:.04*v,delay:i*.03});break;
+  case 'fire':nz(.25,{type:'bandpass',f0:fq*4,q:1,vol:.16*v});crackle(.2,{n:4,vol:.1*v});syn({type:'sine',f0:fq*.5,f1:fq*.3,dur:.2,vol:.1*v});break;
+  case 'harp':for(let i=0;i<3;i++)syn({type:'triangle',f0:fq*[1,1.25,1.5][i],dur:.35,vol:.05*v,delay:i*.05,wet:.5});break;
+  case 'gong':syn({type:'sine',f0:fq,dur:.9,vol:.12*v,lfo:{f:4,d:2},wet:.6});syn({type:'sine',f0:fq*2.4,dur:.5,vol:.04*v,wet:.6});break}}catch(_){}}
+skinUltBurst=function(){const id=skinIdOf(p),f=id&&SKFX[id];if(!f)return;const S=p.size||HERO,sh=f.trail||f.sh;for(let i=0;i<22;i++){const an=i/22*Math.PI*2,sp=rnd(2.2,3.6);skPart(f,sh,p.x,p.h+S*.6,{vx:Math.cos(an)*sp,vh:Math.sin(an)*sp,g:0,life:.8,max:.8,s:1.5,ch2:'♫'})}
+  skFlash('ring',f.col[0],p.x,p.h+S*.6,{s:2.6,life:.5,max:.5});if(f.fl&&f.fl!=='none'&&f.fl!=='stamp')skFlash(f.fl,f.col[f.col.length-1],p.x,p.h+S*.6,{s:2,life:.6,max:.6});skinSnd(f,true);setTimeout(()=>skinSnd(f,true),120)};
 {const cv=document.getElementById('charCv');if(cv){let sx=null;cv.addEventListener('pointerdown',e=>{if(charTab==='skin')sx=e.clientX});cv.addEventListener('pointerup',e=>{if(sx==null)return;const dx=e.clientX-sx;sx=null;if(Math.abs(dx)<36)return;const L=skinList(charSel);charSkI=clamp(charSkI+(dx<0?1:-1),0,L.length-1);sfx('ui');buildChar()});cv.addEventListener('pointercancel',()=>{sx=null})}}
 resize();
 (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{sizePreview()});
