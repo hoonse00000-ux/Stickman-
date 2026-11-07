@@ -5554,6 +5554,8 @@ function drawBlastPick(c,X,Yh){if(!BPK)return;const T=performance.now()/1000;c.s
   c.restore()}
 addEventListener('keydown',e=>{if(G.mode!=='bpick')return;if(e.key==='Escape'){e.preventDefault();closeBlastPick(true)}else if(e.key==='Enter'){e.preventDefault();const L2=BPK?BPK.list.filter(a=>a.life>0):[];closeBlastPick(false);if(L2.length)KIT.necro.spin(L2)}},true);
 
+/* 나중에 추가된 캐릭터(잼민이·선비·대학원생) 스킨도 캐릭터 순서대로 비싸게 */
+{const PR={kid:[6500,11200,16800],seonbi:[7000,12100,18200],grad:[7500,13000,19500]};for(const k in PR){const L=skinList(k);L.forEach((s2,i)=>{const v=PR[k][i];if(!v)return;if(s2.id===k){if(SKINS[k])SKINS[k].price=v}else{const src=(SKINX[k]||[]).find(q=>q.id===s2.id);if(src)src.price=v}})}}
 /* 스킨 가격: 한 캐릭터 안에서 뒤로 갈수록 최소 1.5배씩 비싸게 */
 for(const k of CLSK){const L=skinList(k);let prev=skinPrice(k,L[0]&&L[0].id);for(let i=1;i<L.length;i++){const s2=L[i],need=Math.ceil(prev*1.5/100)*100;let src=s2.id==='violin'?SKIN2.bard:(SKINX[k]||[]).find(q=>q.id===s2.id);if(src&&src.price<need)src.price=need;prev=skinPrice(k,s2.id)}}
 resize();
