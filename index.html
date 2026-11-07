@@ -1263,7 +1263,7 @@ const mult=()=>1+.3*(lvR(G.round)-1);
 function startWave(){G.wUsed={};
   const wv=WAVES[G.wave];G.queue=wv.list.slice();G.phase='banner';G.pt=0;G.spawnT=0;let nm=wv.n;G.waveMax=wv.max;
   if(!wv.boss){const R=lvR(G.round),EX=['small','grunt','brute','ninja','thrower','shield','bomber','charger','spinner','jumper','healer'].filter(k=>TY[k]),pool=EX.slice(0,Math.min(EX.length,2+(R-1)*2)),nMul=Math.pow(20,(clamp(G.round||1,1,MAXR)-1)/(MAXR-1)),extra=Math.max(0,Math.round((wv.list.length+Math.floor(G.wave*1.2))*nMul)-wv.list.length);
-    for(let i=0;i<extra;i++)G.queue.splice(Math.floor(Math.random()*(G.queue.length+1)),0,pool[Math.floor(Math.random()*pool.length)]);G.waveMax=Math.min(16,wv.max+Math.floor((clamp(G.round||1,1,MAXR)-1)*.65)+(G.wave>=2?1:0));if(extra>0)nm+=` · ${G.queue.length}명`}
+    for(let i=0;i<extra;i++)G.queue.splice(Math.floor(Math.random()*(G.queue.length+1)),0,pool[Math.floor(Math.random()*pool.length)]);G.waveMax=Math.min(42,Math.round((wv.max+(G.wave>=2?1:0))*Math.pow(12,(clamp(G.round||1,1,MAXR)-1)/(MAXR-1))));if(extra>0)nm+=` · ${G.queue.length}명`}
   if(wv.boss){const bk=bossOfR(G.round);G.queue=[bk];nm=TY[bk].en+bossTagR(G.round)}
   G.banner={big:wv.boss?'BOSS':'WAVE '+(G.wave+1),small:(G.round>1?'ROUND '+G.round+' · ':'')+(G.wave===0&&!wv.boss?bioOf(G.round).n+' · ':'')+nm,t:0,dur:1.6};
   sfx('wave');
@@ -3438,6 +3438,9 @@ function renderUltScreen(c,X,Yh){
 }
 function canWalk(e,nx){const bw=.12*e.size,f=floorAt(nx+Math.sign(nx-e.x)*bw*.8,bw*.2,e.h);if(Math.abs(f-e.h)>.08)return false;
   for(const b of blocks){if(b.type==='plat')continue;if(e.h>=b.top-.07||e.h+.97*e.size<=b.bot+.01)continue;if(nx+bw>b.x0&&nx-bw<b.x1)return false}return true}
+function crowdBlock(){if(!p||p.state==='dead'||!p.gnd||p.state==='roll'||(p.inv||0)>0||G.online)return;
+  for(const e of enemies){if(!e.active||e.state==='dead'||!e.gnd||e.gone||e.clone>0||Math.abs(e.h-p.h)>.3)continue;const min=.11*(e.size+p.size),d=e.x-p.x;if(Math.abs(d)<min){const o=min-Math.abs(d),sd=Math.sign(d)||p.face,heavy=TY[e.kind].boss?.95:.8;
+    const nx=p.x-sd*o*heavy;if(!blockedAt(nx))p.x=nx;e.x+=sd*o*(1-heavy);if(Math.sign(p.vx)===sd)p.vx*=.3}}}
 function separate(){
   for(let i=0;i<enemies.length;i++)for(let j=i+1;j<enemies.length;j++){
     const a=enemies[i],b=enemies[j];if(a.state==='dead'||b.state==='dead'||!a.gnd||!b.gnd||Math.abs(a.h-b.h)>.2||!a.active||!b.active)continue;
@@ -3454,7 +3457,7 @@ function update(dt){
   updPlayer(dt);updCam();genWorld();G.maxX=Math.max(G.maxX,p.x);
   if(!G.gateOpen&&p.x>GATE){G.gateOpen=true;G.gateT=G.T;G.banner={big:'FIGHT!',small:'BEAT THE STICKMEN ON THE ROOFTOPS',t:0,dur:1.4};sfx('wave');shake(.15)}
   tickBuffs(dt);for(const e of enemies)updEnemy(e,dt);updUlts(dt);updPshots(dt);updAllies(dt);
-  separate();
+  separate();crowdBlock();
   enemies=enemies.filter(e=>!(e.state==='dead'&&e.st>1.4)&&!e.gone&&!(e.x<G.maxX-9&&!e.inZone));
   for(const w of waves){w.x+=w.dir*3.6*dt;w.life-=dt;if(!w.hit&&Math.abs(p.x-w.x)<.2&&p.h<.18&&hurtPlayer(w.dmg||TY.boss.dmg.wave,w.dir,2.6,w,w.ult?'ult':1))w.hit=true}
   waves=waves.filter(w=>w.life>0&&(!G.zone||(w.x>G.zone.x0&&w.x<G.zone.x1)));
@@ -3493,7 +3496,7 @@ function update(dt){
     if(G.phase==='banner'&&!G.banner)G.phase='fight';
     if(G.phase==='fight'){
       G.spawnT-=dt;const alive=enemies.filter(e=>e.zref===G.zone&&e.state!=='dead').length;
-      if(G.queue.length&&G.spawnT<=0&&alive<(G.waveMax||WAVES[G.wave].max)){spawn(G.queue.shift());G.spawnT=rnd(.55,1.1)}
+      if(G.queue.length&&G.spawnT<=0&&alive<(G.waveMax||WAVES[G.wave].max)){spawn(G.queue.shift());G.spawnT=rnd(.55,1.1)/(1+(clamp(G.round||1,1,MAXR)-1)*.16)}
       if(!G.queue.length&&!enemies.some(e=>e.zref===G.zone)){
         G.phase='clear';G.pt=0;
         if(G.zone&&G.zone.mid){G.banner={big:'CLEAR',small:'MID BOSS DOWN',t:0,dur:1.4};sfx('wave');G.pt=1.5}else{p.hp=Math.min(p.maxHp,p.hp+40);
