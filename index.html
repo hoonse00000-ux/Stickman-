@@ -2668,7 +2668,7 @@ necro:{
   kick(){if(!slotSummon())p.cd.kick=.3;else sfx('summon')},
   upper(){const V=vaultSrc(),ks=Object.keys(V).filter(k=>V[k]>0&&TY[k]&&!TY[k].boss).sort((a,b)=>(TY[a].hp||0)-(TY[b].hp||0));if(!ks.length){ftext(p.x,p.h+1.2,'NO SOUL');p.cd.upper=.3;return}
     const k=ks[0];useSoul(k);p.soulSh=Math.min(70,25+(TY[k].hp||40)*.25);p.soulT=10;kst('w_burst',.45,{});ringFx(p.x,p.h+.5,.9,4);ringFx(p.x,p.h+.5,.5,3);for(let i=0;i<12;i++)fx.push({t:'e',x:p.x+rnd(-.6,.6),y:p.h+rnd(0,1.2),vx:(p.x-p.x)*0,vy:rnd(.3,1.2),life:.6,max:.6,r:.03});sfx('shatter');ftext(p.x,p.h+1.2,'SOUL WARD',true)},
-  spin(pick){const L0=allies.filter(a=>a.life>0&&!(a.rise>0));if(!L0.length){ftext(p.x,p.h+1.2,'NO SUMMON');p.cd.spin=.3;return}if(!pick&&L0.length>1){openBlast(L0);return}const L=pick||L0;kst('w_cast',.45,{times:[.25],fire(){for(const a of L){const r=1+.35*a.size;aoe(a.x,a.h,r,1.2,Math.round(24+a.size*10),3,'wpnH');ringFx(a.x,a.h+.4,r,5);ringFx(a.x,a.h+.4,r*.55,3);dust(a.x,10,1.3,a.h);for(let i=0;i<14;i++)fx.push({t:'e',x:a.x,y:a.h+.5*a.size,vx:rnd(-3,3),vy:rnd(-1,3.5),life:.5,max:.5,r:.035});bones(a.x,a.h+.5,8);fx.push({t:'x',x:a.x,y:a.h+.5*a.size,vx:0,vy:0,life:.4,max:.4,r:.9,rot:0});a.life=0}shake(.4);sfx('boom');sfx('shatter')}});ftext(p.x,p.h+1.2,'CORPSE BLAST',true)},
+  spin(pick){const L0=allies.filter(a=>a.life>0&&!(a.rise>0));if(!L0.length){ftext(p.x,p.h+1.2,'NO SUMMON');p.cd.spin=.3;return}if(!pick&&L0.length>1){openBlastPick(L0);return}const L=pick||L0;kst('w_cast',.45,{times:[.25],fire(){for(const a of L){const r=1+.35*a.size;aoe(a.x,a.h,r,1.2,Math.round(24+a.size*10),3,'wpnH');ringFx(a.x,a.h+.4,r,5);ringFx(a.x,a.h+.4,r*.55,3);dust(a.x,10,1.3,a.h);for(let i=0;i<14;i++)fx.push({t:'e',x:a.x,y:a.h+.5*a.size,vx:rnd(-3,3),vy:rnd(-1,3.5),life:.5,max:.5,r:.035});bones(a.x,a.h+.5,8);fx.push({t:'x',x:a.x,y:a.h+.5*a.size,vx:0,vy:0,life:.4,max:.4,r:.9,rot:0});a.life=0}shake(.4);sfx('boom');sfx('shatter')}});ftext(p.x,p.h+1.2,'CORPSE BLAST',true)},
   dash(){kst('w_dash',.42,{melee:{a0:.05,a1:.9,reach:.5,dmg:16,kb:1.4,both:1},upd(u){if(u<.75)p.vx=p.face*8.5;if(Math.random()<.5)fx.push({t:'e',x:p.x,y:p.h+rnd(.2,1),vx:-p.face,vy:0,life:.35,max:.35,r:.03})}});p.inv=Math.max(p.inv,.42);ftext(p.x,p.h+1.2,'PHANTOM DASH',true)},
   blast(){buff('link',10);p.cd.blast=13;kst('w_burst',.4,{});ringFx(p.x,p.h+.5,1.2,3);sfx('wave');ftext(p.x,p.h+1.2,allies.length?'SOUL LINK':'SOUL LINK · NO SUMMON',true)},
   flurry(){let n=0;kst('w_cast',.5,{times:[.25],fire(){for(const e of enemies){if(!alive(e)||Math.abs(e.x-p.x)>5.5||Math.abs(e.h-p.h)>2.5)continue;e.mark=G.T+14;n++;kfx.push({t:'beam',x:p.x+p.face*.3,h:p.h+.8,x2:e.x,h2:e.h+e.size*1.2,life:.25,max:.25,col:'#aaffe6'})}ftext(p.x,p.h+1.5,n?'MARKED ×'+n:'NO TARGET',!!n);sfx('glitch')}});ftext(p.x,p.h+1.2,'DEATH MARK',true)},
@@ -3478,7 +3478,7 @@ function renderUlts(c,X,Yh,front){
     c.restore()}
 }
 function renderUltScreen(c,X,Yh){try{_rus0(c,X,Yh)}finally{try{if(p&&p.pult&&p._uwq&&G.T-p._uwq.t<.2){const q=p._uwq;drawUltWeapon(c,q.A,q.B,q.S,p)}}catch(_){}}}
-function _rus0(c,X,Yh){
+function _rus0(c,X,Yh){if(G.mode==='bpick'){try{drawBlastPick(c,X,Yh)}catch(_){}}
   if(G.pdim>.01){c.fillStyle=`rgba(0,0,0,${G.pdim.toFixed(3)})`;c.fillRect(0,0,W,H)}
   if(G.dark>.01){const px=X(p.x),py=Yh(p.h+.45),r=U*1.7,g=c.createRadialGradient(px,py,r*.35,px,py,r);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,`rgba(0,0,0,${G.dark.toFixed(3)})`);c.fillStyle=g;c.fillRect(0,0,W,H)}
   if(ults.some(u=>u.type==='storm')){c.save();c.strokeStyle='rgba(255,255,255,.22)';c.lineWidth=1;c.beginPath();for(let i=0;i<90;i++){const sx=((i*97.3+G.T*620)%(W+200))-100,sy=((i*53.7+G.T*900)%(H+60))-30;c.moveTo(sx,sy);c.lineTo(sx-8,sy+22)}c.stroke();c.restore()}
@@ -3612,7 +3612,7 @@ function drawWx(c,cam,gy,fx){const T=G.T||0,o=cam*U*.5;c.save();
   else if(fx==='fog'){for(let i=0;i<4;i++){const x=((i*W*.4-o*.6+T*10*(i%2?1:-1))%(W*1.6)+W*1.6)%(W*1.6)-W*.3,g=c.createRadialGradient(0,0,0,0,0,1);g.addColorStop(0,'rgba(255,255,255,.08)');g.addColorStop(1,'rgba(255,255,255,0)');c.save();c.translate(x,gy-H*.03);c.scale(W*.35,H*.14);c.fillStyle=g;c.fillRect(-1,-1,2,2);c.restore()}}
   c.restore()}
 function noBlur(c,on){try{if(on){if(!c._nb){Object.defineProperty(c,'shadowBlur',{configurable:true,get(){return 0},set(v){}});c._nb=1}}else if(c._nb){delete c.shadowBlur;c._nb=0}}catch(_){}}
-function render(rdt){
+function render(rdt){if(G.mode==='bpick')G._bpT=(G._bpT||0)+.016;
   const c=ctx;c.setTransform(DPR,0,0,DPR,0,0);const LQ=!!G.lowfx;noBlur(c,LQ);try{applyDTh()}catch(_){}c.shadowBlur=0;c.shadowColor='rgba(0,0,0,0)';c.globalAlpha=1;c.globalCompositeOperation='source-over';
   c.fillStyle='#0b0b0b';c.fillRect(0,0,W,H);
   let sx=0,sy=0;if(G.shake>0){sx=rnd(-1,1)*G.shake*U*.12;sy=rnd(-1,1)*G.shake*U*.12}
@@ -4189,7 +4189,7 @@ sword:{kick:'달려들며 세 번 베고 칼을 넣는 돌진베기',upper:'뛰�
 ninja:{kick:'뒤로 물러나며 밟으면 기절하는 마름쇠를 뿌려요',upper:'뛰어올라 아래로 표창을 던지는 하늘 표창',spin:'사방으로 표창 8개를 던지는 회전 표창',dash:'가까운 적 뒤로 순간이동해 차는 그림자 걸음'},
 bomber:{kick:'밟으면 터지는 지뢰를 설치해요',upper:'발밑을 폭발시켜 높이 뛰는 로켓 점프',spin:'터지면서 작은 폭탄 3개로 갈라지는 집속탄',dash:'돌진한 뒤 폭발하는 폭풍 돌진'},
 gunner:{kick:'뒤로 공중제비를 돌며 쏘는 백덤블링 사격',upper:'발밑으로 쏴서 높이 뛰는 반동 점프',spin:'총 개머리판으로 앞을 세게 후려쳐 밀쳐내고, 일반 적은 잠깐 멈추게 해요',dash:'미끄러지며 쏘는 슬라이딩 사격'},
-necro:{kick:'슬롯에 넣어둔 영혼을 번갈아 불러내 땅을 파고 올라오게 해요(중간보스까지). 슬롯은 스킬 버튼 위 [슬롯 변경하기]나 T 키로 바꿔요',upper:'영혼 하나를 소모해 피해를 막아주는 영혼 방패',spin:'불러낸 소환수 중 고른 것만 폭발시키는 시체 폭발(소환수가 둘 이상이면 고르는 창이 떠요)',dash:'무적 상태로 관통하는 망령 돌진'},
+necro:{kick:'슬롯에 넣어둔 영혼을 번갈아 불러내 땅을 파고 올라오게 해요(중간보스까지). 슬롯은 스킬 버튼 위 [슬롯 변경하기]나 T 키로 바꿔요',upper:'영혼 하나를 소모해 피해를 막아주는 영혼 방패',spin:'불러낸 소환수 중 고른 것만 폭발시키는 시체 폭발(소환수가 둘 이상이면 터뜨릴 소환수를 화면에서 직접 터치해요)',dash:'무적 상태로 관통하는 망령 돌진'},
 magician:{kick:'상자를 깔아두고, 다시 누르면 다른 곳에서 상자 속으로 들어가 깔아둔 상자에서 튀어나오는 상자 마술',upper:'적을 따라가는 비둘기 3마리',spin:'카드를 사방으로 흩날리는 카드 회오리',dash:'잠시 사라져 모든 공격을 피하는 사라지기'},
 porter:{kick:'뒤로 순간이동하며 쏘는 후퇴 포탈',upper:'위로 순간이동해 아래로 쏘는 상공 게이트',spin:'주변을 날려버리는 차원 균열',dash:'가까운 적 앞으로 순간이동해 차는 점멸 일격'},
 baseball:{kick:'배트로 적을 직접 후려쳐 멀리 날려보내는 직접 타격',upper:'배트를 회전시켜 던지면 적을 뚫고 갔다가 손으로 되돌아오며 한 번 더 때려요',spin:'양쪽을 휘두르는 회전 풀스윙',dash:'미끄러지며 다리를 거는 도루 슬라이딩'},
@@ -5531,6 +5531,28 @@ function tintBegin(c){TNT.on=false;TNT.used=0;try{if(!p||G.mode!=='play')return;
 function tintEnd(c){if(!TNT.on){return}TNT.on=false;if(!TNT.used)return;const t=TNT.c,f=TNT.f,W0=TNT.cv.width,H0=TNT.cv.height;t.save();t.setTransform(1,0,0,1,0,0);t.globalAlpha=.62;t.globalCompositeOperation='source-atop';const g=t.createLinearGradient(0,0,W0*.4,H0);const cl=f.col;cl.forEach((q,i)=>g.addColorStop(cl.length>1?i/(cl.length-1):0,q));if(cl.length===1)g.addColorStop(1,cl[0]);t.fillStyle=g;t.fillRect(0,0,W0,H0);
   if(!G.lowfx){t.globalAlpha=.5;const P=Math.floor(G.T*8);for(let i=0;i<18;i++){const x=((i*977+P*131)%W0),y=((i*571+P*89)%H0);t.fillStyle=i%2?'#ffffff':cl[0];t.fillRect(x,y,3,3)}}t.restore();
   c.save();c.setTransform(1,0,0,1,0,0);c.globalAlpha=1;c.globalCompositeOperation='source-over';c.shadowBlur=0;c.drawImage(TNT.cv,0,0);if(!G.lowfx){c.globalCompositeOperation='lighter';c.globalAlpha=.22;c.drawImage(TNT.cv,0,0)}c.restore()}
+
+/* ---------- 네크로맨서: 폭발시킬 소환수를 직접 터치 ---------- */
+let BPK=null;
+function openBlastPick(L){BPK={list:L.slice()};G.mode='bpick';let ov=document.getElementById('bpOv');
+  if(!ov){ov=document.createElement('div');ov.id='bpOv';ov.style.cssText='position:fixed;inset:0;z-index:60;touch-action:none;cursor:crosshair';
+    ov.innerHTML='<div id="bpBar" style="position:absolute;left:50%;top:max(12px,env(safe-area-inset-top));transform:translateX(-50%);display:flex;gap:8px;align-items:center;background:rgba(10,10,10,.88);border:1px solid rgba(255,255,255,.35);padding:8px 10px;font:600 13px system-ui,sans-serif;color:#eee;white-space:nowrap"><span>✦</span><span id="bpTxt">폭발시킬 소환수를 터치하세요</span><button id="bpAll" class="sbuy" style="padding:6px 12px;font-size:12.5px;width:auto">전부 폭발</button><button id="bpNo" class="sbuy ghost" style="padding:6px 12px;font-size:12.5px;width:auto">취소</button></div>';
+    document.body.appendChild(ov);
+    ov.addEventListener('pointerdown',e=>{if(e.target.closest('#bpBar'))return;e.preventDefault();bpTap(e.clientX,e.clientY)});
+    ov.querySelector('#bpAll').onclick=e=>{e.stopPropagation();const L2=BPK?BPK.list.filter(a=>a.life>0):[];closeBlastPick(false);if(L2.length)KIT.necro.spin(L2)};
+    ov.querySelector('#bpNo').onclick=e=>{e.stopPropagation();closeBlastPick(true)};}
+  ov.querySelector('#bpTxt').textContent='폭발시킬 소환수를 터치하세요';ov.hidden=false;sfx('ui')}
+function closeBlastPick(refund){BPK=null;const ov=document.getElementById('bpOv');if(ov)ov.hidden=true;if(G.mode==='bpick'){G.mode='play';last=performance.now()}if(refund){p.cd.spin=0;p.sta=Math.min(100,p.sta+((SKILL.spin&&SKILL.spin.st)||0))}}
+function bpTap(cx,cy){if(!BPK)return;const r=cv.getBoundingClientRect(),sx=cx-r.left,sy=cy-r.top,wx=sx/U+G.camX,wh=G.camY+(GY-sy)/U;let best=null,bd=1e9;
+  for(const a of BPK.list){if(!(a.life>0))continue;const S=a.size||1,dx=Math.abs(a.x-wx),cyh=a.h+S*.55,dh=Math.abs(cyh-wh);if(dx<.35+S*.28&&dh<.45+S*.7){const d=dx+dh*.6;if(d<bd){bd=d;best=a}}}
+  if(best){closeBlastPick(false);KIT.necro.spin([best])}else{const t=document.getElementById('bpTxt');if(t){t.textContent='소환수를 정확히 터치하세요';setTimeout(()=>{if(BPK&&t)t.textContent='폭발시킬 소환수를 터치하세요'},900)}sfx('ui')}}
+function drawBlastPick(c,X,Yh){if(!BPK)return;const T=performance.now()/1000;c.save();c.fillStyle='rgba(0,0,0,.35)';c.fillRect(0,0,W,H);
+  for(const a of BPK.list){if(!(a.life>0))continue;const S=a.size||1,x=X(a.x),y=Yh(a.h+S*.55),r=U*(.22+S*.26)*(1+.06*Math.sin(T*6));
+    c.strokeStyle='rgba(255,120,90,.95)';c.shadowColor='rgba(255,90,60,1)';c.shadowBlur=14;c.lineWidth=2.5;c.setLineDash([U*.1,U*.07]);c.lineDashOffset=-T*U*.6;c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.stroke();c.setLineDash([]);
+    c.lineWidth=2;for(let i=0;i<4;i++){const an=i*Math.PI/2+T*1.5;c.beginPath();c.moveTo(x+Math.cos(an)*r*1.1,y+Math.sin(an)*r*1.1);c.lineTo(x+Math.cos(an)*r*1.35,y+Math.sin(an)*r*1.35);c.stroke()}
+    c.shadowBlur=0;c.fillStyle='#ffd8cc';c.font=`700 ${Math.round(U*.14+6)}px system-ui,sans-serif`;c.textAlign='center';c.textBaseline='bottom';c.fillText('TAP',x,y-r*1.4-2)}
+  c.restore()}
+addEventListener('keydown',e=>{if(G.mode!=='bpick')return;if(e.key==='Escape'){e.preventDefault();closeBlastPick(true)}else if(e.key==='Enter'){e.preventDefault();const L2=BPK?BPK.list.filter(a=>a.life>0):[];closeBlastPick(false);if(L2.length)KIT.necro.spin(L2)}},true);
 resize();
 (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{sizePreview()});
 requestAnimationFrame(frame);
