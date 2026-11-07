@@ -3241,10 +3241,10 @@ function shopInfo(){if(shopTab==='skin')return skinInfo();const k=CLSK[shopI],c=
   let btn;if(sel)btn='<button class="sbuy ghost" disabled>사용 중</button>';else if(own)btn='<button class="sbuy ghost" id="sAct">선택하기</button>';else if(!prevOk)btn=`<button class="sbuy" disabled>이전 캐릭터 먼저 잠금 해제</button>`;else if(!coinOK(c.price||0))btn=`<button class="sbuy" disabled>코인 부족 · ${COIN.toLocaleString()} / ${(c.price||0).toLocaleString()}</button>`;else btn=`<button class="sbuy" id="sAct">구매 · ${(c.price||0).toLocaleString()} 코인</button>`;
   let sbtn,pvb=own&&!(skOwn&&skOn)?`<button class="sbuy ghost" id="sPvSkin" style="margin-top:6px">${shopPv===k?'미리보기 끄기':'스킨 미리보기'}</button>`:'';if(!own)sbtn='<button class="sbuy" disabled>캐릭터를 먼저 잠금 해제하세요</button>';else if(!skOwn)sbtn=coinOK(skPrice(k))?`<button class="sbuy" id="sSkin">스킨 구매 · ${skPrice(k).toLocaleString()} 코인</button>`:`<button class="sbuy" disabled>코인 부족 · ${COIN.toLocaleString()} / ${skPrice(k).toLocaleString()}</button>`;else sbtn=`<button class="sbuy ghost" id="sSkin">${skOn?'착용 해제':'착용하기'}</button>`;
   $('#sInfo').innerHTML=shopTabs(k,own)+`<div class="shd"><h3>${c.name}<span>${c.job}</span><span>무기 · ${c.wpn}</span></h3>${btn}</div>
-  <div class="sgrid"><div class="scol"><p class="sdesc">${c.desc}</p>${c.kit?`<div class="sbox"><div class="sbt">전용 기술</div><dl class="sstats" style="gap:7px 12px">${c.kit.map(q=>`<dt><kbd>${q[0]}</kbd></dt><dd style="display:block;font-size:12.5px;color:var(--dim)"><b style="color:var(--ink);font-weight:600">${q[1]}</b> · ${q[2]}</dd>`).join('')}</dl></div>`:''}<dl class="sstats"><dt>공격력</dt><dd>${bar(c.st[0])}</dd><dt>사거리</dt><dd>${bar(c.st[1])}</dd><dt>속도</dt><dd>${bar(c.st[2])}</dd></dl>
+  <div class="sgrid"><div class="scol"><p class="sdesc">${c.sd||c.desc}</p><dl class="sstats"><dt>공격력</dt><dd>${bar(c.st[0])}</dd><dt>사거리</dt><dd>${bar(c.st[1])}</dd><dt>속도</dt><dd>${bar(c.st[2])}</dd></dl>
     ${c.vars&&own?`<div class="vars">${c.vars.map(([id,nm])=>`<button data-v="${id}" class="${id===v?'on':''}">${nm}</button>`).join('')}</div>`:''}</div>
-  <div class="scol"><div class="sbox"><div class="sbt">필살기<b>${c.ult.en}</b><span>PC R · 모바일 ★</span></div><p>${c.ult.desc}</p><p style="font-size:11.5px">공격하거나 맞으면 ULT 게이지가 차요. 가득 차면 발동할 수 있어요.</p></div>
-    <div class="sbox"><div class="sbt">스킨<b>${skinList(k).length}종</b><span>${skinEq(k)?'착용 중 · '+(skinList(k).find(q=>q.id===skinEq(k))||{}).name:'기본 모습'}</span></div><p>위의 <b>스킨</b> 탭에서 옆으로 넘기며 스킨을 보고 구매·착용할 수 있어요.</p></div></div></div>`;
+  <div class="scol"><div class="sbox"><div class="sbt">필살기<b>${c.ult.en}</b><span>PC R · 모바일 ★</span></div></div>
+    <div class="sbox"><div class="sbt">스킨<b>${skinList(k).length}종</b><span>${skinEq(k)?'착용 중 · '+(skinList(k).find(q=>q.id===skinEq(k))||{}).name:'기본 모습'}</span></div></div></div></div>`;
   if(!own)$('#sInfo').innerHTML=shopTabs(k,false)+`<div class="shd"><h3>???<span>LOCKED</span><span>가격 · ${(c.price||0).toLocaleString()} 코인</span></h3>${btn}</div><div class="sgrid"><div class="scol"><p class="sdesc" style="color:var(--dim)">아직 잠겨 있는 캐릭터예요. 구매하면 모습과 무기, 전용 기술, 필살기, 고유 스킨이 공개돼요.</p></div></div>`;
   const pv=$('#sPvSkin');if(pv)pv.onclick=()=>{shopPv=shopPv===k?null:k;buildShop()};
   const act=$('#sAct');if(act)act.onclick=()=>{if(!own){if(!prevOk||!coinOK(c.price||0))return;if(!DEV.on)COIN-=(c.price||0);SHOP.owned.push(k);sfx('wave')}SHOP.cls=k;G.cls=k;saveShop();buildShop()};
@@ -3291,7 +3291,7 @@ function buildChar(){if(charMode==='skin'){buildSkinScr();return}$('#charBack h2
     const ca=$('#cSkAct');if(ca)ca.onclick=()=>{if(!ow){if(!buySkin(k,sk.id))return;setSkin(k,sk.id)}else setSkin(k,eq?null:sk.id);buildChar()};
     $('#charInfo').querySelectorAll('.stabs button').forEach(b=>b.onclick=()=>{charTab=b.dataset.t;buildChar()});return}
   $('#charInfo').innerHTML=`<h3>${c.name}<span>${c.job}</span></h3>${ctabs}<div class="crow"><span class="ctag">무기 · ${c.wpn}</span><span class="ctag">필살기 · ${c.ult.en}</span><span class="ctag">${progTxt(k)}</span></div>
-    <p class="sdesc" style="font-size:13.5px;color:var(--dim)">${c.desc}</p>
+    <p class="sdesc" style="font-size:13.5px;color:var(--dim)">${c.sd||c.desc}</p>
     ${c.vars&&own?`<div class="vars">${c.vars.map(([id,nm])=>`<button data-v="${id}" class="${id===v?'on':''}">${nm}</button>`).join('')}</div>`:''}
     <div class="crow"><span class="ctag">스킨 · ${skinEq(k)?(skinList(k).find(q=>q.id===skinEq(k))||{}).name+' 착용 중':'기본 모습'}</span></div>
     ${own&&k==='necro'?`<div class="sbt" style="margin-top:4px">영혼 보관함</div><div class="vault" id="cVault">${vaultBtns()}</div>`:''}
@@ -4779,7 +4779,7 @@ function fitCharRow(){const cb=$('#charBack .cbody'),cp=$('#charBack .cprev'),gr
   const over=el=>el.scrollHeight>el.clientHeight+2;
   if(cv){const H=cp.clientHeight,w=cv.clientWidth||cp.clientWidth;cv.style.aspectRatio='auto';cv.style.height=Math.round(Math.max(120,Math.min(w/1.6,H*.46)))+'px'}
   if(over(cp)&&ci){let lo=.5,hi=1;for(let it=0;it<8;it++){const m=(lo+hi)/2;ci.style.zoom=m.toFixed(3);if(over(cp))hi=m;else lo=m}ci.style.zoom=lo.toFixed(3)}
-  cp.style.overflowY=over(cp)?'auto':'hidden';cp.scrollLeft=0}
+  cp.style.overflowY='hidden';cp.scrollTop=0;cp.scrollLeft=0}
 function fitScreens(){try{if(!$('#shopBack').hidden)fitZoom($('#shopBack .sinfo'),[$('#sInfo')])}catch(_){}
   try{if(!$('#setBack').hidden){const sw=$('#setBack .setwrap');fitZoom(sw,[...sw.children])}}catch(_){}
   try{if(!$('#waveBack').hidden){const wb=$('#waveBack .wfbody');fitZoom(wb,[$('#waveBody')])}}catch(_){}
@@ -5445,6 +5445,7 @@ const HZS={boss:{fx:'spike'},bandit:{fx:'drop',obj:'sword',os:.7,col:'rgba(255,2
   minotaur:{fx:'horn',ink:'#e8d8c8',col:'rgba(255,120,80,.9)'},titan:{fx:'pillar',col:'rgba(200,190,180,.9)',ink:'#bbb'},mirror:{fx:'drop',obj:'shard',col:'rgba(220,150,255,.95)'},gladiator:{fx:'drop',obj:'spear',os:1.1},
   warlord:{fx:'drop',obj:'axe',col:'rgba(255,190,120,.9)'},frostq:{fx:'drop',obj:'icicle',col:'rgba(150,220,255,.95)'},reaper:{fx:'drop',obj:'scythe',col:'rgba(160,120,230,.95)'}};
 
+const CLSSD={"base": "모든 기본기와 콤보를 쓰는 기본 졸라맨.", "archer": "활로 멀리서 쏘는 원거리 캐릭터.", "sword": "검으로 멀리, 세게 베는 근접 캐릭터.", "ninja": "표창을 던지고 벽을 타는 빠른 닌자.", "bomber": "폭탄을 던져 주변 적을 한꺼번에 날려요.", "gunner": "탄을 다 쓰면 다음 총으로 자동 교체돼요.", "necro": "쓰러뜨린 적의 영혼을 모아 소환해요.", "magician": "카드와 상자로 적을 속이는 마술사.", "porter": "포탈로 적과 나를 순간이동시켜요.", "baseball": "공을 던지고 돌아온 공을 배트로 쳐요.", "volt": "전기로 적을 감전시켜 멈추게 해요.", "wolf": "발톱으로 몰아치는 늑대인간.", "bard": "기타 연주와 음파로 싸워요.", "frost": "얼음으로 적을 느리게 하고 얼려요.", "druid": "덩굴과 나무로 적을 묶고 공격해요.", "shade": "그림자와 낫으로 싸우는 사신.", "kid": "우산을 휘두르는 키 작은 잼민이.", "seonbi": "부채 바람과 붓글씨로 싸우는 선비.", "grad": "연필과 책으로 싸우는 대학원생."};for(const k in CLSSD)if(CLS[k])CLS[k].sd=CLSSD[k];
 resize();
 (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{sizePreview()});
 requestAnimationFrame(frame);
