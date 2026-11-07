@@ -5553,6 +5553,9 @@ function drawBlastPick(c,X,Yh){if(!BPK)return;const T=performance.now()/1000;c.s
     c.shadowBlur=0;c.fillStyle='#ffd8cc';c.font=`700 ${Math.round(U*.14+6)}px system-ui,sans-serif`;c.textAlign='center';c.textBaseline='bottom';c.fillText('TAP',x,y-r*1.4-2)}
   c.restore()}
 addEventListener('keydown',e=>{if(G.mode!=='bpick')return;if(e.key==='Escape'){e.preventDefault();closeBlastPick(true)}else if(e.key==='Enter'){e.preventDefault();const L2=BPK?BPK.list.filter(a=>a.life>0):[];closeBlastPick(false);if(L2.length)KIT.necro.spin(L2)}},true);
+
+/* 스킨 가격: 한 캐릭터 안에서 뒤로 갈수록 최소 1.5배씩 비싸게 */
+for(const k of CLSK){const L=skinList(k);let prev=skinPrice(k,L[0]&&L[0].id);for(let i=1;i<L.length;i++){const s2=L[i],need=Math.ceil(prev*1.5/100)*100;let src=s2.id==='violin'?SKIN2.bard:(SKINX[k]||[]).find(q=>q.id===s2.id);if(src&&src.price<need)src.price=need;prev=skinPrice(k,s2.id)}}
 resize();
 (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{sizePreview()});
 requestAnimationFrame(frame);
