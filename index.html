@@ -1472,7 +1472,7 @@ function explode(e){const r=.95;shake(.4);sfx('boom');
   if(Math.abs(p.x-e.x)<r&&Math.abs(p.h-e.h)<.7)hurtPlayer(TY.bomber.dmg.boom,Math.sign(p.x-e.x)||1,3.6,e,1);
   for(const o of enemies)if(o!==e&&o.state!=='dead'&&o.active&&Math.abs(o.x-e.x)<r&&Math.abs(o.h-e.h)<.7)hitEnemy(o,30,'boomx',Math.sign(o.x-e.x)||1,3);
 }
-const CLSM={archer:[1.15,1.1],sword:[1.05,1.2],ninja:[.86,.9],gunner:[.66,.75],wolf:[.8,.85],volt:[.82,.85],shade:[.85,.88],frost:[.9,.9],bard:[1.08,1.05],druid:[.9,.84],magician:[.95,1],porter:[.95,1]};
+const CLSM={archer:[1.4,1.2],sword:[1.05,1.2],ninja:[.86,.9],gunner:[.92,.88],wolf:[.8,.85],volt:[1.02,.95],shade:[.85,.88],frost:[.9,.9],bard:[1.08,1.05],druid:[.9,.84],magician:[.95,1],porter:[.95,1]};
 const SHB={shield:1,golem:.25,m_titan:.8,titan:.45};
 function shieldBreak(e,dir){e.noShield=true;e.shHP=0;const sx=e.x+e.face*.14*e.size,sh=e.h+.55*e.size;ftext(e.x,e.h+1.2*e.size,'SHIELD BREAK',true);sfx('shatter');shake(.25);sparks(sx,sh,-dir,14,1.3);
   for(let q=0;q<9;q++)kfx.push({t:'shell',x:sx,h:sh+rnd(-.2,.2)*e.size,vx:-dir*rnd(-1,3),vh:rnd(1.5,4),life:1.2,max:1.2,r:rnd(0,6),big:1});if(!TY[e.kind].boss)setState(e,'hurt',.9);else e.flash=.2}
@@ -1969,7 +1969,7 @@ const CLS={
   sword:{name:'검객',job:'SWORDSMAN',wpn:'검',price:600,desc:'1번 공격이 검 베기로 바뀌어요. 펀치보다 멀리 닿고 세게 쳐요.',vars:[['katana','카타나'],['dagger','단검 · 빠름']]},
   ninja:{name:'닌자',job:'NINJA',wpn:'표창',price:900,desc:'1번 공격으로 표창을 2번 던져요. 이동 속도가 15% 빨라요. 벽을 향해 달리면 손을 쓰지 않고 벽을 타고 올라가고, 벽에 매달린 채 1번으로 표창을 던지거나 점프로 반대편으로 높이 차고 나가요. 2번은 뒤로 물러나며 밟으면 기절하는 마름쇠를 뿌려요.'},
   bomber:{name:'폭탄광',job:'BOMB MANIAC',wpn:'폭탄',price:1300,desc:'1번 공격으로 폭탄을 포물선으로 던져요. 떨어진 자리에서 터져 주변 적을 모두 쳐요.'},
-  gunner:{name:'총잡이',job:'GUNNER',wpn:'총',price:1800,desc:'1번을 누르고 있으면 조준 사격을 해요. 조이스틱이나 마우스로 방향을 정해요. 총마다 탄창이 있고, 탄을 다 쓰면 권총 → AK → 샷건 → 저격총 순서로 다음 총을 자동으로 꺼내요. 다 쓴 총은 그동안 재장전돼요. 3번 반동 점프로 높이 뛰어오른 뒤 1번을 누르면 총으로 땅을 내려찍어요.',vars:[['pistol','권총'],['ak','AK · 3연사'],['shotgun','샷건 · 산탄'],['sniper','저격총 · 관통']]},
+  gunner:{name:'총잡이',job:'GUNNER',wpn:'총',price:1800,desc:'1번을 누르고 있으면 조준 사격을 해요. 조이스틱이나 마우스로 방향을 정해요. 총마다 탄창이 있어서 다 쓰면 재장전하고, 4번으로 권총·AK·샷건·저격총을 바꿔 들어요. 3번 반동 점프로 높이 뛰어오른 뒤 1번을 누르면 총으로 땅을 내려찍어요.',vars:[['pistol','권총'],['ak','AK · 3연사'],['shotgun','샷건 · 산탄'],['sniper','저격총 · 관통']]},
   necro:{name:'네크로맨서',job:'NECROMANCER',wpn:'지팡이',price:2400,desc:'1번을 누르면 지팡이 끝의 유령이 달려나가 적을 물고 돌아와요. 쓰러뜨린 적이 남긴 영혼에 다가가 2번(소환)을 누르면 보관함에 영원히 저장돼요. 소환 슬롯 3칸에 넣어둔 영혼이 2번을 누를 때마다 번갈아 나와요. 영혼을 소모해 피해를 막고, 소환수를 폭발시키고, 소환수와 연결해 체력을 회복하고, 표식을 남긴 적이 죽으면 영혼이 2배로 나와요. 필살기로는 쓰러뜨린 보스를 불러내요.'},
   magician:{name:'마술사',job:'MAGICIAN',wpn:'카드',price:3100,desc:'1번 공격으로 카드 3장을 던져요. 상자를 깔아두고 다른 곳에서 상자를 통해 튀어나오거나, 잠시 사라져 공격을 피하고, 모자로 적과 투사체를 빨아들여요. 앙코르로 직전에 쓴 스킬을 약하게 한 번 더 써요.'},
   porter:{name:'텔레포터',job:'TELEPORTER',wpn:'포탈건',price:3900,desc:'1번 공격으로 내 앞과 멀리 한 곳에 서로 이어진 포탈 두 개를 열어요. 포탈에 들어간 적과 나는 반대쪽 포탈로 순간이동하고, 적은 피해를 입어요.'},
@@ -2658,7 +2658,7 @@ bomber:{
 gunner:{
   kick(){kst('w_back',.42,{times:[.14,.26],fire(){kshot('bullet',0,16,9)}});p.vx=-p.face*4.2;p.vh=3.4;p.gnd=false;sfx('jump')},
   upper(){p.aimAng=-1.35;kst('w_xbow',.4,{times:[.04],fire(){for(let k=0;k<6;k++)kshot('pellet',-1.4+(k-2.5)*.1,14,8,{life:.25,kb:2.5,h:p.h+.45});aoe(p.x,p.h,.8,.6,14,2.5,'quake');fx.push({t:'mz',x:p.x+p.face*.1,y:p.h+.15,vx:0,vy:0,life:.08,max:.08,d:p.face},{t:'r',x:p.x,y:p.h+.05,vx:0,vy:0,life:.3,max:.3,r:.7,w:3});kfx.push({t:'smoke',x:p.x,h:p.h,life:.5,max:.5,s:2.2});dust(p.x,12,1.3,p.h);shake(.22);sfx('gshot');p.vh=10;p.gnd=false;p.rjump=1}});ftext(p.x,p.h+1.2,'RECOIL JUMP',true)},
-  spin(){kst('w_sword',.45,{melee:{a0:.32,a1:.6,reach:1.0,dmg:16,kb:3.2,kind:'wpnH',on(e){if(!TY[e.kind].boss&&e.state!=='dead')setState(e,'hurt',.7);ftext(e.x,e.h+e.size+.3,'BASH!');shake(.12)}}});ftext(p.x,p.h+1.2,'BUTT STRIKE',true);sfx('swing')},
+  spin(){p.cd.spin=.35;p.sta=Math.min(100,p.sta+SKILL.spin.st);if(!p.ammo)gunInit();const i=GUNK.indexOf(p.gun);p.gun=GUNK[(i+1)%GUNK.length];p.relT=0;kst('w_gun',.28,{});ftext(p.x,p.h+1.2,GUNS[p.gun].n,true);sfx('reload')},
   dash(){kst('w_slide',.55,{upd(u){if(u<.7)p.vx=p.face*6.5},times:[.12,.26,.4],fire(){kshot('bullet',0,16,9,{h:p.h+.3});sfx('xbow')}});p.inv=Math.max(p.inv,.3);ftext(p.x,p.h+1.2,'SLIDE SHOT',true)},
   blast(){const A=aimNow();p.face=A.dir;p.aimAng=A.ang;kst('w_xbow',.55,{times:[.28],fire(){arrowAt(A,{kind:'snipe',spd:30,dmg:30,grav:0,kb:3.2,pierce:1,heavy:1,life:1});gunFx(A,1);shake(.18);sfx('gsnipe');p.recoil=.3}});ftext(p.x,p.h+1.2,'PIERCING SHOT',true)},
   flurry(){const A=aimNow();p.face=A.dir;p.aimAng=A.ang;kst('w_xbow',.7,{times:[.08,.16,.24,.32,.4,.48],fire(){const B={dir:A.dir,ang:A.ang+(p.wfi-3.5)*.09};arrowAt(B,{kind:'bullet',spd:19,dmg:9,grav:0,kb:1.4,life:1.2});gunFx(B);p.recoil=.12;sfx('gpistol')}});ftext(p.x,p.h+1.2,'FAN FIRE',true)},
@@ -2694,7 +2694,9 @@ magician:{
     if(p.wcfg&&p.wcfg!==w0){const cf=p.wcfg;if(cf.melee)cf.melee=Object.assign({},cf.melee,{dmg:Math.round(cf.melee.dmg*W)});const wrap=f=>f&&function(){const m=pshots.length,kk=kfx.length;G.wk=W;try{return f.apply(this,arguments)}finally{G.wk=1;for(let i=m;i<pshots.length;i++)pshots[i].dmg=Math.round(pshots[i].dmg*W);for(let i=kk;i<kfx.length;i++)kfx[i].wk=W}};cf.fire=wrap(cf.fire);if(cf.upd)cf.upd=wrap(cf.upd)}
     for(let i=0;i<16;i++)fx.push({t:'s',x:p.x,y:p.h+1,vx:rnd(-3,3),vy:rnd(1,4),life:.5,max:.5});cardsFx(p.x,p.h+1.2,12);ftext(p.x,p.h+1.7,'ENCORE!',true);sfx('combo')},
   quake(){const cx=aimX();kst('w_summon',.55,{times:[.35],fire(){rainAt('card',cx,10,9,{sc:1.4})}});ftext(p.x,p.h+1.2,'STARFALL',true)},
-  dive(){kdive(()=>{aoe(p.x,p.h,1,.8,20,2.4,'quake');for(let k=0;k<8;k++){const an=.2+k*(Math.PI-.4)/7,s2=kshot('card',0,9,7,{pierce:1});s2.vx=Math.cos(an)*9;s2.vh=Math.sin(an)*9;s2.h=p.h+.2}sfx('slam')});ftext(p.x,p.h+1.2,'TRICK DROP',true)}},
+  dive(){kdive(()=>{const x0=p.x,h0=p.h;aoe(x0,h0,1.45,.95,30,2.8,'quake',null,q=>{if(!TY[q.kind].boss)holdE(q,.7,'star')});p.inv=Math.max(p.inv,.45);for(let k=0;k<12;k++){const an=.15+k*(Math.PI-.3)/11,s2=kshot('card',0,10,11,{pierce:1,homing:k%3===0?1:0,life:1.3});s2.vx=Math.cos(an)*10;s2.vh=Math.sin(an)*10;s2.h=h0+.2}
+    for(let i=0;i<26;i++)fx.push({t:'e',x:x0+rnd(-.4,.4),y:h0+.5,vx:rnd(-4,4),vy:rnd(0,5),life:.7,max:.7,r:.03});shake(.35);sfx('slam');sfx('magic');
+    kfx.push({t:'mtrick',x:x0,h:h0,life:.5,max:.5,up(k){if(k.life<.12&&!k.f){k.f=1;const ts=enemies.filter(e=>alive(e)&&Math.abs(e.x-x0)<6&&Math.abs(e.h-h0)<3).sort((a,b)=>Math.abs(a.x-x0)-Math.abs(b.x-x0)).slice(0,5);for(const e of ts){const s3=kshot('card',0,0,14,{pierce:1,life:.6,sc:1.3});s3.x=e.x;s3.h=e.h+3.6;s3.vx=0;s3.vh=-15;s3.px=e.x}if(ts.length){sfx('pop');ftext(x0,h0+1.6,'ENCORE CARDS',true)}}}})});ftext(p.x,p.h+1.2,'TRICK DROP',true)}},
 volt:{
   kick(){kst('w_cast',.4,{times:[.16],fire(){const hp=handPos(),ex=chainZap(hp.x,hp.h,4,12,4,null,.2);if(!ex.size){kfx.push({t:'beam',x:hp.x,h:hp.h,x2:hp.x+p.face*2.2,h2:hp.h+rnd(-.2,.2),life:.15,max:.15,col:'#cdeeff',sty:'el'});sfx('zap')}}});p.cd.kick=.9;ftext(p.x,p.h+1.2,'CHAIN LIGHTNING',true)},
   upper(){const ms=kfx.filter(k=>k.t==='vmine'&&k.life>0);if(ms.length>=3)ms[0].life=0;const x=p.x+p.face*.3;kfx.push({t:'vmine',x,h:gnd(x),life:14,max:14,dr:DRW.vmine,up(k){for(const e of enemies){if(!alive(e)||Math.abs(e.x-k.x)>.22+.12*e.size||Math.abs(e.h-k.h)>.3)continue;k.life=0;aoe(k.x,k.h,1.1,.9,20,1.5,'wpnH',null,q=>holdE(q,.8,'zap'));strike(k.x,0,.1,{h:k.h});ringFx(k.x,k.h+.2,1.1,4);break}}});kst('w_slam',.35,{});sparkE(x,gnd(x)+.1,8);sfx('block');ftext(p.x,p.h+1.2,'SHOCK MINE',true)},
@@ -2795,13 +2797,13 @@ function gunFx(A,big){const mx=p.x+A.dir*(.5+(p.gun==='pistol'?0:.18)),my=p.h+.6
   kfx.push({t:'shell',x:p.x+A.dir*.15,h:p.h+.68,vx:-A.dir*rnd(1.2,2.4),vh:rnd(2,3.6),life:.9,max:.9,r:rnd(0,6),big:p.gun==='shotgun'||big},{t:'smoke',x:mx+A.dir*.05,h:my,life:.4,max:.4,s:big?1.6:1})}
 function gunNext(){if(!p.ammo)gunInit();const cur=p.gun;p.bg=p.bg||{};p.bg[cur]=GUNS[cur].rel*1.6;const i=GUNK.indexOf(cur);let nx=null;for(let k=1;k<GUNK.length;k++){const g2=GUNK[(i+k)%GUNK.length];if(p.ammo[g2]>0){nx=g2;break}}
   if(!nx){delete p.bg[cur];startReload();return}p.gun=nx;p.relT=0;p.rl=Math.max(p.rl||0,.22);ftext(p.x,p.h+1.25,GUNS[nx].n,true);sfx('reload');if(G.tutorial)tutEv('reload')}
-function fireGun(A){if(!p.ammo)gunInit();if(p.gun==='mg')return;const g=GUNS[p.gun];if(p.relT>0)return;if(p.ammo[p.gun]<=0){sfx('click');gunNext();return}
+function fireGun(A){if(!p.ammo)gunInit();if(p.gun==='mg')return;const g=GUNS[p.gun];if(p.relT>0)return;if(p.ammo[p.gun]<=0){sfx('click');startReload();return}
   p.ammo[p.gun]--;p.face=A.dir;p.lastShot=G.T;
   if(p.gun==='pistol'){arrowAt(A,{kind:'bullet',spd:19,dmg:15,grav:0,kb:1.8,life:1.2});sfx('gpistol');p.recoil=.13;shake(.03)}
   else if(p.gun==='ak'){arrowAt({dir:A.dir,ang:A.ang+rnd(-.05,.05)},{kind:'bullet',spd:20,dmg:5,grav:0,kb:1,life:1.2});sfx('gak');p.recoil=.08}
   else if(p.gun==='shotgun'){for(let k=0;k<6;k++)arrowAt({dir:A.dir,ang:A.ang+(k-2.5)*.075+rnd(-.02,.02)},{kind:'pellet',spd:15,dmg:5,grav:0,kb:2.3,life:.32});sfx('gshot');p.recoil=.24;shake(.12);if(p.gnd)p.vx-=A.dir*1.6}
   else{arrowAt(A,{kind:'snipe',spd:28,dmg:30,grav:0,kb:3,pierce:1,heavy:1,life:1});sfx('gsnipe');p.recoil=.26;shake(.15)}
-  p.rl=g.rl;gunFx(A,p.gun==='shotgun'||p.gun==='sniper');if(G.tutorial)tutEv('fire');if(p.ammo[p.gun]<=0)gunNext()}
+  p.rl=g.rl;gunFx(A,p.gun==='shotgun'||p.gun==='sniper');if(G.tutorial)tutEv('fire');if(p.ammo[p.gun]<=0)startReload()}
 function startReload(){if(!p.ammo||p.relT>0||!GUNS[p.gun])return;const g=GUNS[p.gun];if(p.ammo[p.gun]>=g.mag)return;p.relT=g.rel;p.relMax=g.rel;p.relGun=p.gun;ftext(p.x,p.h+1.25,'RELOAD');sfx('reload');if(G.tutorial)tutEv('reload')}
 function gunTick(dt){if(!p.pult&&p.gun==='mg')p.gun=p.prevGun||'pistol';if(!p.pult)p.nhide=false;if(p.bg&&p.ammo)for(const k in p.bg){p.bg[k]-=dt;if(p.bg[k]<=0){p.ammo[k]=GUNS[k].mag;delete p.bg[k]}}if(!GUNS[p.gun])return;
   if(p.relT>0){if(p.relGun!==p.gun)p.relT=0;else{p.relT-=dt;if(p.relT<=0){p.ammo[p.gun]=GUNS[p.gun].mag;sfx('click')}}}
@@ -2817,7 +2819,7 @@ const KITN={
 sword:{kick:[IC.dash,'돌진','돌진베기'],upper:[IC.up,'승천','승천검'],spin:[IC.spin,'회전','회전베기'],dash:[IC.dash,'질풍','질풍참'],blast:[IC.wave,'검기','검기 날리기'],flurry:[IC.multi,'천검','천검 난도질'],quake:[IC.quake,'가르기','대지 가르기'],dive:[IC.dive,'낙하','낙하참']},
 ninja:{kick:[IC.star,'마름쇠','마름쇠 뿌리기'],upper:[IC.up,'하늘','하늘 표창'],spin:[IC.spin,'회전','회전 표창'],dash:[IC.dash,'순보','그림자 걸음'],blast:[IC.star,'거대','거대 표창'],flurry:[IC.multi,'난사','표창 난사'],quake:[IC.rain,'표창비','표창 비'],dive:[IC.dive,'암살','암살 낙하']},
 bomber:{guard:[IC.burst,'폭발','발밑 폭발'],kick:[IC.mine,'지뢰','지뢰 설치'],upper:[IC.rocket,'로켓','로켓 점프'],spin:[IC.burst,'집속','집속탄'],dash:[IC.dash,'돌진','폭풍 돌진'],blast:[IC.bomb,'대형','대형 폭탄'],flurry:[IC.multi,'세례','폭탄 세례'],quake:[IC.rain,'공습','공습'],dive:[IC.dive,'낙하','폭탄 낙하']},
-gunner:{kick:[IC.back,'백덤','백덤블링 사격'],upper:[IC.rocket,'반동','반동 점프'],spin:[IC.burst,'개머리','개머리판 치기'],dash:[IC.slide,'슬라','슬라이딩 사격'],blast:[IC.aim,'관통','관통탄'],flurry:[IC.multi,'패닝','패닝 사격'],quake:[IC.bomb,'수류탄','수류탄'],dive:[IC.dive,'공중','공중 난사']},
+gunner:{kick:[IC.back,'백덤','백덤블링 사격'],upper:[IC.rocket,'반동','반동 점프'],spin:[IC.spin,'교체','무기 교체'],dash:[IC.slide,'슬라','슬라이딩 사격'],blast:[IC.aim,'관통','관통탄'],flurry:[IC.multi,'패닝','패닝 사격'],quake:[IC.bomb,'수류탄','수류탄'],dive:[IC.dive,'공중','공중 난사']},
 necro:{kick:[IC.skull,'소환','영혼 소환'],upper:[IC.shield,'방패','영혼 방패'],spin:[IC.burst,'폭발','시체 폭발'],dash:[IC.dash,'돌진','망령 돌진'],blast:[IC.beam,'연결','영혼 연결'],flurry:[IC.aim,'표식','사령 표식'],quake:[IC.hand,'무덤','무덤의 손'],dive:[IC.dive,'사신','사신 낙하']},
 magician:{kick:[IC.box,'상자','상자 마술'],upper:[IC.dove,'비둘기','비둘기'],spin:[IC.spin,'회오리','카드 회오리'],dash:[IC.dash,'사라짐','사라지기'],blast:[IC.hat,'모자','흡수 모자'],flurry:[IC.multi,'앙코르','앙코르'],quake:[IC.rain,'별똥별','별똥별'],dive:[IC.dive,'트릭','트릭 낙하']},
 porter:{kick:[IC.back,'후퇴','후퇴 포탈'],upper:[IC.up,'상공','상공 게이트'],spin:[IC.burst,'균열','차원 균열'],dash:[IC.portal,'점멸','점멸 일격'],blast:[IC.orb,'공허','공허 구체'],flurry:[IC.multi,'연속','연속 점멸'],quake:[IC.portal,'낙하문','낙하 게이트'],dive:[IC.dive,'게이트','게이트 낙하']},
@@ -4188,7 +4190,7 @@ archer:{kick:'뒤로 뛰며 쏘는 백스텝 사격',upper:'볼트 3발을 연�
 sword:{kick:'달려들며 세 번 베고 칼을 넣는 돌진베기',upper:'뛰어오르며 올려베어 적을 띄우는 승천검',spin:'양쪽을 휩쓰는 회전베기',dash:'적을 관통하며 지나가는 질풍참'},
 ninja:{kick:'뒤로 물러나며 밟으면 기절하는 마름쇠를 뿌려요',upper:'뛰어올라 아래로 표창을 던지는 하늘 표창',spin:'사방으로 표창 8개를 던지는 회전 표창',dash:'가까운 적 뒤로 순간이동해 차는 그림자 걸음'},
 bomber:{kick:'밟으면 터지는 지뢰를 설치해요',upper:'발밑을 폭발시켜 높이 뛰는 로켓 점프',spin:'터지면서 작은 폭탄 3개로 갈라지는 집속탄',dash:'돌진한 뒤 폭발하는 폭풍 돌진'},
-gunner:{kick:'뒤로 공중제비를 돌며 쏘는 백덤블링 사격',upper:'발밑으로 쏴서 높이 뛰는 반동 점프',spin:'총 개머리판으로 앞을 세게 후려쳐 밀쳐내고, 일반 적은 잠깐 멈추게 해요',dash:'미끄러지며 쏘는 슬라이딩 사격'},
+gunner:{kick:'뒤로 공중제비를 돌며 쏘는 백덤블링 사격',upper:'발밑으로 쏴서 높이 뛰는 반동 점프',spin:'권총 · AK · 샷건 · 저격총을 바꿔 드는 무기 교체',dash:'미끄러지며 쏘는 슬라이딩 사격'},
 necro:{kick:'슬롯에 넣어둔 영혼을 번갈아 불러내 땅을 파고 올라오게 해요(중간보스까지). 슬롯은 스킬 버튼 위 [슬롯 변경하기]나 T 키로 바꿔요',upper:'영혼 하나를 소모해 피해를 막아주는 영혼 방패',spin:'불러낸 소환수 중 고른 것만 폭발시키는 시체 폭발(소환수가 둘 이상이면 터뜨릴 소환수를 화면에서 직접 터치해요)',dash:'무적 상태로 관통하는 망령 돌진'},
 magician:{kick:'상자를 깔아두고, 다시 누르면 다른 곳에서 상자 속으로 들어가 깔아둔 상자에서 튀어나오는 상자 마술',upper:'적을 따라가는 비둘기 3마리',spin:'카드를 사방으로 흩날리는 카드 회오리',dash:'잠시 사라져 모든 공격을 피하는 사라지기'},
 porter:{kick:'뒤로 순간이동하며 쏘는 후퇴 포탈',upper:'위로 순간이동해 아래로 쏘는 상공 게이트',spin:'주변을 날려버리는 차원 균열',dash:'가까운 적 앞으로 순간이동해 차는 점멸 일격'},
@@ -4203,7 +4205,7 @@ function classSteps(c){const K=KITN[c]||{},nm=a=>(c==='archer'?ARCHN[a]:(K[a]||[
   const atkName=(SLOTN[c]&&SLOTN[c].punch)?SLOTN[c].punch[2]:'기본 공격';
   if(c==='archer')S.push({t:'조준 사격',x:`${KK('1','조준 버튼')}을 <strong>누르고 있으면</strong> 조준하며 계속 쏴요. 마우스·${KK('W S')}·조이스틱으로 각도를 바꿀 수 있어요. 훈련용 졸라맨을 3번 맞혀보세요.`,ev:['fire'],n:3});
   else if(c==='gunner'){S.push({t:'조준 사격',x:`${KK('1','조준 버튼')}을 <strong>누르고 있으면</strong> 조준하며 쏴요. 마우스·조이스틱으로 방향을 정해요. 5발 쏴보세요.`,ev:['fire'],n:5});
-    S.push({t:'탄창 · 자동 교체',x:`캐릭터 오른쪽 위에 남은 탄이 보여요. 탄을 다 쓰면 <strong>다음 총으로 자동 교체</strong>돼요(권총 → AK → 샷건 → 저격총). 다 쓴 총은 그동안 재장전되고, 잠시 쏘지 않아도 재장전해요. 탄을 다 써서 총을 바꿔 보세요.`,ev:['reload'],n:1});}
+    S.push({t:'탄창 · 재장전',x:`캐릭터 오른쪽 위에 남은 탄이 보여요. 탄을 다 쓰거나 잠시 쏘지 않으면 <strong>재장전</strong>해요. 재장전을 한 번 해보세요.`,ev:['reload'],n:1});}
   else if(c==='baseball'){S.push({t:'투구',x:`${KK('1')} 공을 던져 훈련용 졸라맨을 맞혀보세요. 공은 맞고 튕겨 돌아와요.`,ev:['atk'],n:1});
     S.push({t:'스윙 게이지',x:`공이 날아가 있는 동안 ${KK('1')}을 <strong>누르고 있으면</strong> 게이지가 차고, 떼면 그만큼 세게 휘둘러요. 2번 휘둘러보세요.`,ev:['bat'],n:2});
     S.push({t:'홈런',x:`졸라맨에게 맞고 돌아오는 공을 게이지 <strong>MAX</strong>로 치면 홈런! 한 번 성공해보세요.`,ev:['homerun'],n:1});}
@@ -4255,7 +4257,7 @@ ninja:{blast:['GIANT STAR','적을 뚫고 갔다가 되돌아오는 거대 표�
 bomber:{blast:['BIG BOMB','엄청난 폭발을 일으키는 대형 폭탄을 던져요'],flurry:['BARRAGE','폭탄 5개를 연달아 흩뿌려요'],quake:['AIRSTRIKE','앞쪽에 폭탄이 줄지어 떨어져요'],dive:['BOMB DIVE','내리꽂으며 큰 폭발을 일으켜요']},
 gunner:{blast:['PIERCING SHOT','조준한 방향으로 적을 모두 꿰뚫는 관통탄을 쏴요'],flurry:['FAN FIRE','공이치기를 연달아 쳐서 6발을 부채꼴로 쏴요'],quake:['GRENADE','포물선으로 날아가 터지는 수류탄을 던져요'],dive:['AIR STRAFE','뛰어올라 아래로 연사해요']},
 necro:{blast:['SOUL LINK','10초 동안 소환수가 입힌 피해의 20%만큼 체력을 회복해요'],flurry:['DEATH MARK','주변 적에게 표식을 남겨요. 표식이 남은 적이 죽으면 영혼이 2배로 나와요'],quake:['GRAVE HANDS','주변 적들을 땅에서 솟은 뼈로 묶어요'],dive:['REAPER DROP','내리꽂으며 뼈 가시를 솟게 해요']},
-magician:{blast:['MAGIC HAT','모자를 설치해 주변 적과 투사체를 빨아들이고, 빨아들인 만큼 강하게 터뜨려요'],flurry:['ENCORE','직전에 쓴 스킬을 약해진 형태로 한 번 더 써요'],quake:['STARFALL','가까운 적 위로 카드가 쏟아져요'],dive:['TRICK DROP','내리꽂으며 카드를 사방으로 날려요']},
+magician:{blast:['MAGIC HAT','모자를 설치해 주변 적과 투사체를 빨아들이고, 빨아들인 만큼 강하게 터뜨려요'],flurry:['ENCORE','직전에 쓴 스킬을 약해진 형태로 한 번 더 써요'],quake:['STARFALL','가까운 적 위로 카드가 쏟아져요'],dive:['TRICK DROP','내리꽂아 주변 적을 기절시키고 카드 12장을 사방으로 날린 뒤, 근처 적 머리 위로 카드가 떨어져요']},
 porter:{blast:['VOID ORB','닿는 적을 계속 때리는 느린 공허 구체를 쏴요'],flurry:['BLINK CHAIN','가까운 적 4명에게 순간이동하며 차례로 때려요'],quake:['DROP GATE','주변 적들을 공중으로 순간이동시켜 떨어뜨려요'],dive:['GATE DIVE','내리꽂으며 차원 충격파를 일으켜요']},
 baseball:{blast:['FASTBALL','적을 뚫고 가는 강속구를 던져요'],flurry:['RAPID PITCH','공 5개를 연달아 던져요'],quake:['METEOR BALL','가까운 적 위로 거대한 공을 떨어뜨려 폭발시켜요'],dive:['DIVING SLAM','내리꽂으며 땅을 울려요']},
 volt:{blast:['THUNDERBOLT','가까운 적에게 큰 낙뢰를 내리쳐 감전시켜요'],flurry:['OVERCHARGE','7초 동안 공격이 20% 세지고 전기 구체가 2번 튀어요'],quake:['THUNDERSTORM','먹구름을 불러 4초 동안 번개를 계속 떨어뜨려요'],dive:['EM DROP','내리꽂으며 전기를 터뜨리고 주변 적에게 번개를 튀겨요']},
@@ -5457,7 +5459,7 @@ const HZS={boss:{fx:'spike'},bandit:{fx:'drop',obj:'sword',os:.7,col:'rgba(255,2
   minotaur:{fx:'horn',ink:'#e8d8c8',col:'rgba(255,120,80,.9)'},titan:{fx:'pillar',col:'rgba(200,190,180,.9)',ink:'#bbb'},mirror:{fx:'drop',obj:'shard',col:'rgba(220,150,255,.95)'},gladiator:{fx:'drop',obj:'spear',os:1.1},
   warlord:{fx:'drop',obj:'axe',col:'rgba(255,190,120,.9)'},frostq:{fx:'drop',obj:'icicle',col:'rgba(150,220,255,.95)'},reaper:{fx:'drop',obj:'scythe',col:'rgba(160,120,230,.95)'}};
 
-const CLSSD={"base": "모든 기본기와 콤보를 쓰는 기본 졸라맨.", "archer": "활로 멀리서 쏘는 원거리 캐릭터.", "sword": "검으로 멀리, 세게 베는 근접 캐릭터.", "ninja": "표창을 던지고 벽을 타는 빠른 닌자.", "bomber": "폭탄을 던져 주변 적을 한꺼번에 날려요.", "gunner": "탄을 다 쓰면 다음 총으로 자동 교체돼요.", "necro": "쓰러뜨린 적의 영혼을 모아 소환해요.", "magician": "카드와 상자로 적을 속이는 마술사.", "porter": "포탈로 적과 나를 순간이동시켜요.", "baseball": "공을 던지고 돌아온 공을 배트로 쳐요.", "volt": "전기로 적을 감전시켜 멈추게 해요.", "wolf": "발톱으로 몰아치는 늑대인간.", "bard": "기타 연주와 음파로 싸워요.", "frost": "얼음으로 적을 느리게 하고 얼려요.", "druid": "덩굴과 나무로 적을 묶고 공격해요.", "shade": "그림자와 낫으로 싸우는 사신.", "kid": "우산을 휘두르는 키 작은 잼민이.", "seonbi": "부채 바람과 붓글씨로 싸우는 선비.", "grad": "연필과 책으로 싸우는 대학원생."};for(const k in CLSSD)if(CLS[k])CLS[k].sd=CLSSD[k];
+const CLSSD={"base": "모든 기본기와 콤보를 쓰는 기본 졸라맨.", "archer": "활로 멀리서 쏘는 원거리 캐릭터.", "sword": "검으로 멀리, 세게 베는 근접 캐릭터.", "ninja": "표창을 던지고 벽을 타는 빠른 닌자.", "bomber": "폭탄을 던져 주변 적을 한꺼번에 날려요.", "gunner": "권총·AK·샷건·저격총을 바꿔 가며 쏘는 총잡이.", "necro": "쓰러뜨린 적의 영혼을 모아 소환해요.", "magician": "카드와 상자로 적을 속이는 마술사.", "porter": "포탈로 적과 나를 순간이동시켜요.", "baseball": "공을 던지고 돌아온 공을 배트로 쳐요.", "volt": "전기로 적을 감전시켜 멈추게 해요.", "wolf": "발톱으로 몰아치는 늑대인간.", "bard": "기타 연주와 음파로 싸워요.", "frost": "얼음으로 적을 느리게 하고 얼려요.", "druid": "덩굴과 나무로 적을 묶고 공격해요.", "shade": "그림자와 낫으로 싸우는 사신.", "kid": "우산을 휘두르는 키 작은 잼민이.", "seonbi": "부채 바람과 붓글씨로 싸우는 선비.", "grad": "연필과 책으로 싸우는 대학원생."};for(const k in CLSSD)if(CLS[k])CLS[k].sd=CLSSD[k];
 /* ---------- 대학원생 스킨: 화학과 · 컴퓨터공학과 투사체 ---------- */
 const GHS=t=>{t=String(t||'');let h=7;for(let i=0;i<t.length;i++)h=(h*31+t.charCodeAt(i))>>>0;return h};
 const GLANG=['Python','C++','Java','JS','Rust','Go','SQL','C#','Kotlin','Swift','<html>','Ruby','TS','PHP','R','Lua'];
