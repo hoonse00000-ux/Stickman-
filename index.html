@@ -167,7 +167,7 @@ body:not(.desk) .keys{display:none}
 .ch small{position:relative;font-family:var(--f-mono);font-size:10px;color:var(--dim);letter-spacing:.08em}
 .ch.boss{border-color:rgba(255,255,255,.5);box-shadow:0 0 12px rgba(255,255,255,.12)}
 .ch.boss small{color:var(--ink)}
-.statrow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--line);background:rgba(10,10,10,.75)}
+.statrow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--line);background:rgba(10,10,10,.75)}
 .statrow div{padding:10px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
 .statrow div+div{border-left:1px solid var(--line)}
 .statrow span{font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;color:var(--dim)}
@@ -409,6 +409,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none}
 @media (max-width:600px){.wrounds{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.wrounds .wround{font-size:8px;letter-spacing:.05em;margin-bottom:3px}.wrounds .wround span{font-size:8px}.wgrid{gap:2px}}
 @media (max-width:600px){.sstage{height:clamp(170px,28vh,260px)}}
 .snav,.sback,.sbuy,.stabs button,.nav{touch-action:manipulation}
+.lvbar{display:block;height:4px;background:rgba(255,255,255,.12);margin-top:3px;position:relative;overflow:hidden}.lvbar>i{position:absolute;left:0;top:0;bottom:0;background:#fff;box-shadow:0 0 6px #fff}
 </style>
 
 <div class="app">
@@ -478,6 +479,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none}
       <div><span>최고 웨이브</span><b id="bW">—</b></div>
       <div><span>최장 거리</span><b id="bD">0m</b></div>
       <div><span>최고 콤보</span><b id="bC">0</b></div>
+      <div><span>레벨</span><b id="bLv">LV 1</b><i class="lvbar"><i id="bLvB"></i></i></div>
     </div>
     <div class="menu">
     <button class="go" id="goBtn">START</button>
@@ -1255,7 +1257,7 @@ let p=null,enemies=[],fx=[],texts=[],waves=[],shots=[],pwaves=[],eshots=[],bolts
 let best={w:0,wl:'—',k:0,c:0,d:0};
 try{best=Object.assign(best,JSON.parse(localStorage.getItem('zm-fight-best')||'{}'))}catch(_){}
 function showBest(){{const sb=$('#shopBtn');if(sb)sb.innerHTML=`<small>SHOP</small><b class="coinhud"><svg class="dico coini" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/></svg>${coinTxt()}</b>`;const prb=$('#practiceBtn');if(prb)prb.textContent=(SHOP.cls||'base')==='base'?'튜토리얼':'튜토리얼 · '+CLS[SHOP.cls].name;const chb=$('#charBtn');if(chb)chb.innerHTML=`<small>CHARACTER</small><b>${CLS[SHOP.cls||'base'].name}</b>`}const cc=SHOP.cls||'base',cn=CLS[cc].name,sv=getProg(cc);
-  {const mx=DEV.on?MAXR*5-1:Math.max(sv.max||0,sv.idx||0),wb=$('#waveBtn');wb.hidden=!(mx>0);wb.textContent='웨이브 선택';wb.onclick=()=>openWaves(mx,sv.idx,DEV.on?{dev:1}:{})}const cb=$('#contBtn');if(sv.idx>0){cb.hidden=false;cb.textContent=`이어하기 · ${cn} · R${Math.floor(sv.idx/5)+1} WAVE ${sv.idx%5+1}${sv.idx%5===4?' (BOSS)':''}`;cb.onclick=()=>{closeTut();startGame(sv.idx)}}else cb.hidden=true;$('#bW').textContent=best.wl||'—';$('#bD').textContent=Math.floor(best.d)+'m';$('#bC').textContent=best.c}
+  {const mx=DEV.on?MAXR*5-1:Math.max(sv.max||0,sv.idx||0),wb=$('#waveBtn');wb.hidden=!(mx>0);wb.textContent='웨이브 선택';wb.onclick=()=>openWaves(mx,sv.idx,DEV.on?{dev:1}:{})}const cb=$('#contBtn');if(sv.idx>0){cb.hidden=false;cb.textContent=`이어하기 · ${cn} · R${Math.floor(sv.idx/5)+1} WAVE ${sv.idx%5+1}${sv.idx%5===4?' (BOSS)':''}`;cb.onclick=()=>{closeTut();startGame(sv.idx)}}else cb.hidden=true;$('#bW').textContent=best.wl||'—';try{const L=lvInfo(EXP);$('#bLv').textContent='LV '+L.lv;$('#bLvB').style.width=(L.lv>=LVMAX?100:Math.round(L.cur/L.need*100))+'%';$('#bLv').parentNode.title=L.lv>=LVMAX?'최고 레벨':`다음 레벨까지 ${(L.need-L.cur).toLocaleString()} EXP`}catch(_){}$('#bD').textContent=Math.floor(best.d)+'m';$('#bC').textContent=best.c}
 
 function applyStats(full){const rr=lvR(G.round);p.lvl=Math.max(1,G.round|0);p.maxHp=Math.round(100+15*(rr-1));p.atk=1+.12*(rr-1);p.regen=24*(1+.06*(rr-1));if(full)p.hp=p.maxHp}
 function newPlayer(){return{kind:'hero',size:HERO,x:1.6,h:0,gnd:true,wall:0,wallB:null,wallT:0,wallDir:0,noSteer:0,safe:{x:1.6,h:0},pk:null,vx:0,face:1,state:'idle',st:0,dur:0,w:.2,phase:0,vh:0,ultG:0,cd:{upper:0,spin:0,dash:0},hp:100,maxHp:100,atk:1,regen:24,lvl:1,sta:100,inv:0,combo:0,lastHit:-9,hitSet:new Set(),seed:0,flash:0}}
@@ -1504,7 +1506,7 @@ function hitEnemy(e,dmg,kind,dir,kb){if(dmg>0&&e&&e.kind!=='hero')try{skinHit(e)
   ftext(e.x,hy+.25*e.size,String(dmg),pw>=2);
   if(e.hp<=0){kill(e,dir);return}
   if(TY[e.kind].boss&&!e.ulting){e.poise+=dmg;if(e.poise>=70){e.poise=0;setState(e,'hurt',.45)}}
-  else setState(e,'hurt',kind==='kick'?.42:.3);
+  else{if((e.armorT||0)>G.T){e.vx*=.35}else{if(G.T-(e.stunT0||-9)>2.2){e.stunT0=G.T;e.stunC=0}e.stunC=(e.stunC||0)+1;if(e.stunC>=4){e.stunC=0;e.armorT=G.T+1.5;e.vx*=.35;ftext(e.x,e.h+e.size+.35,'버팀!');}else setState(e,'hurt',kind==='kick'?.42:.3)}}
 }
 const HEAL={charger:7,spinner:6,healer:4,jumper:4,dummy:0,shadow:0,golem:0,bomblord:0,storm:0,small:4,grunt:7,brute:12,ninja:6,thrower:5,shield:9,bomber:3,boss:0};
 function healKill(e){const h=HEAL[e.kind]??(TY[e.kind].mid?15:0);if(!h||p.state==='dead')return;const g=Math.min(h,p.maxHp-p.hp);p.hp+=g;if(g>0)texts.push({x:p.x,y:p.h+1.35,txt:'+'+g+' HP',big:false,life:.9,max:.9})}
@@ -2081,7 +2083,7 @@ let COIN=0;try{COIN=+(localStorage.getItem('zm-fight-coin')||0)||0}catch(_){}
 function saveShop(){try{localStorage.setItem('zm-fight-exp',String(EXP));localStorage.setItem('zm-fight-coin',String(COIN));localStorage.setItem('zm-fight-shop',JSON.stringify(SHOP))}catch(_){}}
 const EXPV={small:4,grunt:6,brute:12,thrower:6,bomber:5,ninja:8,shield:9,charger:8,spinner:8,healer:7,jumper:6};
 function giveExp(e){if(G.tutorial||G.admin||G.ta||G.online||e.clone!=null)return;const t=TY[e.kind];let n=t.boss?250:t.mid?80:(EXPV[e.kind]||0);if(!n)return;n=Math.round(n*(1+.25*(G.round-1)));
-  EXP+=n;G.runExp=(G.runExp||0)+n;texts.push({x:e.x,y:e.h+e.size*.9+.45,txt:'+'+n+' EXP',big:false,life:.9,max:.9});saveShop();dropCoins(e,Math.round(n*1.25*(t.boss?1+.15*(clamp(G.round||1,1,MAXR)-1):1)*bossCoinMul(e)))}
+  const lv0=lvInfo(EXP).lv;EXP+=n;G.runExp=(G.runExp||0)+n;{const lv1=lvInfo(EXP).lv;if(lv1>lv0)levelUp(lv0,lv1)}texts.push({x:e.x,y:e.h+e.size*.9+.45,txt:'+'+n+' EXP',big:false,life:.9,max:.9});saveShop();dropCoins(e,Math.round(n*1.25*(t.boss?1+.15*(clamp(G.round||1,1,MAXR)-1):1)*bossCoinMul(e)))}
 function bossCoinMul(e){const t=TY[e.kind];if(!t||!(t.boss||t.mid)||G.admin||G.tutorial)return 1;let R={t:0,k:{}};try{R=JSON.parse(localStorage.getItem('zm-fight-bkc')||'null')||R}catch(_){}const now=Date.now();if(!R.t||now-R.t>=864e5)R={t:now,k:{}};const c=R.k[e.kind]||0;R.k[e.kind]=c+1;try{localStorage.setItem('zm-fight-bkc',JSON.stringify(R))}catch(_){}const m=Math.max(.05,Math.pow(.55,c));return m}
 function dropCoins(e,v){if(!G.coins)G.coins=[];const k=Math.min(8,Math.max(1,Math.round(v/12)));let left=v;for(let i=0;i<k;i++){const pv=i===k-1?left:Math.floor(v/k);left-=pv;G.coins.push({x:e.x+rnd(-.15,.15),h:e.h+e.size*.6,vx:rnd(-2.2,2.2),vh:rnd(2.5,4.5),v:pv,t:0,gnd:false})}}
 function collectCoins(all){if(!G.coins||!G.coins.length)return;let got=0;for(const c of G.coins){if(all||c.got){got+=c.v;c.dead=1}}if(got){COIN+=got;G.runCoin=(G.runCoin||0)+got;saveShop()}G.coins=G.coins.filter(c=>!c.dead)}
@@ -3861,7 +3863,7 @@ let hintCache={};
 function updHud(){
   if(!document.body.classList.contains('desk'))for(const a of['punch','kick','jump']){const h=comboHint(a);if(hintCache[a]!==h){hintCache[a]=h;const b=document.querySelector(`.act [data-c="${a}"]`);if(b){b.classList.toggle('hint',!!h);b.dataset.hint=h}}}
   {const sn=G.cls==='necro'&&kitMode()&&p.state!=='dead'&&!!soulNear();if(hud.soulN!==sn){hud.soulN=sn;const b=document.querySelector('.act [data-c="kick"]');if(b)b.classList.toggle('soulg',sn);const k=document.querySelector('#keys [data-a="kick"]');if(k)k.classList.toggle('soulg',sn)}}
-  setTxt('rtag','R'+G.round);setTxt('wv',String(G.wave+1));setTxt('ko','KO '+G.ko);setTxt('expv','EXP '+EXP.toLocaleString());setTxt('coinb',coinTxt());{const ch=$('#coinv');if(ch)ch.classList.toggle('fl',(G.coinFlash||0)>0)}{const ug=(p.ultG||0);$('#ultb').style.width=ug+'%';$('#ultbar').classList.toggle('full',ug>=100);const ub=document.querySelector('.act [data-c="ult"]');if(ub){ub.style.setProperty('--ug',(ug/100).toFixed(3));ub.classList.toggle('ready',ug>=100)}const kl=document.querySelector('#keys [data-a="ult"]');if(kl)kl.classList.toggle('cool',ug<100)}setTxt('dm',Math.floor(G.maxX*2.4)+'m');{const tt=$('#taTimer');if(tt){tt.hidden=!G.ta;if(G.ta){const s2=fmtT(G.ta.t),tb=$('#taT');if(tb.textContent!==s2)tb.textContent=s2}}}
+  setTxt('rtag','R'+G.round);setTxt('wv',String(G.wave+1));setTxt('ko','KO '+G.ko);setTxt('expv','LV '+lvInfo(EXP).lv+' · EXP '+EXP.toLocaleString());setTxt('coinb',coinTxt());{const ch=$('#coinv');if(ch)ch.classList.toggle('fl',(G.coinFlash||0)>0)}{const ug=(p.ultG||0);$('#ultb').style.width=ug+'%';$('#ultbar').classList.toggle('full',ug>=100);const ub=document.querySelector('.act [data-c="ult"]');if(ub){ub.style.setProperty('--ug',(ug/100).toFixed(3));ub.classList.toggle('ready',ug>=100)}const kl=document.querySelector('#keys [data-a="ult"]');if(kl)kl.classList.toggle('cool',ug<100)}setTxt('dm',Math.floor(G.maxX*2.4)+'m');{const tt=$('#taTimer');if(tt){tt.hidden=!G.ta;if(G.ta){const s2=fmtT(G.ta.t),tb=$('#taT');if(tb.textContent!==s2)tb.textContent=s2}}}
   $('#hpb').style.width=(p.hp/p.maxHp*100)+'%';$('#hpbar').classList.toggle('low',p.hp<p.maxHp*.25);$('#stb').style.width=p.sta+'%';
   document.querySelector('.act [data-c="roll"]').style.setProperty('--st',clamp(p.sta/100,0,1));
   for(const a in SKILL){const r=1-p.cd[a]/SKILL[a].cd;document.querySelector(`.act [data-c="${a}"]`).style.setProperty('--cd',r.toFixed(3));
@@ -5592,6 +5594,12 @@ function allyThink(a,tg,dt){a.jcd=(a.jcd||0)-dt;const idx=allies.indexOf(a),sp=a
   else{const tx=p.x-p.face*(.6+(idx%4)*.4);if(Math.abs(tx-a.x)>.35||p.h>a.h+.4||(p.gnd&&p.h<a.h-.4&&Math.abs(p.x-a.x)<3))allyNav(a,tx,p.gnd?p.h:a.h,Math.max(sp,2.4),dt);else{a.state='idle';if(a.gnd)a.vx*=Math.exp(-12*dt)}}
   if((a.stuckT||0)>1.2&&a.gnd&&(a.jcd||0)<=0){a.vh=7.5;a.vx=a.face*2.6;a.gnd=false;a.jcd=.6}
   const moving=a.state==='walk'||!a.gnd;a.stuckT=(moving||Math.abs(a.x-x0)>.001)?0:((tg&&Math.abs(tg.x-a.x)>1)||Math.abs(p.x-a.x)>3?(a.stuckT||0)+dt:0)}
+
+/* ---------- 플레이 레벨 (누적 EXP 기반) ---------- */
+const LVMAX=99;const lvNeed=L=>Math.round(90*Math.pow(L,1.4));
+function lvInfo(x){x=Math.max(0,x||0);let L=1;while(L<LVMAX){const n=lvNeed(L);if(x<n)return{lv:L,cur:x,need:n};x-=n;L++}return{lv:LVMAX,cur:0,need:1}}
+try{const L=lvInfo(EXP),b0=document.getElementById('bLv');if(b0){b0.textContent='LV '+L.lv;document.getElementById('bLvB').style.width=Math.round(L.cur/L.need*100)+'%'}}catch(_){}
+function levelUp(a,b){let reward=0;for(let L=a+1;L<=b;L++)reward+=50+L*20;COIN+=reward;saveShop();try{sfx('wave');sfx('chime')}catch(_){}if(p){texts.push({x:p.x,y:p.h+1.9,txt:'LEVEL UP! LV '+b,big:true,life:2,max:2});texts.push({x:p.x,y:p.h+1.45,txt:'+'+reward+' 코인',big:false,life:2,max:2});for(let i=0;i<24;i++){const an=i/24*Math.PI*2;fx.push({t:'e',x:p.x,y:p.h+.8,vx:Math.cos(an)*3.5,vy:Math.sin(an)*3.5,life:.8,max:.8,r:.035})}}}
 resize();
 (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{sizePreview()});
 requestAnimationFrame(frame);
