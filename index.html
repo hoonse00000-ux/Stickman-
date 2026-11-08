@@ -5558,6 +5558,9 @@ addEventListener('keydown',e=>{if(G.mode!=='bpick')return;if(e.key==='Escape'){e
 {const PR={kid:[6500,11200,16800],seonbi:[7000,12100,18200],grad:[7500,13000,19500]};for(const k in PR){const L=skinList(k);L.forEach((s2,i)=>{const v=PR[k][i];if(!v)return;if(s2.id===k){if(SKINS[k])SKINS[k].price=v}else{const src=(SKINX[k]||[]).find(q=>q.id===s2.id);if(src)src.price=v}})}}
 /* 스킨 가격: 한 캐릭터 안에서 뒤로 갈수록 최소 1.5배씩 비싸게 */
 for(const k of CLSK){const L=skinList(k);let prev=skinPrice(k,L[0]&&L[0].id);for(let i=1;i<L.length;i++){const s2=L[i],need=Math.ceil(prev*1.5/100)*100;let src=s2.id==='violin'?SKIN2.bard:(SKINX[k]||[]).find(q=>q.id===s2.id);if(src&&src.price<need)src.price=need;prev=skinPrice(k,s2.id)}}
+
+/* 스킨 가격 재조정: 캐릭터 간 차이를 줄이고(300→3,000), 캐릭터 안에서는 1.5배씩 */
+CLSK.forEach((k,ci)=>{const L=skinList(k);let pr=Math.round((300+ci*150)/100)*100;L.forEach((s2,i)=>{if(i>0)pr=Math.round(pr*1.5/100)*100;if(s2.id===k){if(SKINS[k])SKINS[k].price=pr}else if(s2.id==='violin'){if(SKIN2.bard)SKIN2.bard.price=pr}else{const src=(SKINX[k]||[]).find(q=>q.id===s2.id);if(src)src.price=pr}})});
 resize();
 (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{sizePreview()});
 requestAnimationFrame(frame);
