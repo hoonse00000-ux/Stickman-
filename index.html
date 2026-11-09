@@ -1261,7 +1261,9 @@ function showBest(){{const sb=$('#shopBtn');if(sb)sb.innerHTML=`<small>SHOP</sma
 
 function applyStats(full){const rr=lvR(G.round);p.lvl=Math.max(1,G.round|0);p.maxHp=Math.round(100+15*(rr-1));p.atk=1+.12*(rr-1);p.regen=24*(1+.06*(rr-1));if(full)p.hp=p.maxHp}
 function newPlayer(){return{kind:'hero',size:HERO,x:1.6,h:0,gnd:true,wall:0,wallB:null,wallT:0,wallDir:0,noSteer:0,safe:{x:1.6,h:0},pk:null,vx:0,face:1,state:'idle',st:0,dur:0,w:.2,phase:0,vh:0,ultG:0,cd:{upper:0,spin:0,dash:0},hp:100,maxHp:100,atk:1,regen:24,lvl:1,sta:100,inv:0,combo:0,lastHit:-9,hitSet:new Set(),seed:0,flash:0}}
-const setState=(o,s,dur,w)=>{o.state=s;o.st=0;o.dur=dur||0;o.w=w||.2};
+const setState=(o,s,dur,w)=>{if(s==='hurt'&&o&&o.kind&&typeof p!=='undefined'&&o!==p&&typeof TY!=='undefined'&&TY[o.kind]&&enemies.indexOf(o)>=0&&!G.tutorial){const T=G.T;if((o.armorT||0)>T){o.vx*=.4;return}
+    if(TY[o.kind].boss){o.armorT=T+2.4}else{if(T-(o.stunT0||-9)>2.2){o.stunT0=T;o.stunC=0}o.stunC=(o.stunC||0)+1;if(o.stunC>=4){o.stunC=0;o.armorT=T+1.5;o.vx*=.35;if(o.state==='hurt'){o.state='idle';o.st=0}try{ftext(o.x,o.h+o.size+.35,'버팀!')}catch(_){}return}}}
+  o.state=s;o.st=0;o.dur=dur||0;o.w=w||.2};
 
 let kfx=[];
 function startGame(from,adm,opt){if(G._vsBak){VSLOT=G._vsBak;G._vsBak=null}G.infSoul=false;kfx=[];collectCoins(true);G.coins=[];G.runCoin=0;from=(typeof from==='number'&&from>0)?from:0;G.startIdx=from;if(adm)G.admin=true;else{G.admin=false;G.adminSkin=false;G.cls=SHOP.cls}G.ta=opt&&opt.ta?{cls:opt.ta,t:0,r:opt.r||0}:null;G.allClear=0;if(G.ta)G.cls=G.ta.cls;
@@ -1483,7 +1485,7 @@ function hitEnemy(e,dmg,kind,dir,kb){if(dmg>0&&e&&e.kind!=='hero')try{skinHit(e)
   if(SHB[e.kind]&&!e.noShield&&e.face===-dir&&e.state!=='hurt'&&e.state!=='dead'&&!BREAK[kind]){if(e.shHP==null){e.shMax=e.max*SHB[e.kind];e.shHP=e.shMax}e.shHP-=dmg;e.shFl=.12;const bd=Math.max(1,Math.round(dmg*.15));e.hp-=bd;e.flash=.05;e.vx=dir*.6;if(e.shHP<=0){shieldBreak(e,dir);if(e.hp<=0)kill(e,dir);return}
     ftext(e.x,e.h+1.15*e.size,'BLOCK');sparks(e.x+e.face*.14*e.size,e.h+.55*e.size,-dir,5,.8);sfx('block');if(e.hp<=0)kill(e,dir);return}
   if(e.kind==='rival'){if(!G.netR)netHit(e,dmg,kind,dir,kb);return}
-  const t=TY[e.kind];dmg=Math.round(dmg*rnd(.9,1.1));
+  const t=TY[e.kind],vh0=e.vh||0,arm=(e.armorT||0)>G.T;dmg=Math.round(dmg*rnd(.9,1.1));
   e.hp-=dmg;postHit(e,dmg,kind);e.flash=.09;e.shk=.14;e.vx=dir*kb/t.wt;if(e.kind==='dummy')e.hp=e.max;if(G.tutorial)tutEv('hit:'+kind);
   if(kind==='aerial'&&!TY[e.kind].boss){e.vh=-7;e.bounce=true}
   if(kind==='airslam'&&!TY[e.kind].boss){e.vh=-10;e.bounce=true}
@@ -1499,6 +1501,7 @@ function hitEnemy(e,dmg,kind,dir,kb){if(dmg>0&&e&&e.kind!=='hero')try{skinHit(e)
   if(TY[e.kind].mid&&e.vh>0)e.vh*=.6;
   if(kind==='upper'&&!TY[e.kind].boss){e.vh=({small:6.2,grunt:5.6,brute:3.6,shield:4.4,bomber:6.2}[e.kind]??5.8);e.h=Math.max(e.h,.02)}
   if(kind==='kick'&&e.kind==='small'){e.vh=3.8;e.h=Math.max(e.h,.02)}
+  if(arm&&(e.vh||0)>vh0){e.vh=vh0;e.bounce=false}
   if(G.T-p.lastHit<1.3)p.combo++;else p.combo=1;
   p.lastHit=G.T;G.bestCombo=Math.max(G.bestCombo,p.combo);
   const hy=(e.kind==='small'?.42:.62)*Math.min(e.size,1.2)+e.h;
@@ -1506,7 +1509,7 @@ function hitEnemy(e,dmg,kind,dir,kb){if(dmg>0&&e&&e.kind!=='hero')try{skinHit(e)
   ftext(e.x,hy+.25*e.size,String(dmg),pw>=2);
   if(e.hp<=0){kill(e,dir);return}
   if(TY[e.kind].boss&&!e.ulting){e.poise+=dmg;if(e.poise>=70){e.poise=0;setState(e,'hurt',.45)}}
-  else{if((e.armorT||0)>G.T){e.vx*=.35}else{if(G.T-(e.stunT0||-9)>2.2){e.stunT0=G.T;e.stunC=0}e.stunC=(e.stunC||0)+1;if(e.stunC>=4){e.stunC=0;e.armorT=G.T+1.5;e.vx*=.35;ftext(e.x,e.h+e.size+.35,'버팀!');}else setState(e,'hurt',kind==='kick'?.42:.3)}}
+  else setState(e,'hurt',kind==='kick'?.42:.3);
 }
 const HEAL={charger:7,spinner:6,healer:4,jumper:4,dummy:0,shadow:0,golem:0,bomblord:0,storm:0,small:4,grunt:7,brute:12,ninja:6,thrower:5,shield:9,bomber:3,boss:0};
 function healKill(e){const h=HEAL[e.kind]??(TY[e.kind].mid?15:0);if(!h||p.state==='dead')return;const g=Math.min(h,p.maxHp-p.hp);p.hp+=g;if(g>0)texts.push({x:p.x,y:p.h+1.35,txt:'+'+g+' HP',big:false,life:.9,max:.9})}
@@ -2342,7 +2345,7 @@ function spikeAt(x,h,s){kfx.push({t:'spike',x,h,s:s||1,life:.55,max:.55});dust(x
 function kdive(land,st){kst(st||'w_fall',2.5,{upd(u,dt){if(p.st>.2&&!p.kdn){p.kdn=1;p.vh=-15;p.vx=p.face*2.4}if(p.kdn&&!p.kdone){p.vh=Math.min(p.vh,-12);if(p.gnd){p.kdone=1;land();p.st=p.dur-.15}}}});if(p.gnd){p.vh=6.2;p.gnd=false}else p.vh=Math.max(p.vh,2.5);p.inv=Math.max(p.inv,.4)}
 function rainAt(kind,cx,n,dmg,o){for(let k=0;k<n;k++)pshots.push(Object.assign({x:cx+rnd(-.9,.9),h:p.h+4.5+k*.32,vx:0,vh:-13,grav:0,dmg,kind,life:1.6,hitSet:new Set(),kb:.6,rot:0},o||{}));marks.push({x:cx,h:Math.max(0,floorAt(cx,.05,p.h+3)),life:.6,max:.6,r:1})}
 function aimX(rg){const t=nearest(rg||6);return t?t.x:p.x+p.face*2.5}
-function launch(e,v){if(!TY[e.kind].boss&&e.kind!=='brute'){e.vh=v;e.h=Math.max(e.h,.02)}}
+function launch(e,v){if((e.armorT||0)>G.T)return;if(!TY[e.kind].boss&&e.kind!=='brute'){e.vh=v;e.h=Math.max(e.h,.02)}}
 /* ---------- status · buff · zone helpers ---------- */
 function holdE(e,t,type){if(!e||e.state==='dead'||e.gone||e.hell)return;const T2=TY[e.kind]||{};t*=T2.boss?.4:T2.mid?.65:1;if(t>(e.hold||0)){e.hold=t;e.holdK=type||'stun';e.holdMx=t}}
 function slowE(e,t){if(e)e.slowT=Math.max(e.slowT||0,t)}
