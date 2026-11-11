@@ -296,7 +296,7 @@ body:not(.desk) .keys{display:none}
 .wcell{aspect-ratio:1;max-width:100%;min-width:0;border:1px solid var(--line);background:rgba(14,14,14,.9);color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;font-family:var(--f-display);padding:2px}
 .wcell b{font-size:clamp(15px,4.5vw,19px);font-weight:700;line-height:1}
 .wcell small{font-family:var(--f-mono);font-size:8.5px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-.wcell.boss{border-color:rgba(255,255,255,.55)}.wcell.boss b{text-shadow:0 0 8px var(--glow)}
+.wcell{overflow:hidden}.wcell.boss{border-color:rgba(255,255,255,.55)}.wcell.boss{container-type:inline-size}.wcell.boss b{text-shadow:0 0 8px var(--glow);font-size:10px;font-size:clamp(7px,26cqw,19px);max-width:100%;letter-spacing:0;white-space:nowrap}
 .wcell.mid small{color:var(--ink)}
 .wcell.cur{box-shadow:0 0 12px var(--glow),inset 0 0 8px rgba(255,255,255,.1);border-color:var(--ink)}
 .wcell:disabled{opacity:.22;cursor:default}
@@ -3233,7 +3233,7 @@ function openShop(){shopSkinOnly=0;$('#shopBack h2').textContent='SHOP';shopPv=n
 function closeShop(){if(shopSkinOnly){shopSkinOnly=0;shopTab='char';$('#shopBack').hidden=true;$('#shopBack h2').textContent='SHOP';charMode='char';$('#charBack').hidden=false;buildChar();return}shopPv=null;$('#shopBack').hidden=true;showBest()}
 function buildShop(){const tr=$('#sTrack');if(shopTab==='skin'&&!ownC(CLSK[shopI]))shopTab='char';if(shopTab==='skin'){const k=CLSK[shopI],L=skinLD(k);skinI=clamp(skinI,0,Math.max(0,L.length-1));tr.innerHTML=L.map((sk,i)=>{const ow=!sk.id||skinOwned(k,sk.id),eq=(skinEq(k)||'')===sk.id;return`<div class="scard${ow?' own':''}" data-i="${i}"><canvas data-k="${k}" data-sk="${sk.id}"></canvas><b>${sk.name}</b><small>${eq?'착용 중':ow?'보유':LOCKSVG+skinPrice(k,sk.id).toLocaleString()+' 코인'}</small></div>`}).join('');
     tr.querySelectorAll('.scard').forEach(el=>el.addEventListener('click',()=>{if(shopDrag&&shopDrag.moved)return;const i=+el.dataset.i;if(i!==skinI){skinI=i;layoutShop()}}));layoutShop();return}
-  tr.innerHTML=CLSK.map((k,i)=>{const c=CLS[k],own=ownC(k);return`<div class="scard${own?' own':''}" data-i="${i}"><canvas data-k="${k}"></canvas><b>${own?c.name:'???'}</b><small>${own?(G.cls===k?'사용 중':'보유'):LOCKSVG+(c.price||0).toLocaleString()+' 코인'}</small></div>`}).join('');
+  tr.innerHTML=CLSK.map((k,i)=>{const c=CLS[k],own=ownC(k);return`<div class="scard${own?' own':''}" data-i="${i}"><canvas data-k="${k}"></canvas><b>${c.name}</b><small>${own?(G.cls===k?'사용 중':'보유'):LOCKSVG+(c.price||0).toLocaleString()+' 코인'}</small></div>`}).join('');
   tr.querySelectorAll('.scard').forEach(el=>el.addEventListener('click',()=>{if(shopDrag&&shopDrag.moved)return;const i=+el.dataset.i;if(i!==shopI){shopI=i;layoutShop()}}));layoutShop()}
 function layoutShop(dx){const st=$('#sStage').getBoundingClientRect(),cw=Math.max(110,Math.min(230,st.width*.3,(st.height*.94-46)/1.05));$('#sTrack').style.setProperty('--cw',cw+'px');
   const CUR=shopTab==='skin'?skinI:shopI;$('#sTrack').querySelectorAll('.scard').forEach(el=>{const i=+el.dataset.i,off=i-CUR+(dx||0)/(cw*.95),ao=Math.abs(off),sc=ao<1?lerp(1,.76,ao):ao<2?lerp(.76,.6,ao-1):.6,bl=ao<1?ao*2:2+(ao-1)*1.5,op=ao<1?lerp(1,.5,ao):ao<2?lerp(.5,.28,ao-1):Math.max(0,.28-(ao-2)*.3);
@@ -3254,7 +3254,7 @@ function shopInfo(){if(shopTab==='skin')return skinInfo();const k=CLSK[shopI],c=
     ${c.vars&&own?`<div class="vars">${c.vars.map(([id,nm])=>`<button data-v="${id}" class="${id===v?'on':''}">${nm}</button>`).join('')}</div>`:''}</div>
   <div class="scol"><div class="sbox"><div class="sbt">필살기<b>${c.ult.en}</b><span>PC R · 모바일 ★</span></div></div>
     <div class="sbox"><div class="sbt">스킨<b>${skinList(k).length}종</b><span>${skinEq(k)?'착용 중 · '+(skinList(k).find(q=>q.id===skinEq(k))||{}).name:'기본 모습'}</span></div></div></div></div>`;
-  if(!own)$('#sInfo').innerHTML=shopTabs(k,false)+`<div class="shd"><h3>???<span>LOCKED</span><span>가격 · ${(c.price||0).toLocaleString()} 코인</span></h3>${btn}</div><div class="sgrid"><div class="scol"><p class="sdesc" style="color:var(--dim)">아직 잠겨 있는 캐릭터예요. 구매하면 모습과 무기, 전용 기술, 필살기, 고유 스킨이 공개돼요.</p></div></div>`;
+  if(!own)$('#sInfo').innerHTML=shopTabs(k,false)+`<div class="shd"><h3>${c.name}<span>${c.job} · 잠김</span><span>무기 · ${c.wpn}</span></h3>${btn}</div><div class="sgrid"><div class="scol"><p class="sdesc">${c.sd||c.desc}</p><dl class="sstats"><dt>공격력</dt><dd>${bar(c.st[0])}</dd><dt>사거리</dt><dd>${bar(c.st[1])}</dd><dt>속도</dt><dd>${bar(c.st[2])}</dd></dl></div><div class="scol"><div class="sbox"><div class="sbt">필살기<b>${c.ult.en}</b><span>구매하면 사용 가능</span></div></div></div></div>`;
   const pv=$('#sPvSkin');if(pv)pv.onclick=()=>{shopPv=shopPv===k?null:k;buildShop()};
   const act=$('#sAct');if(act)act.onclick=()=>{if(!own){if(!prevOk||!coinOK(c.price||0))return;if(!DEV.on)COIN-=(c.price||0);SHOP.owned.push(k);sfx('wave')}SHOP.cls=k;G.cls=k;saveShop();buildShop()};
   const sb2=$('#sSkin');if(sb2)sb2.onclick=()=>{SHOP.skinV=SHOP.skinV||{};if(!skOwn){if(!coinOK(skPrice(k)))return;if(!DEV.on)COIN-=skPrice(k);SHOP.skins.push(k);SHOP.skinOn[k]=true;delete SHOP.skinV[k];sfx('wave')}else if(skOn)SHOP.skinOn[k]=false;else{SHOP.skinOn[k]=true;delete SHOP.skinV[k]}saveShop();buildShop()};
@@ -3337,7 +3337,7 @@ function renderShop(dt,T){const d=Math.min(2,devicePixelRatio||1);
     c.save();c.strokeStyle='#f5f5f5';c.shadowColor='rgba(255,255,255,.7)';c.shadowBlur=8;c.lineWidth=1.5;c.beginPath();c.moveTo(w*.12,gy);c.lineTo(w*.88,gy);c.stroke();c.restore();
     const fk=hasS?'sk_'+(skid||'none_'+k):k,f=shopFig[fk]||(shopFig[fk]={kind:'hero',cls:k,skin:false,x:0,h:0,size:1,face:1,state:'idle',st:0,dur:0,w:.3,phase:0,seed:i});f.cls=k;if(hasS&&!skid){f.skin=false;f.vio=false;f.skinId=null}else if(skid){f.skin=true;f.vio=skid==='violin';f.skinId=skid}else{f.skin=!!skinEq(k)||shopPv===k;f.vio=skinEq(k)==='violin';f.skinId=skinEq(k)}
     if(i===CUR){const [stt,du]=SDEMO[k],cyc=du+.9,tt=(T*1)%cyc;if(tt<du){f.state=stt;f.st=tt;f.dur=du;f.w=stt==='punch'?.2:.3}else f.state='idle'}else f.state='idle';
-    if(!ownC(k)){f.state=k==='baseball'?'w_batc':'idle';f.batG=.75;f.st=0;f.dur=9;f.skin=false;drawSilhouette(c,cv2,f,smooth(f,pose(f,T),dt),w/2,gy,u,d);return}drawFig(c,f,smooth(f,pose(f,T),dt),w/2,gy,u)})}
+    if(!ownC(k)&&!hasS){f.skin=false;f.skinId=null}drawFig(c,f,smooth(f,pose(f,T),dt),w/2,gy,u)})}
 
 const ULT={boss:'ROYAL QUAKE',shadow:'ECLIPSE',golem:'AVALANCHE',bomblord:'MEGATON',storm:'TEMPEST',titan:'CEILING COLLAPSE',phantom:'GLITCH PRISON',warlord:'SPEAR RAIN',archmage:'ARCANE BEAM',emperor:'WORLD BREAK'};
 function zoneB(){return G.zone||{x0:p.x-6,x1:p.x+6}}
