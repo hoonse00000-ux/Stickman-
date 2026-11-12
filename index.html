@@ -5392,12 +5392,21 @@ KIT.shade.blast=function(){const ts=sk2Near(6.5,3);if(!ts.length){ftext(p.x,p.h+
 KIT.shade.dive=function(){kst('w_spin',1,{});sfx('swing');const hit=new Map();kfx.push({t:'reap',life:1,max:1,dr(c,k,a,X,Yh){const ag=k.max-k.life,an=ag*Math.PI*4,x=X(p.x),y=Yh(p.h+.7),R=U*1.7;c.save();c.globalAlpha=Math.min(1,k.life/.2);c.strokeStyle='rgba(176,122,255,.35)';c.lineWidth=U*.25;c.beginPath();c.arc(x,y,R,an-1.2,an);c.stroke();const hx=x+Math.cos(an)*R,hy=y+Math.sin(an)*R*.6;c.translate(hx,hy);c.rotate(an+Math.PI/2);c.fillStyle='#e6dcff';c.shadowColor='#b07aff';c.shadowBlur=18;c.beginPath();c.moveTo(0,0);c.quadraticCurveTo(U*.7,-U*.3,U*1.1,U*.3);c.quadraticCurveTo(U*.6,0,0,U*.12);c.closePath();c.fill();c.strokeStyle='#888';c.lineWidth=3;c.beginPath();c.moveTo(0,0);c.lineTo(-U*.9,0);c.stroke();c.restore()},
   up(k){const ag=k.max-k.life,an=ag*Math.PI*4,hx=p.x+Math.cos(an)*1.7,hh=p.h+.7+Math.sin(an)*1.0;for(const e of enemies){if(!alive(e))continue;if(Math.abs(e.x-hx)<.6+.1*e.size&&Math.abs(e.h+e.size*.5-hh)<1.1&&G.T-(hit.get(e)||-9)>.3){hit.set(e,G.T);hitEnemy(e,15,'wpnH',Math.sign(e.x-p.x)||1,1.2);sk2Heal(3);sparks(e.x,e.h+.6,1,6,1)}}}});ftext(p.x,p.h+1.2,'SOUL REAP',true)};
 
-/* ---- 마술사: 칼 상자 ---- */
-KIT.magician.quake=function(){const t=sk2Near(6.5,1)[0];if(!t){ftext(p.x,p.h+1.2,'NO TARGET');p.cd.quake=.4;return}kst('w_summon',.5,{});holdE(t,1.6,'stun');sfx('pop');
-  kfx.push({t:'sbox',e:t,life:1.7,max:1.7,n:0,dr(c,k,a,X,Yh){const e=k.e;if(!alive(e)&&k.n<5)return;const ag=k.max-k.life,x=X(e.x),y=Yh(e.h),w=U*e.size*.6,h=U*e.size*1.4;if(ag>1.45)return;c.save();c.fillStyle='#2a0a3a';c.strokeStyle='#ffd04a';c.lineWidth=3;c.fillRect(x-w,y-h,w*2,h);c.strokeRect(x-w,y-h,w*2,h);c.fillStyle='#ffd04a';c.font=`700 ${Math.round(U*.3)}px ${FONT.disp}`;c.textAlign='center';c.fillText('?',x,y-h*.4);
-    for(let i=0;i<k.n;i++){const sy=y-h*(.2+i*.15),sd=i%2?1:-1;c.strokeStyle='#e8e8e8';c.lineWidth=3;c.beginPath();c.moveTo(x+sd*w*1.5,sy);c.lineTo(x-sd*w*.6,sy);c.stroke();c.fillStyle='#c8955a';c.fillRect(x+sd*w*1.5-(sd>0?0:U*.12),sy-U*.05,U*.12,U*.1)}c.restore()},
-    up(k){const ag=k.max-k.life;while(k.n<5&&ag>=.25+k.n*.2){k.n++;if(alive(k.e)){hitEnemy(k.e,11,'wpnH',1,0);sparks(k.e.x,k.e.h+.6,k.n%2?1:-1,5,1)}sfx('swing')}if(!k.done&&ag>=1.45){k.done=1;const e=k.e;aoe(e.x,e.h,1.3,1.3,22,2.5,'wpnH');for(let i=0;i<3;i++)kshot('dove',.3+i*.25,7,12,{x:e.x,h:e.h+1,dir:i%2?1:-1});ftext(e.x,e.h+e.size+.4,'TA-DA!',true);shake(.2);sfx('boom')}}});
-  ftext(p.x,p.h+1.2,'SWORD BOX',true)};
+/* ---- 마술사: 마술 고리 ---- */
+KIT.magician.quake=function(){const ts=sk2Near(7,3);if(!ts.length){ftext(p.x,p.h+1.2,'NO TARGET');p.cd.quake=.4;return}kst('w_summon',.5,{});sfx('pop');
+  for(const t of ts)holdE(t,1.6,'stun');
+  kfx.push({t:'mring',es:ts,sx:p.x,sh:p.h+1.2,life:1.75,max:1.75,n:0,dr(c,k,a,X,Yh){const ag=k.max-k.life,es=k.es.filter(alive);if(!es.length&&!k.done)return;c.save();
+    if(ag<1.15){const q=Math.min(1,ag/.35);const pts=es.map(e=>[X(k.sx+(e.x-k.sx)*q),Yh(k.sh+(e.h+e.size*.7-k.sh)*q)]);
+      if(q>=1&&pts.length>1){c.strokeStyle='#ffd04a';c.lineWidth=2.5;c.shadowColor='#ffd04a';c.shadowBlur=10;c.setLineDash([6,4]);c.lineDashOffset=-G.T*40;c.beginPath();pts.forEach((pt,i)=>i?c.lineTo(pt[0],pt[1]):c.moveTo(pt[0],pt[1]));c.stroke();c.setLineDash([])}
+      pts.forEach((pt,i)=>{const r=U*(.55-.15*Math.max(0,(ag-.35)/.8)),sp=G.T*6+i*2;c.strokeStyle='#ffe27a';c.lineWidth=4;c.shadowColor='#ffb020';c.shadowBlur=14;c.beginPath();c.ellipse(pt[0],pt[1],r,r*Math.abs(Math.cos(sp))*.9+r*.1,0,0,Math.PI*2);c.stroke();c.strokeStyle='#fff6c8';c.lineWidth=1.5;c.beginPath();c.ellipse(pt[0],pt[1],r*.8,r*.8*Math.abs(Math.sin(sp))+r*.08,0,0,Math.PI*2);c.stroke()})}
+    else if(k.bx!=null){const q=(ag-1.15)/.6,x=X(k.bx),y=Yh(k.bh+.8);c.globalAlpha=1-q;c.strokeStyle='#ffd04a';c.shadowColor='#ffd04a';c.shadowBlur=18;for(let j=0;j<3;j++){c.lineWidth=6*(1-q);c.beginPath();c.arc(x,y,U*(.4+q*(2.2+j*.5)),0,Math.PI*2);c.stroke()}
+      c.fillStyle='#fff3b0';for(let i=0;i<10;i++){const an=i*Math.PI/5+q,r=U*(.6+q*2.6);c.beginPath();c.arc(x+Math.cos(an)*r,y+Math.sin(an)*r*.6,U*.08*(1-q)+1,0,Math.PI*2);c.fill()}}
+    c.restore()},
+    up(k,dt){const ag=k.max-k.life,es=k.es.filter(alive);
+      if(ag>.35&&ag<1.15&&es.length){const cx=es.reduce((s,e)=>s+e.x,0)/es.length;for(const e of es){const d=cx-e.x;if(Math.abs(d)>.35)e.x+=Math.sign(d)*Math.min(Math.abs(d),6*dt)}}
+      while(k.n<3&&ag>=.5+k.n*.22){k.n++;for(const e of es){hitEnemy(e,9,'wpnH',e.x<p.x?-1:1,0);sparks(e.x,e.h+e.size*.7,1,4,.9)}sfx('zap')}
+      if(!k.done&&ag>=1.15){k.done=1;const src=es.length?es:k.es;const bx=src.reduce((s,e)=>s+e.x,0)/src.length,bh=src.reduce((s,e)=>s+e.h,0)/src.length;k.bx=bx;k.bh=bh;aoe(bx,bh,1.8,1.6,30,3,'wpnH');for(const e of es)launch(e,5);sparks(bx,bh+.8,1,14,1.6);sparks(bx,bh+.8,-1,14,1.6);ftext(bx,bh+2,'TA-DA!',true);shake(.3);sfx('boom')}}});
+  ftext(p.x,p.h+1.2,'LINKING RINGS',true)};
 
 /* ---- 늑대인간: 늑대 무리 ---- */
 KIT.wolf.flurry=function(){kst('w_summon',.5,{times:[.2],fire(){for(const k0 of[0,1]){const d=p.face,sx=p.x-d*.3,lane=k0;kfx.push({t:'pack',x:sx,h:gnd(sx),d,lane,life:1.1,max:1.1,hit:new Set(),dr(c,k,a,X,Yh){const x=X(k.x),y=Yh(k.h)-k.lane*U*.15,s=U*.42,ph=G.T*22+k.lane*2;c.save();c.globalAlpha=Math.min(.85,k.life/.25);c.translate(x,y);c.scale(k.d,1);c.fillStyle='rgba(230,240,255,.85)';c.shadowColor='#bfe0ff';c.shadowBlur=14;c.beginPath();c.ellipse(0,-s*.7,s*.75,s*.32,0,0,Math.PI*2);c.fill();c.beginPath();c.ellipse(s*.8,-s*.95,s*.3,s*.22,-.3,0,Math.PI*2);c.fill();c.beginPath();c.moveTo(s*.9,-s*1.15);c.lineTo(s*.95,-s*1.45);c.lineTo(s*.75,-s*1.15);c.fill();c.strokeStyle='rgba(230,240,255,.85)';c.lineWidth=s*.13;for(const [lx,o] of[[-.5,0],[-.3,1],[.4,1],[.55,0]]){const sw=Math.sin(ph+o*Math.PI)*.35;c.beginPath();c.moveTo(s*lx,-s*.55);c.lineTo(s*(lx+sw),0);c.stroke()}c.beginPath();c.moveTo(-s*.7,-s*.8);c.quadraticCurveTo(-s*1.2,-s*1.1,-s*1.3,-s*.7);c.stroke();c.restore()},
@@ -5422,10 +5431,10 @@ const SK2U={sword:{dive:['HEAVEN SPLIT','앞으로 순식간에 지나간 뒤, �
   bard:{dive:['STAGE DIVE','관객 위로 뛰어들듯 적 셋의 머리를 차례로 밟고 넘어가며 기절시켜요']},
   frost:{dive:['ICE AGE','주변 적을 얼음 속에 가뒀다가 한꺼번에 깨뜨려요']},
   shade:{blast:['SHADOW CAGE','가까운 적 셋을 그림자 감옥에 가뒀다가 안쪽으로 터뜨려요'],dive:['SOUL REAP','거대한 영혼의 낫이 몸 주위를 두 바퀴 돌며 베고, 벨 때마다 체력을 회복해요']},
-  magician:{quake:['SWORD BOX','가까운 적을 마술 상자에 가두고 칼을 꽂은 뒤, 상자가 터지며 비둘기가 날아가요']},
+  magician:{quake:['LINKING RINGS','가까운 적 셋에게 황금 고리를 던져 하나로 묶고, 한데 끌어당겨 감전시킨 뒤 고리째 터뜨려요']},
   wolf:{flurry:['PACK HOWL','울부짖어 유령 늑대 두 마리를 불러 앞으로 달려가며 적을 물어 날려요']}};
 for(const k in SK2U)for(const a in SK2U[k]){(UCLS[k]=UCLS[k]||{})[a]=SK2U[k][a]}
-{const KN={sword:{dive:[IC.sword,'가르기','천지가르기']},ninja:{flurry:[IC.star,'분신','분신 표창'],quake:[IC.star,'결계','표창 결계'],dive:[IC.dive,'암살','암살']},bomber:{dive:[IC.bomb,'폭격','융단 폭격']},necro:{dive:[IC.skull,'행진','묘지 행진']},porter:{dive:[IC.portal,'낙하','차원 낙하']},baseball:{dive:[IC.ball,'리코셰','리코셰']},volt:{flurry:[IC.zap,'코일','테슬라 코일'],dive:[IC.beam,'레일건','레일건']},bard:{dive:[IC.note,'다이브','스테이지 다이브']},frost:{dive:[IC.ice,'빙하기','빙하기']},shade:{blast:[IC.moon,'감옥','그림자 감옥'],dive:[IC.moon,'수확','영혼 수확']},magician:{quake:[IC.card,'칼상자','칼 상자']},wolf:{flurry:[IC.claw,'무리','늑대 무리']}};
+{const KN={sword:{dive:[IC.sword,'가르기','천지가르기']},ninja:{flurry:[IC.star,'분신','분신 표창'],quake:[IC.star,'결계','표창 결계'],dive:[IC.dive,'암살','암살']},bomber:{dive:[IC.bomb,'폭격','융단 폭격']},necro:{dive:[IC.skull,'행진','묘지 행진']},porter:{dive:[IC.portal,'낙하','차원 낙하']},baseball:{dive:[IC.ball,'리코셰','리코셰']},volt:{flurry:[IC.zap,'코일','테슬라 코일'],dive:[IC.beam,'레일건','레일건']},bard:{dive:[IC.note,'다이브','스테이지 다이브']},frost:{dive:[IC.ice,'빙하기','빙하기']},shade:{blast:[IC.moon,'감옥','그림자 감옥'],dive:[IC.moon,'수확','영혼 수확']},magician:{quake:[IC.card,'고리','마술 고리']},wolf:{flurry:[IC.claw,'무리','늑대 무리']}};
   for(const k in KN)for(const a in KN[k]){KITN[k]=KITN[k]||{};KITN[k][a]=KN[k][a]}}
 
 /* 피해 보정: 우체부 특급 · 문어 먹물 */
