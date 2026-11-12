@@ -5118,7 +5118,7 @@ MAGK.spin=function(){kst('w_throw',.45,{times:[.28],fire(){const hp=handPos();cs
     if(s.ret){const dx=p.x-s.x,dh=(p.h+.6)-s.h,d=Math.hypot(dx,dh)||1;s.vx=dx/d*10;s.vh=dh/d*10;if(d<.45){s.life=0;p.cd.spin*=.5;ftext(p.x,p.h+1.3,'캐치!');sfx('clank')}}
     if(Math.random()<dt*25)fx.push({t:'s',x:s.x,y:s.h-.15,vx:rnd(-2,2),vy:rnd(0,2),life:.2,max:.2})},
   onHit(s,e){hitEnemy(e,magOn(e)?14:9,'wpn',Math.sign(s.vx)||1,s.kb);magS(e,1);sparks(e.x,e.h+.5,Math.sign(s.vx)||1,3,.7)}});sfx('clank')}});ftext(p.x,p.h+1.2,'MAGNET SAW',true)};
-MAGK.dash=function(){kst('w_summon',.45,{times:[.15],fire(){p.mArm=60;p.mArmT=G.T+7;p.mArmLive=1;p.mArmAb=0;magShardsFx(p.x,p.h+.6,24);sfx('magnet');sfx('clank');ftext(p.x,p.h+1.5,'방어막 60',true)}});ftext(p.x,p.h+1.2,'METAL ARMOR',true)};
+MAGK.dash=function(){kst('w_summon',.45,{times:[.15],fire(){p.mArm=90;p.mArmT=G.T+9;p.mArmLive=1;p.mArmAb=0;magShardsFx(p.x,p.h+.6,24);sfx('magnet');sfx('clank');ftext(p.x,p.h+1.5,'방어막 90',true)}});ftext(p.x,p.h+1.2,'METAL ARMOR',true)};
 MAGK.quake=function(){const cx=aimX(5.5),h=gnd(cx);kst('w_summon',.5,{times:[.25],fire(){zone({t:'magz',x:cx,h,w:1.6,dur:4.5,tick:.4,n:0,dr:DRW.magz,f(k){k.n++;for(const e of enemies)if(inZone(k,e,1.6)){slowE(e,.6);hitEnemy(e,4,'wpn',Math.sign(e.x-k.x)||1,0);e.x+=(k.x-e.x)*.08;if(k.n%4===0)magS(e,1)}for(const q of eshots)if(q.life>0&&!q.ult&&Math.abs(q.x-k.x)<k.w&&q.h<k.h+2.2){q.life=0;sparks(q.x,q.h,1,4,.6)}}});sfx('magnet')}});ftext(p.x,p.h+1.2,'MAGNETIC FIELD',true)};
 const _mdive=MAGK.dive;MAGK.dive=function(){const cx=aimX(6);_mdive.call(this);setTimeout(()=>{if(!p)return;let n=0;for(const e of enemies)if(alive(e)&&magOn(e)&&Math.abs(e.x-cx)<4.5&&!TY[e.kind].boss){e.x=lerp(e.x,cx,.75);n++;sparks(e.x,e.h+.5,Math.sign(cx-e.x)||1,4,.8)}if(n)ftext(cx,gnd(cx)+2,'끌어당김 x'+n,true)},380)};
 const _mp=MAGP;NEWB.magnet=function(){const c=_mp();const on=c.melee.on;c.melee.on=function(e){on.call(this,e);magS(e,1)};return c}}
@@ -5183,7 +5183,7 @@ DRW.opool=function(c,k,a,X,Yh){const fade=Math.min(1,k.life/.4,(k.max-k.life)/.2
 {const _nh=ncHurt;ncHurt=function(dmg,dir,src){const r=_nh(dmg,dir,src);if(G.cls==='octo'&&(p.oShT||0)>G.T&&src&&src.kind&&alive(src)&&Math.sign(src.x-p.x)===p.face&&G.T-(p.oCtr||-9)>.5&&Math.abs(src.x-p.x)<2.5){p.oCtr=G.T;octTent(p.x,p.h+.6,src.x,src.h+src.size*.5,.3);hitEnemy(src,12,'wpnH',p.face,1.8);ftext(src.x,src.h+src.size+.3,'반격!')}return r}}
 /* ---- 매 프레임: 상태 처리 ---- */
 {const _nt=ncTick;ncTick=function(dt){_nt(dt);if(!p||p.state==='dead')return;const T=G.T;
-  if(G.cls==='magnet'&&p.mArmLive&&(p.mArm<=0||T>p.mArmT)){p.mArmLive=0;const ab=60-Math.max(0,p.mArm||0),n=10;for(let i=0;i<n;i++){const an=i/n*Math.PI*2,d=Math.cos(an)>=0?1:-1;cshot({dr:DRW.ncShard,x:p.x,h:p.h+.6,dir:d,spd:10,ang:Math.atan2(Math.sin(an),Math.abs(Math.cos(an))),dmg:10+Math.round(ab/6),life:.55,kb:1.2,onHit(s,e){hitEnemy(e,s.dmg,'wpnH',Math.sign(s.vx)||1,s.kb);magS(e,1);s.life=0}})}ftext(p.x,p.h+1.5,'파편 폭발!',true);sfx('clank');sfx('boom');ringFx(p.x,p.h+.6,1,4)}
+  if(G.cls==='magnet'&&p.mArmLive&&(p.mArm<=0||T>p.mArmT)){p.mArmLive=0;const ab=90-Math.max(0,p.mArm||0),n=10;for(let i=0;i<n;i++){const an=i/n*Math.PI*2,d=Math.cos(an)>=0?1:-1;cshot({dr:DRW.ncShard,x:p.x,h:p.h+.6,dir:d,spd:10,ang:Math.atan2(Math.sin(an),Math.abs(Math.cos(an))),dmg:10+Math.round(ab/6),life:.55,kb:1.2,onHit(s,e){hitEnemy(e,s.dmg,'wpnH',Math.sign(s.vx)||1,s.kb);magS(e,1);s.life=0}})}ftext(p.x,p.h+1.5,'파편 폭발!',true);sfx('clank');sfx('boom');ringFx(p.x,p.h+.6,1,4)}
   if(G.cls==='camera'){for(const e of enemies)if((e.camMark||0)>T&&!e._cb&&(e.hp<=0||e.state==='dead')){e._cb=1;e.camMark=0;aoe(e.x,e.h,1.3,1.2,20,2.4,'wpnH');camFlashFx(e.x,e.h+.6,1,1.2);camFlashFx(e.x,e.h+.6,-1,1.2);ncPart(e.x,e.h+.6,16,'#ffe36a',3,.5);sfx('shutter');let nb=null,bd=3.5;for(const o of enemies)if(alive(o)&&o!==e){const d=Math.abs(o.x-e.x);if(d<bd){bd=d;nb=o}}if(nb){nb.camMark=T+6;p.camLast={e:nb,x:nb.x,h:nb.h};ftext(nb.x,nb.h+nb.size+.35,'연쇄 포착!',true)}}}
   if(G.cls==='octo'){const H=p.oHold;if(H){if(!alive(H.e)){p.oHold=null}else if(T>H.t){p.oHold=null;const e=H.e;hitEnemy(e,16,'wpnH',p.face,.5);crack(e.x,Math.max(0,gnd(e.x)),.6);dust(e.x,8,1,e.h);sfx('slam')}else{const tx=p.x+p.face*(.75+.12*H.e.size);if(!blockedAt(tx)){H.e.x=tx}H.e.h=p.h+.5;H.e.vx=0;holdE(H.e,.15,'stun');if(Math.random()<.2)octTent(p.x,p.h+.7,H.e.x,H.e.h+.4,.15,.09)}}
     if(p.oSwing&&T>p.oSwing&&p.gnd){p.oSwing=0;aoe(p.x,p.h,1.3,1,18,2.4,'wpnH',null,e=>{e.inkT=G.T+2;e.cd=Math.max(e.cd||0,1.2)});inkCloud(p.x,p.h+.3,1,1.5);dust(p.x,12,1.2,p.h);shake(.2);sfx('slam');ftext(p.x,p.h+1.2,'TENTACLE DROP')}}
@@ -5199,7 +5199,7 @@ DRW.ncstat=function(c,k,a,X,Yh){if(!p||!NCK.includes(G.cls))return;const T=G.T;c
   if(G.cls==='camera'){for(let i=0;i<3;i++){const on=i<(p.film||0);c.fillStyle=on?'#ffe36a':'rgba(0,0,0,.55)';c.strokeStyle='#ffe36a';c.lineWidth=1;c.fillRect(x-U*.27+i*U*.2,y-U*.04,U*.14,U*.1);c.strokeRect(x-U*.27+i*U*.2,y-U*.04,U*.14,U*.1)}}
   if(G.cls==='painter'){const ci=pCi();for(let i=0;i<3;i++){c.fillStyle=PCOL3[i].c;c.globalAlpha=i===ci?1:.3;c.beginPath();c.arc(x+(i-1)*U*.16,y,U*(i===ci?.065:.045),0,Math.PI*2);c.fill()}c.globalAlpha=1}
   if(G.cls==='mailman'){c.fillStyle='rgba(0,0,0,.55)';c.fillRect(x-w/2-1,y-1,w+2,h+2);if(mailExp()){c.fillStyle=Math.floor(T*12)%2?'#fff':'#5ab0ff';c.fillRect(x-w/2,y,w*(p.mExp-T)/6,h);c.font=`700 ${Math.round(U*.14)}px ${FONT.disp}`;c.textAlign='center';c.fillStyle='#9fd0ff';c.fillText('특급 모드',x,y-U*.05)}else{c.fillStyle='#5ab0ff';c.fillRect(x-w/2,y,w*(p.mG||0)/12,h)}}
-  if(G.cls==='magnet'&&p.mArmLive&&p.mArm>0){c.fillStyle='rgba(0,0,0,.55)';c.fillRect(x-w/2-1,y-1,w+2,h+2);c.fillStyle='#d8dde6';c.fillRect(x-w/2,y,w*p.mArm/60,h)}
+  if(G.cls==='magnet'&&p.mArmLive&&p.mArm>0){c.fillStyle='rgba(0,0,0,.55)';c.fillRect(x-w/2-1,y-1,w+2,h+2);c.fillStyle='#d8dde6';c.fillRect(x-w/2,y,w*p.mArm/90,h)}
   c.restore()};
 XULT.camera={init(u){u.f=p.face;u.snaps=[];u.fired=0;sfx('shutter')},
   up(u,t,dt){p.pultPose='w_gun';p.pst=.1;p.pdur=1;G.pdim=Math.max(G.pdim||0,.5);
@@ -6495,6 +6495,55 @@ const PNTDR=[{n:'MONSTER!',s:PNTULT.slice(),e:[[.43,.41],[.57,.41]]},
 let PNTBAG=[],PNTLAST=-1;
 {const _q=XULT.painter;XULT.painter=Object.assign({},_q,{init(u){if(!PNTBAG.length){PNTBAG=PNTDR.map((_,i)=>i).filter(i=>i!==PNTLAST);for(let i=PNTBAG.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[PNTBAG[i],PNTBAG[j]]=[PNTBAG[j],PNTBAG[i]]}}const i=PNTBAG.pop();PNTLAST=i;const d=PNTDR[i];PNTULT.length=0;PNTULT.push(...d.s);PNTEYE.length=0;PNTEYE.push(...d.e);u.pname=d.n;_q.init(u)},
   up(u,t,dt){_q.up(u,t,dt);if(t>=2.05&&!u.pn){u.pn=1;ftext(p.x,p.h+2.2,u.pname,true)}}})}
+
+/* ================= 자석 인간 개편: 자화 5단 · 자기 폭발 · 과충전 ================= */
+magS=function(e,n){if(!alive(e))return;e.magS=Math.min(5,((e.magT||0)>G.T?e.magS||0:0)+(n||1));e.magT=G.T+6};
+function mgOver(){return (p.mgO||0)>G.T}
+let MGB=0;
+function mgBurst(e){e.magS=0;e.magT=0;e.mgImm=G.T+2;e.mgf=0;holdE(e,.8,'stun');magShardsFx(e.x,e.h+.6,24);ringFx(e.x,e.h+.6,1.5,5);ftext(e.x,e.h+e.size+.5,'MAG BURST!',true);shake(.25);sfx('clank');sfx('boom');
+  MGB=1;try{aoe(e.x,e.h,1.5,1.4,24,3,'wpnH')}finally{MGB=0}
+  for(let i=0;i<4;i++)cshot({dr:DRW.ncShard,x:e.x,h:e.h+.6,dir:i%2?1:-1,spd:11,ang:rnd(-.3,.6),dmg:8,life:.6,kb:1,onHit(s,o){if(o===e)return;MGB=1;try{hitEnemy(o,s.dmg,'wpn',Math.sign(s.vx)||1,s.kb)}finally{MGB=0}s.life=0}})}
+function mgDmg(e,dmg,kind){if(!e||dmg<=0||e.kind==='hero'||!alive(e))return dmg;if(magOn(e))dmg*=1+.07*e.magS;if(MGB)return dmg;const T=G.T;
+  if((e.mgImm||0)<=T){e.mgf=(e.mgf||0)+Math.min(2,Math.max(.3,dmg/12))*(mgOver()?2:1);while(e.mgf>=1){e.mgf-=1;magS(e,1)}if((e.magS||0)>=5)mgBurst(e)}
+  if(!mgOver()){p.mgM=Math.min(100,(p.mgM||0)+dmg*.32);if(p.mgM>=100){p.mgM=0;p.mgO=T+6;ftext(p.x,p.h+1.6,'OVERCHARGE',true);for(const r of[1,2])ringFx(p.x,p.h+.6,r,5);sfx('magnet')}}
+  return dmg}
+{const _nd=ncDmg;ncDmg=function(e,dmg,kind){dmg=_nd(e,dmg,kind);if(G.cls==='magnet')dmg=mgDmg(e,dmg,kind);return dmg}}
+function mgTick(dt){if(p.state==='dead')return;const T=G.T;
+  if(p.pult&&p.pult.k==='magnet'){if(!p._mgU){p._mgU=1;p.mgO=Math.max(p.mgO||0,T+8)}}else p._mgU=0;
+  if(mgOver()){for(const k in p.cd)if(p.cd[k]>0)p.cd[k]=Math.max(0,p.cd[k]-dt*.6);p.mgTk=(p.mgTk||0)-dt;
+    for(const e of enemies)if(alive(e)&&magOn(e)&&!TY[e.kind].boss&&Math.abs(e.x-p.x)<4.5&&Math.abs(e.x-p.x)>1&&Math.abs(e.h-p.h)<2){const d=Math.sign(p.x-e.x),nx=e.x+d*1.4*dt;if(!blockedAt(nx))e.x=nx}
+    if(p.mgTk<=0){p.mgTk=.4;for(const e of enemies)if(alive(e)&&Math.abs(e.x-p.x)<1.3+.12*e.size&&Math.abs(e.h-p.h)<1.4){hitEnemy(e,6,'wpn',Math.sign(e.x-p.x)||1,.4)}}}
+  let m=kfx.find(k=>k.t==='mgmeter');if(!m){m={t:'mgmeter',life:99,max:99,dr:DRW.mgmeter};kfx.push(m)}m.life=99}
+{const _nt=ncTick;ncTick=function(dt){_nt(dt);try{if(G.cls==='magnet'&&p&&G.mode==='play')mgTick(dt)}catch(_){}}}
+DRW.mgmeter=function(c,k,a,X,Yh){if(!p||G.cls!=='magnet'||G.mode!=='play'||p.state==='dead')return;const o=mgOver();
+  if(o){for(let i=0;i<6;i++){const an=G.T*6+i*Math.PI/3,r=1.15;DRW.ncShard(c,{vx:-Math.sin(an),vh:Math.cos(an),sc:1.1},X(p.x+Math.cos(an)*r),Yh(p.h+.65+Math.sin(an)*r*.55))}}
+  if(p.pult)return;const S=p.size||HERO,x=X(p.x),y=Yh(p.h+S*1.32+.34),w=U*.62,h=Math.max(3,U*.06);c.save();c.globalAlpha=.9;c.fillStyle='rgba(0,0,0,.55)';c.fillRect(x-w/2-1,y-1,w+2,h+2);
+  const v=o?(p.mgO-G.T)/6:(p.mgM||0)/100;c.fillStyle=o?(Math.sin(G.T*14)>0?'#ffffff':'#ff5a5a'):'#ff5a5a';c.fillRect(x-w/2,y,w*Math.min(1,v),h);if(o){c.shadowColor='#ff5a5a';c.shadowBlur=10;c.strokeStyle='#ffd0d0';c.lineWidth=1;c.strokeRect(x-w/2-1,y-1,w+2,h+2)}c.restore()};
+/* 기본 공격: 세 번째마다 레일 펀치 · 과충전 중 파편 추가 */
+{const _b=NEWB.magnet;NEWB.magnet=function(){const c=_b();p.mgN=(p.mgN||0)+1;const hv=p.mgN%3===0,ov=mgOver();c.melee.dmg=Math.round(c.melee.dmg*1.2);const f0=c.fire;
+  c.fire=function(){if(f0)f0.call(this);if(hv||ov){const hp=handPos(),n=ov?3:1;for(let i=0;i<n;i++){const big=hv&&i===(n-1)/2|0;cshot({dr:DRW.ncShard,x:hp.x,h:hp.h,spd:15,ang:(i-(n-1)/2)*.1,dmg:hv?22:10,life:.8,kb:1.4,sc:hv?2.2:1,pierce:hv?1:0,rehit:9,onHit(s,e){hitEnemy(e,s.dmg,hv?'wpnH':'wpn',Math.sign(s.vx)||p.face,s.kb);magS(e,1);if(!hv)s.life=0}})}if(hv){ftext(p.x,p.h+1.3,'RAIL PUNCH',true);sfx('clank')}}};return c}}
+/* 새 기술 */
+MAGK.blast=function(){const d=p.face,hp=handPos();kst('w_gun',.45,{times:[.15],fire(){const hit=new Set();kfx.push({t:'mfist',x:p.x+d*.5,h:p.h+.65,d,dist:0,ret:0,life:2,max:2,
+    dr(c,k,a,X,Yh){const x=X(k.x),y=Yh(k.h),s=U*.32;c.save();c.translate(x,y);c.scale(k.d,1);c.fillStyle='#d8dde6';c.strokeStyle='#ffffff';c.lineWidth=1.5;c.shadowColor='#ff5a5a';c.shadowBlur=14;c.beginPath();c.moveTo(-s*1.4,-s*.5);c.lineTo(s*.2,-s*.6);c.quadraticCurveTo(s*1.1,-s*.6,s*1.1,0);c.quadraticCurveTo(s*1.1,s*.6,s*.2,s*.6);c.lineTo(-s*1.4,s*.5);c.closePath();c.fill();c.stroke();c.strokeStyle='#e04a4a';c.lineWidth=3;for(const yy of[-.3,0,.3]){c.beginPath();c.moveTo(s*.35,yy*s);c.lineTo(s*.9,yy*s);c.stroke()}c.fillStyle='rgba(255,140,60,.8)';c.beginPath();c.moveTo(-s*1.4,-s*.35);c.lineTo(-s*(2+Math.random()*.6),0);c.lineTo(-s*1.4,s*.35);c.fill();c.restore()},
+    up(k,dt){if(!k.ret){const st=13*dt;k.x+=k.d*st;k.dist+=st;if(Math.random()<.5)magShardsFx(k.x,k.h,1);for(const e of enemies)if(alive(e)&&!hit.has(e)&&Math.abs(e.x-k.x)<.5+.12*e.size&&k.h>e.h-.2&&k.h<e.h+e.size+.3){hit.add(e);hitEnemy(e,24,'wpnH',k.d,3);launch(e,3);sparks(e.x,e.h+.6,k.d,8,1.2);sfx('punch')}
+      if(k.dist>6.5||blockedAt(k.x+k.d*.3)){k.ret=1;k.life=.4;aoe(k.x,k.h-.6,1.4,1.4,22,3,'wpnH',null,e=>magS(e,2));for(const r of[.6,1.2])ringFx(k.x,k.h,r,5);magShardsFx(k.x,k.h,20);shake(.3);sfx('boom')}}}});sfx('magnet');sfx('swing')}});ftext(p.x,p.h+1.2,'ROCKET FIST',true)};
+MAGK.flurry=function(){const ts=enemies.filter(e=>alive(e)&&magOn(e)&&Math.abs(e.x-p.x)<7.5&&Math.abs(e.h-p.h)<3);if(!ts.length){const n=nearest(6);if(n)ts.push(n)}if(!ts.length){ftext(p.x,p.h+1.2,'NO TARGET');p.cd.flurry=.4;return}
+  kst('w_summon',1.4,{});sfx('magnet');for(const e of ts)holdE(e,1.5,'stun');
+  kfx.push({t:'mchain',es:ts,tk:0,ag:0,life:1.6,max:1.6,dr(c,k,a,X,Yh){if(!p||k.done)return;const x0=X(p.x+p.face*.4),y0=Yh(p.h+.7);c.save();for(const e of k.es){if(!alive(e))continue;sk2Bolt(c,x0,y0,X(e.x),Yh(e.h+e.size*.55),'#ff5a5a',2.5);c.fillStyle='#ffd0d0';c.beginPath();c.arc(X(e.x),Yh(e.h+e.size*.55),U*.07,0,Math.PI*2);c.fill()}c.restore()},
+    up(k,dt){k.ag+=dt;k.tk-=dt;const es=k.es.filter(alive);if(k.ag<1.2){if(k.tk<=0){k.tk=.25;for(const e of es){hitEnemy(e,2+1.5*(e.magS||1),'wpn',Math.sign(p.x-e.x)||1,0)}sfx('zap')}}
+      else if(!k.done){k.done=1;const tx=p.x+p.face*1.1;for(const e of es){if(!TY[e.kind].boss&&!blockedAt(tx)){e.x=tx;e.h=Math.max(e.h,gnd(tx))}const st=e.magS||0;hitEnemy(e,30+6*st,'wpnH',p.face,3.5);launch(e,4)}magShardsFx(tx,p.h+.6,26);ringFx(tx,p.h+.6,1.4,6);G.flash=Math.max(G.flash||0,.2);shake(.45);sfx('boom');sfx('clank');ftext(tx,p.h+2,'CRASH!',true)}}});
+  ftext(p.x,p.h+1.2,'MAGNET CHAIN',true)};
+/* 강화: 철편 · 갑옷 · 철구 */
+MAGK.kick=function(){const air=!p.gnd;kst('w_throw',.45,{times:[.3],fire(){const hp=handPos();for(let i=0;i<7;i++)cshot({dr:DRW.ncShard,life:.65,kb:1,h:hp.h,x:hp.x,spd:13,ang:(air?-.55:0)+(i-3)*.11,dmg:11,onHit(s,e){hitEnemy(e,s.dmg,'wpn',Math.sign(s.vx)||p.face,s.kb);magS(e,1);sparks(e.x,e.h+.5,Math.sign(s.vx)||1,4,.8);s.life=0}});sfx('clank');sfx('swing')}});ftext(p.x,p.h+1.2,air?'SHARD RAIN':'IRON SHARDS',true)};
+{const _md=MAGK.dive;MAGK.dive=function(){const cx=aimX(6),h=gnd(cx);_md.call(this);kfx.push({t:'mdv2',ag:0,life:1.6,max:1.6,dr(){},up(k,dt){k.ag+=dt;if(k.ag>=1.05&&!k.done){k.done=1;aoe(cx,h,2.4,1.4,24,2,'wpnH',null,e=>magS(e,2));groundWave(cx,h,2.4);for(let i=0;i<8;i++){const an=i/8*Math.PI*2;cshot({dr:DRW.ncShard,x:cx,h:h+.4,dir:Math.cos(an)>=0?1:-1,spd:11,ang:Math.abs(Math.sin(an))*.8,dmg:12,life:.7,kb:1.2,onHit(s,e){hitEnemy(e,s.dmg,'wpn',Math.sign(s.vx)||1,s.kb);magS(e,1);s.life=0}})}}}})}}
+Object.assign(UCLS.magnet,{blast:['ROCKET FIST','거대한 강철 주먹을 로켓처럼 날려 지나가는 적을 모두 치고, 끝에서 폭발해 자화를 2 쌓아요'],flurry:['MAGNET CHAIN','자화된 적들을 붉은 사슬로 묶어 계속 감전시킨 뒤, 내 앞으로 끌어와 한꺼번에 들이받아요. 자화가 많을수록 세져요']});
+UCLS.magnet.dive[1]='거대한 철구를 떨어뜨리고, 착지 후 파편이 사방으로 튀어요. 자화된 적은 떨어지는 곳으로 끌려와요';
+Object.assign(KITN.magnet,{blast:[IC.magnet,'주먹','로켓 주먹'],flurry:[IC.shard,'사슬','자력 사슬']});
+CTD.magnet.kick='금속 파편 7개를 부채꼴로 발사해요. 공중에서 쓰면 아래로 쏟아져요. 맞은 적에게 자화 스택이 쌓여요';
+CTD.magnet.dash='9초 동안 피해를 90까지 막고, 깨지거나 끝나면 파편이 사방으로 터져요';
+CLS.magnet.desc='1번 공격으로 자석 주먹을 날리고, 세 번째마다 꿰뚫는 레일 펀치가 나가요. 모든 공격이 자화를 쌓아 5번 쌓이면 적이 자기 폭발을 일으키고, 자화된 적은 더 아파해요. 자력 게이지가 가득 차면 6초 동안 과충전 상태가 돼요.';
+CLS.magnet.sd='자화를 쌓아 터뜨리고, 사슬로 끌어당겨 박살 내는 자석 전투가.';try{CLSSD.magnet=CLS.magnet.sd}catch(_){}
+CLSM.magnet=[1.15,1.25];
 
 requestAnimationFrame(frame);
 })();
