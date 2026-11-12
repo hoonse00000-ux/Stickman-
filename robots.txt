@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://hoonse00000-ux.github.io/Stickman-/sitemap.xml
